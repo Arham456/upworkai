@@ -8,44 +8,11 @@ import {
   Search,
 } from "lucide-react";
 
-const stats = [
-  {
-    label: "Total Proposals Written",
-    value: "0",
-    icon: FileText,
-    description: "Proposals sent to clients",
-    color: "text-green-400",
-    bg: "bg-green-400/10",
-    border: "border-green-400/20",
-  },
-  {
-    label: "Win Rate",
-    value: "0%",
-    icon: TrendingUp,
-    description: "Proposals that converted",
-    color: "text-blue-400",
-    bg: "bg-blue-400/10",
-    border: "border-blue-400/20",
-  },
-  {
-    label: "Connects Saved",
-    value: "0",
-    icon: Zap,
-    description: "Connects not wasted on bad fits",
-    color: "text-yellow-400",
-    bg: "bg-yellow-400/10",
-    border: "border-yellow-400/20",
-  },
-  {
-    label: "Jobs Analyzed",
-    value: "0",
-    icon: Search,
-    description: "Jobs scored by AI",
-    color: "text-purple-400",
-    bg: "bg-purple-400/10",
-    border: "border-purple-400/20",
-  },
-];
+interface Props {
+  totalProposals: number;
+  winRate: number;
+  jobsAnalyzed: number;
+}
 
 const container: Variants = {
   hidden: {},
@@ -59,7 +26,46 @@ const item: Variants = {
   show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } },
 };
 
-export function StatsCards() {
+export function StatsCards({ totalProposals, winRate, jobsAnalyzed }: Props) {
+  const stats = [
+    {
+      label: "Total Proposals Written",
+      value: String(totalProposals),
+      icon: FileText,
+      description: "Proposals sent to clients",
+      color: "text-green-400",
+      bg: "bg-green-400/10",
+      border: "border-green-400/20",
+    },
+    {
+      label: "Win Rate",
+      value: `${winRate}%`,
+      icon: TrendingUp,
+      description: "Proposals that converted",
+      color: "text-blue-400",
+      bg: "bg-blue-400/10",
+      border: "border-blue-400/20",
+    },
+    {
+      label: "Connects Saved",
+      value: String(jobsAnalyzed),
+      icon: Zap,
+      description: "Connects not wasted on bad fits",
+      color: "text-yellow-400",
+      bg: "bg-yellow-400/10",
+      border: "border-yellow-400/20",
+    },
+    {
+      label: "Jobs Analyzed",
+      value: String(jobsAnalyzed),
+      icon: Search,
+      description: "Jobs scored by AI",
+      color: "text-purple-400",
+      bg: "bg-purple-400/10",
+      border: "border-purple-400/20",
+    },
+  ];
+
   return (
     <motion.div
       variants={container}
