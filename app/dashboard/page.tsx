@@ -19,8 +19,8 @@ export default async function DashboardPage() {
     <div className="flex h-screen bg-zinc-950 overflow-hidden">
       <Sidebar />
 
-      <main className="flex-1 overflow-y-auto">
-        <div className="max-w-5xl mx-auto px-6 py-8 space-y-8">
+      <main className="flex-1 overflow-y-auto pt-14 md:pt-0">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-8">
           <div>
             <h1 className="text-2xl font-bold text-white">
               Welcome back, {firstName} 👋

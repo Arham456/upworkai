@@ -194,7 +194,7 @@ export function ProposalWriter({ job }: Props) {
       <button
         onClick={handleGenerate}
         disabled={!canGenerate || isGenerating}
-        className="flex items-center gap-2 rounded-lg bg-green-500 px-5 py-2.5 text-sm font-semibold text-zinc-950 hover:bg-green-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        className="flex w-full sm:w-auto justify-center items-center gap-2 rounded-lg bg-green-500 px-5 py-2.5 text-sm font-semibold text-zinc-950 hover:bg-green-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
         {isGenerating ? (
           <>

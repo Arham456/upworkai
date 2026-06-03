@@ -102,8 +102,8 @@ export default function AnalyzePage() {
     <div className="flex h-screen bg-zinc-950 overflow-hidden">
       <Sidebar />
 
-      <main className="flex-1 overflow-y-auto">
-        <div className="max-w-3xl mx-auto px-6 py-10 space-y-8">
+      <main className="flex-1 overflow-y-auto pt-14 md:pt-0">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-10 space-y-8">
           <div>
             <h1 className="text-2xl font-bold text-white">Analyze Job</h1>
             <p className="text-zinc-400 mt-1 text-sm">

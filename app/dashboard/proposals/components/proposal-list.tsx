@@ -126,7 +126,7 @@ export function ProposalList({ initialProposals }: Props) {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-end justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-end gap-3 justify-between">
         <div>
           <h1 className="text-2xl font-bold text-white">My Proposals</h1>
           <p className="text-zinc-400 mt-1 text-sm">

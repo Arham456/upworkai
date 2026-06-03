@@ -43,7 +43,7 @@ export default function Home() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="text-5xl sm:text-6xl font-bold tracking-tight text-white leading-[1.1]"
+          className="text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.1]"
         >
           Write Winning Upwork
           <br />
@@ -69,7 +69,7 @@ export default function Home() {
           <button
             onClick={() => signIn("google")}
             disabled={status === "loading"}
-            className="group flex items-center gap-3 rounded-full bg-white px-7 py-3.5 text-base font-semibold text-zinc-900 shadow-lg transition-all duration-200 hover:bg-zinc-100 hover:shadow-xl hover:scale-[1.02] disabled:opacity-60 disabled:cursor-not-allowed"
+            className="group flex w-full sm:w-auto items-center justify-center gap-3 rounded-full bg-white px-7 py-3.5 text-base font-semibold text-zinc-900 shadow-lg transition-all duration-200 hover:bg-zinc-100 hover:shadow-xl hover:scale-[1.02] disabled:opacity-60 disabled:cursor-not-allowed"
           >
             <GoogleIcon />
             Continue with Google
