@@ -9,6 +9,8 @@ export async function POST() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    console.log("[checkout] TOKEN:", process.env.POLAR_ACCESS_TOKEN?.slice(0, 10));
+
     const token = process.env.POLAR_ACCESS_TOKEN;
     const productId = process.env.POLAR_PRODUCT_ID;
     const polarServer = process.env.POLAR_SERVER ?? "sandbox";
