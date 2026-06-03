@@ -28,7 +28,7 @@ export default async function ProposalsPage() {
   });
 
   // Serialize dates before passing to Client Component
-  const serialized = proposals.map((p) => ({
+  const serialized = proposals.map((p: typeof proposals[number]) => ({
     ...p,
     createdAt: p.createdAt.toISOString(),
   }));
