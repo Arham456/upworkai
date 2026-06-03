@@ -1,6 +1,5 @@
 import { getServerSession } from "next-auth/next";
 import { NextResponse } from "next/server";
-import { Polar } from "@polar-sh/sdk";
 import { authOptions } from "@/lib/auth";
 
 export async function POST() {
@@ -10,29 +9,67 @@ export async function POST() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    if (!process.env.POLAR_ACCESS_TOKEN || !process.env.POLAR_PRODUCT_ID) {
+    const token = process.env.POLAR_ACCESS_TOKEN;
+    const productId = process.env.POLAR_PRODUCT_ID;
+    const polarServer = process.env.POLAR_SERVER ?? "sandbox";
+
+    console.log("[checkout] token present:", !!token);
+    console.log("[checkout] productId:", productId);
+    console.log("[checkout] server:", polarServer);
+
+    if (!token || !productId) {
       return NextResponse.json(
-        { error: "Polar is not configured" },
+        { error: "Polar is not configured (missing POLAR_ACCESS_TOKEN or POLAR_PRODUCT_ID)" },
         { status: 500 },
       );
     }
 
-    const polar = new Polar({
-      accessToken: process.env.POLAR_ACCESS_TOKEN,
-      server: (process.env.POLAR_SERVER as "sandbox" | "production") ?? "sandbox",
+    const baseUrl =
+      polarServer === "production"
+        ? "https://api.polar.sh"
+        : "https://sandbox-api.polar.sh";
+
+    const body = {
+      products: [productId],
+      external_customer_id: session.user.id,
+      customer_email: session.user.email ?? undefined,
+      customer_name: session.user.name ?? undefined,
+      success_url: `${process.env.NEXTAUTH_URL}/dashboard?upgraded=true`,
+    };
+
+    console.log("[checkout] POST", `${baseUrl}/v1/checkouts/`, JSON.stringify(body));
+
+    const res = await fetch(`${baseUrl}/v1/checkouts/`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify(body),
+      // Disable Next.js fetch caching for this request
+      cache: "no-store",
     });
 
-    const checkout = await polar.checkouts.create({
-      products: [process.env.POLAR_PRODUCT_ID],
-      externalCustomerId: session.user.id,
-      customerEmail: session.user.email ?? undefined,
-      customerName: session.user.name ?? undefined,
-      successUrl: `${process.env.NEXTAUTH_URL}/dashboard?upgraded=true`,
-    });
+    const data = await res.json() as Record<string, unknown>;
 
-    return NextResponse.json({ checkoutUrl: checkout.url });
+    console.log("[checkout] Polar response status:", res.status);
+    console.log("[checkout] Polar response body:", JSON.stringify(data));
+
+    if (!res.ok) {
+      const detail = (data.detail as string) ?? (data.error as string) ?? JSON.stringify(data);
+      return NextResponse.json(
+        { error: `Polar API error (${res.status}): ${detail}` },
+        { status: 500 },
+      );
+    }
+
+    const checkoutUrl = data.url as string;
+    return NextResponse.json({ checkoutUrl });
   } catch (err) {
-    console.error("[checkout] Error:", err);
+    const cause = err instanceof Error ? (err as NodeJS.ErrnoException).cause : undefined;
+    console.error("[checkout] Unhandled error:", err);
+    console.error("[checkout] Error cause:", cause);
     const message = err instanceof Error ? err.message : "Unexpected error";
     return NextResponse.json({ error: message }, { status: 500 });
   }
