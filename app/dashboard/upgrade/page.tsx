@@ -7,19 +7,19 @@ import { Sidebar } from "../components/sidebar";
 import { CheckoutButton } from "./components/checkout-button";
 
 const FREE_FEATURES = [
-  { text: "5 proposals / month", included: true },
-  { text: "Job analyzer", included: true },
+  { text: "5 proposals to get your first win", included: true },
+  { text: "3 job analyses", included: true },
   { text: "Win / loss tracking", included: true },
   { text: "Profile setup", included: true },
   { text: "Unlimited proposals", included: false },
-  { text: "Priority support", included: false },
+  { text: "No watermark", included: false },
 ];
 
 const PRO_FEATURES = [
   { text: "Unlimited proposals", included: true },
   { text: "Unlimited job analysis", included: true },
+  { text: "No watermark on proposals", included: true },
   { text: "Win / loss tracking", included: true },
-  { text: "Profile setup", included: true },
   { text: "AI tone matching from samples", included: true },
   { text: "Priority support", included: true },
 ];
@@ -125,7 +125,7 @@ export default async function UpgradePage() {
                   )}
                 </div>
                 <p className="mt-2 text-3xl font-bold text-white">
-                  $9
+                  $14
                   <span className="text-base font-normal text-zinc-500"> / month</span>
                 </p>
               </div>

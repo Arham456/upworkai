@@ -26,17 +26,19 @@ export async function POST(request: NextRequest) {
       jobDescription?: string;
     };
 
-    // Enforce free-tier limit (5 proposals total)
+    // Enforce free-tier limit (5 proposals lifetime)
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
       select: { plan: true },
     });
-    if (user?.plan !== "pro") {
+    const isFreePlan = user?.plan !== "pro";
+    if (isFreePlan) {
       const count = await prisma.proposal.count({ where: { userId: session.user.id } });
       if (count >= 5) {
         return Response.json(
           {
-            error: "Upgrade to Pro to write unlimited proposals",
+            error:
+              "You've used all 5 free proposals. Free plan was designed to get you your first win. If it worked — Pro is how you keep winning. $14/month — less than what you earn in one hour.",
             upgradeRequired: true,
           },
           { status: 403 },
@@ -122,6 +124,13 @@ Write a compelling, personalized proposal. Address the client's core concern dir
             ) {
               controller.enqueue(encoder.encode(event.delta.text));
             }
+          }
+          if (isFreePlan) {
+            controller.enqueue(
+              encoder.encode(
+                "\n\n---\nWritten with UpworkAI Free · upgrade at upworkai-alpha.vercel.app",
+              ),
+            );
           }
         } catch (streamErr) {
           console.error("[proposal] Stream error:", streamErr);

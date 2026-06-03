@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
+import Link from "next/link";
 import {
   Search,
   Loader2,
@@ -63,12 +64,14 @@ export default function AnalyzePage() {
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [upgradeRequired, setUpgradeRequired] = useState(false);
   const [result, setResult] = useState<AnalysisResult | null>(null);
 
   async function handleAnalyze() {
     if (!description.trim()) return;
     setLoading(true);
     setError(null);
+    setUpgradeRequired(false);
     setResult(null);
 
     try {
@@ -79,7 +82,11 @@ export default function AnalyzePage() {
       });
 
       if (!res.ok) {
-        const data = (await res.json()) as { error?: string };
+        const data = (await res.json()) as { error?: string; upgradeRequired?: boolean };
+        if (data.upgradeRequired) {
+          setUpgradeRequired(true);
+          return;
+        }
         throw new Error(data.error ?? "Analysis failed");
       }
 
@@ -147,6 +154,22 @@ export default function AnalyzePage() {
               )}
             </button>
           </div>
+
+          {/* Upgrade wall */}
+          {upgradeRequired && (
+            <div className="rounded-xl border border-zinc-700 bg-zinc-900 p-6 space-y-4">
+              <p className="text-zinc-200 leading-relaxed">
+                You&apos;ve analyzed 3 jobs on the free plan. Upgrade to Pro for unlimited job analysis.
+              </p>
+              <Link
+                href="/dashboard/upgrade"
+                className="inline-flex items-center gap-2 rounded-lg bg-green-500 px-5 py-2.5 text-sm font-semibold text-zinc-950 hover:bg-green-400 transition-colors"
+              >
+                Upgrade to Pro
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          )}
 
           {/* Results */}
           <AnimatePresence mode="wait">

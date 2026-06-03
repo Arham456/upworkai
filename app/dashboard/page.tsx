@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth/next";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, Sparkles } from "lucide-react";
+import { ArrowRight, CheckCircle2, Sparkles, Zap } from "lucide-react";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Sidebar } from "./components/sidebar";
@@ -17,7 +17,7 @@ export default async function DashboardPage() {
   const userId = session.user.id;
   const firstName = session.user.name?.split(" ")[0] ?? "there";
 
-  const [totalProposals, wonProposals, jobsAnalyzed, profile] = await Promise.all([
+  const [totalProposals, wonProposals, jobsAnalyzed, profile, user] = await Promise.all([
     prisma.proposal.count({ where: { userId } }),
     prisma.proposal.count({ where: { userId, status: "won" } }),
     prisma.job.count({ where: { userId } }),
@@ -25,10 +25,18 @@ export default async function DashboardPage() {
       where: { userId },
       select: { skills: true, niche: true },
     }),
+    prisma.user.findUnique({
+      where: { id: userId },
+      select: { plan: true },
+    }),
   ]);
 
   const winRate =
     totalProposals > 0 ? Math.round((wonProposals / totalProposals) * 100) : 0;
+
+  const isPro = user?.plan === "pro";
+  const proposalsRemaining = Math.max(0, 5 - totalProposals);
+  const analysesRemaining = Math.max(0, 3 - jobsAnalyzed);
 
   const step1Done = !!(profile && profile.skills.length > 0 && profile.niche);
   const step2Done = jobsAnalyzed > 0;
@@ -61,6 +69,74 @@ export default async function DashboardPage() {
             winRate={winRate}
             jobsAnalyzed={jobsAnalyzed}
           />
+
+          {/* Free plan usage */}
+          {!isPro && (
+            <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-6 space-y-5">
+              <div className="flex items-center justify-between">
+                <h2 className="text-sm font-semibold text-zinc-400 uppercase tracking-wide">
+                  Free Plan Usage
+                </h2>
+                <Link
+                  href="/dashboard/upgrade"
+                  className="flex items-center gap-1.5 rounded-lg bg-green-500/10 border border-green-500/20 px-3 py-1.5 text-xs font-semibold text-green-400 hover:bg-green-500/20 transition-colors"
+                >
+                  <Zap className="w-3 h-3" />
+                  Upgrade — $14/mo
+                </Link>
+              </div>
+
+              <div className="space-y-4">
+                {/* Proposals bar */}
+                <div>
+                  <div className="flex justify-between mb-1.5">
+                    <span className="text-sm text-zinc-300">
+                      {totalProposals} of 5 free proposals used
+                    </span>
+                    <span
+                      className={`text-xs font-medium ${
+                        proposalsRemaining <= 1 ? "text-red-400" : "text-zinc-500"
+                      }`}
+                    >
+                      {proposalsRemaining} remaining
+                    </span>
+                  </div>
+                  <div className="h-1.5 rounded-full bg-zinc-800 overflow-hidden">
+                    <div
+                      className={`h-full rounded-full transition-all ${
+                        proposalsRemaining <= 1 ? "bg-red-500" : "bg-green-500"
+                      }`}
+                      style={{ width: `${Math.min(100, (totalProposals / 5) * 100)}%` }}
+                    />
+                  </div>
+                </div>
+
+                {/* Analyses bar */}
+                <div>
+                  <div className="flex justify-between mb-1.5">
+                    <span className="text-sm text-zinc-300">
+                      {jobsAnalyzed} of 3 free analyses used
+                    </span>
+                    <span
+                      className={`text-xs font-medium ${
+                        analysesRemaining <= 1 ? "text-red-400" : "text-zinc-500"
+                      }`}
+                    >
+                      {analysesRemaining} remaining
+                    </span>
+                  </div>
+                  <div className="h-1.5 rounded-full bg-zinc-800 overflow-hidden">
+                    <div
+                      className={`h-full rounded-full transition-all ${
+                        analysesRemaining <= 1 ? "bg-red-500" : "bg-green-500"
+                      }`}
+                      style={{ width: `${Math.min(100, (jobsAnalyzed / 3) * 100)}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-6">
             <div className="flex items-start gap-4">

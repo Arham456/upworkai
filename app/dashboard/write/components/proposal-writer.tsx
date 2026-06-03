@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   PenLine,
@@ -13,6 +14,7 @@ import {
   Sparkles,
   AlertCircle,
   TrendingUp,
+  ArrowRight,
 } from "lucide-react";
 
 interface Job {
@@ -41,6 +43,7 @@ export function ProposalWriter({ job }: Props) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [proposal, setProposal] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [upgradeRequired, setUpgradeRequired] = useState(false);
   const [copied, setCopied] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [savedId, setSavedId] = useState<string | null>(null);
@@ -52,6 +55,7 @@ export function ProposalWriter({ job }: Props) {
     setIsGenerating(true);
     setProposal("");
     setError(null);
+    setUpgradeRequired(false);
     setSavedId(null);
 
     try {
@@ -65,7 +69,11 @@ export function ProposalWriter({ job }: Props) {
       });
 
       if (!res.ok) {
-        const data = (await res.json()) as { error?: string };
+        const data = (await res.json()) as { error?: string; upgradeRequired?: boolean };
+        if (data.upgradeRequired) {
+          setUpgradeRequired(true);
+          return;
+        }
         throw new Error(data.error ?? "Generation failed");
       }
 
@@ -208,6 +216,23 @@ export function ProposalWriter({ job }: Props) {
           </>
         )}
       </button>
+
+      {/* Upgrade wall */}
+      {upgradeRequired && (
+        <div className="rounded-xl border border-zinc-700 bg-zinc-900 p-6 space-y-4">
+          <p className="text-zinc-200 leading-relaxed">
+            You&apos;ve used all 5 free proposals. Free plan was designed to get you your first win.
+            If it worked — Pro is how you keep winning. $14/month — less than what you earn in one hour.
+          </p>
+          <Link
+            href="/dashboard/upgrade"
+            className="inline-flex items-center gap-2 rounded-lg bg-green-500 px-5 py-2.5 text-sm font-semibold text-zinc-950 hover:bg-green-400 transition-colors"
+          >
+            Upgrade to Pro
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+      )}
 
       {/* Error */}
       {error && (

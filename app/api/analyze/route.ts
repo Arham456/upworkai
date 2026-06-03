@@ -30,6 +30,24 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Job description is required" }, { status: 400 });
     }
 
+    // Enforce free-tier limit (3 job analyses lifetime)
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { plan: true },
+    });
+    if (user?.plan !== "pro") {
+      const analysisCount = await prisma.job.count({ where: { userId: session.user.id } });
+      if (analysisCount >= 3) {
+        return NextResponse.json(
+          {
+            error: "You've analyzed 3 jobs on the free plan. Upgrade to Pro for unlimited job analysis.",
+            upgradeRequired: true,
+          },
+          { status: 403 },
+        );
+      }
+    }
+
     if (!process.env.ANTHROPIC_API_KEY) {
       console.error("[analyze] ANTHROPIC_API_KEY is not set");
       return NextResponse.json(
