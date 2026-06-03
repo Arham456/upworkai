@@ -1,0 +1,145 @@
+import { getServerSession } from "next-auth/next";
+import { NextRequest } from "next/server";
+import Anthropic from "@anthropic-ai/sdk";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+
+const SYSTEM_PROMPT =
+  "You are an expert Upwork proposal writer. Write a proposal that directly addresses the client's core fear, sounds human and personal, and positions the freelancer's specific strengths. Never use generic phrases like 'I am interested in your project'. Open with something that shows you read and understood their specific situation.";
+
+export async function POST(request: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session) {
+      return Response.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (!process.env.ANTHROPIC_API_KEY) {
+      return Response.json(
+        { error: "Server configuration error: ANTHROPIC_API_KEY is not set" },
+        { status: 500 },
+      );
+    }
+
+    const body = (await request.json()) as {
+      jobId?: string;
+      jobDescription?: string;
+    };
+
+    // Enforce free-tier limit (5 proposals total)
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { plan: true },
+    });
+    if (user?.plan !== "pro") {
+      const count = await prisma.proposal.count({ where: { userId: session.user.id } });
+      if (count >= 5) {
+        return Response.json(
+          {
+            error: "Upgrade to Pro to write unlimited proposals",
+            upgradeRequired: true,
+          },
+          { status: 403 },
+        );
+      }
+    }
+
+    const profile = await prisma.profile.findUnique({
+      where: { userId: session.user.id },
+    });
+
+    let job = null;
+    if (body.jobId) {
+      job = await prisma.job.findFirst({
+        where: { id: body.jobId, userId: session.user.id },
+      });
+      if (!job) {
+        return Response.json({ error: "Job not found" }, { status: 404 });
+      }
+    }
+
+    const jobDescription = job?.description ?? body.jobDescription ?? "";
+    if (!jobDescription.trim()) {
+      return Response.json({ error: "Job description is required" }, { status: 400 });
+    }
+
+    const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+
+    const profileSection = profile
+      ? `FREELANCER PROFILE:
+Skills: ${profile.skills.join(", ") || "Not specified"}
+Niche: ${profile.niche || "Not specified"}
+Experience level: ${profile.experience || "Not specified"}
+${
+  profile.sampleProposals.length > 0
+    ? `\nSample proposals (match this tone and style):\n${profile.sampleProposals
+        .slice(0, 2)
+        .join("\n\n---\n\n")}`
+    : ""
+}`
+      : "FREELANCER PROFILE: Not configured — write a strong general proposal.";
+
+    const analysisSection = job
+      ? `
+JOB ANALYSIS (from prior AI analysis):
+Summary: ${job.jobSummary ?? "N/A"}
+Client's core concern: ${job.clientConcern ?? "N/A"}
+Recommended approach: ${job.recommendedApproach ?? "N/A"}
+Competition level: ${job.competitionLevel ?? "N/A"}
+${job.redFlags.length > 0 ? `Red flags to address or avoid: ${job.redFlags.join(", ")}` : "No red flags."}`
+      : "";
+
+    const userMessage = `${profileSection}
+${analysisSection}
+
+FULL JOB DESCRIPTION:
+${jobDescription.trim()}
+
+Write a compelling, personalized proposal. Address the client's core concern directly in the opening sentence. Be specific about their project details. Sound like a real person who has read and understood their situation — not a template.`;
+
+    const stream = client.messages.stream({
+      model: "claude-opus-4-7",
+      max_tokens: 2048,
+      thinking: { type: "adaptive" },
+      system: [
+        {
+          type: "text",
+          text: SYSTEM_PROMPT,
+          cache_control: { type: "ephemeral" },
+        },
+      ],
+      messages: [{ role: "user", content: userMessage }],
+    });
+
+    const encoder = new TextEncoder();
+    const readable = new ReadableStream({
+      async start(controller) {
+        try {
+          for await (const event of stream) {
+            if (
+              event.type === "content_block_delta" &&
+              event.delta.type === "text_delta"
+            ) {
+              controller.enqueue(encoder.encode(event.delta.text));
+            }
+          }
+        } catch (streamErr) {
+          console.error("[proposal] Stream error:", streamErr);
+          const msg =
+            streamErr instanceof Error ? streamErr.message : "Stream failed";
+          controller.enqueue(encoder.encode(`\n\n[Error: ${msg}]`));
+        } finally {
+          controller.close();
+        }
+      },
+    });
+
+    return new Response(readable, {
+      headers: { "Content-Type": "text/plain; charset=utf-8" },
+    });
+  } catch (err) {
+    console.error("[proposal] Unhandled error:", err);
+    const message = err instanceof Error ? err.message : "Unexpected server error";
+    return Response.json({ error: message }, { status: 500 });
+  }
+}
