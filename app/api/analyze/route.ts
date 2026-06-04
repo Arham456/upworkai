@@ -7,6 +7,39 @@ import { prisma } from "@/lib/prisma";
 const SYSTEM_PROMPT =
   "You are an expert Upwork proposal strategist. Analyze job postings and return ONLY a JSON object with no markdown, no explanation. Identify what the client truly fears, the competition level, and the best approach for this specific freelancer profile.";
 
+const OPENING_LINES: Record<string, string[]> = {
+  ghosting: [
+    "I read your post — sounds like reliability has been the real issue, not capability.",
+    "Before I pitch anything, let me address what I think you've experienced: hired and ghosted.",
+    "Three words that killed your last project. Let me show you the opposite in 60 seconds.",
+  ],
+  quality: [
+    "Your spec is more detailed than most — that usually means you've been burned by 'good enough' before.",
+    "I can see quality isn't negotiable here. Let me show you exactly how I enforce it.",
+    "The level of detail in your brief tells me we think alike about what 'done' actually means.",
+  ],
+  deadline: [
+    "I noticed your deadline. It's tight — here's exactly how I'd hit it, day by day.",
+    "Deadlines aren't guidelines for me. Here's my delivery record in 30 seconds.",
+    "Your timeline is workable. Here's the plan, and here's how we handle slippage if it happens.",
+  ],
+  budget: [
+    "You've set a clear budget. I work within it — no scope creep, no invoice surprises.",
+    "Budget clarity means we can move fast. Here's exactly what I'd build for your number.",
+    "I noticed the budget cap. Here's what you get at that rate, nothing left out.",
+  ],
+  communication: [
+    "I update clients before they have to ask. Here's what that looks like day-to-day.",
+    "Daily Slack updates, shared board, 2-hour response — that's my baseline, not a promise.",
+    "You mentioned communication matters. Here's how I've never left a client wondering.",
+  ],
+  other: [
+    "I read your post twice. Here's what I think you actually need versus what you asked for.",
+    "Let me skip the pitch and get straight to how I'd approach your specific situation.",
+    "Your project has a few moving parts. Here's how I'd sequence them to avoid the common mistakes.",
+  ],
+};
+
 interface AnalysisResult {
   matchScore: number;
   clientConcern: string;
@@ -14,6 +47,9 @@ interface AnalysisResult {
   redFlags: string[];
   recommendedApproach: string;
   jobSummary: string;
+  fearType: string;
+  triggerWords: string[];
+  jobCategory: string;
   // full-page mode extras
   jobDescription?: string;
   hireRate?: string | null;
@@ -23,6 +59,7 @@ interface AnalysisResult {
   memberSince?: string | null;
   clientRating?: string | null;
   jobBudget?: string | null;
+  connectsRequired?: number | null;
 }
 
 export async function POST(request: NextRequest) {
@@ -37,6 +74,7 @@ export async function POST(request: NextRequest) {
     const body = (await request.json()) as {
       description?: string;
       fullPageText?: string;
+      connectsRequired?: number;
     };
 
     const isFullPageMode = !!body.fullPageText?.trim();
@@ -98,7 +136,8 @@ export async function POST(request: NextRequest) {
   "clientLocation": <string e.g. "United States" or null if not found>,
   "memberSince": <string e.g. "January 2020" or null if not found>,
   "clientRating": <string e.g. "4.95" or null if not found>,
-  "jobBudget": <string e.g. "$500–$1,000" or null if not found>`
+  "jobBudget": <string e.g. "$500–$1,000" or null if not found>,
+  "connectsRequired": <number | null — connects needed to apply if shown, else null>`
       : "";
 
     const inputLabel = isFullPageMode
@@ -122,7 +161,10 @@ Return a JSON object with these exact keys:
   "competitionLevel": <"Low" | "Medium" | "High">,
   "redFlags": <array of strings — potential issues or concerns>,
   "recommendedApproach": <string — how this freelancer should position themselves>,
-  "jobSummary": <string — 1-2 sentence summary of what the job requires>${clientIntelFields}
+  "jobSummary": <string — 1-2 sentence summary of what the job requires>,
+  "fearType": <"ghosting" | "quality" | "deadline" | "budget" | "communication" | "other">,
+  "triggerWords": <array of strings — words from the job post that signal this fear>,
+  "jobCategory": <string — e.g. "Web Development", "Design", "Writing", "Marketing">${clientIntelFields}
 }`;
 
     const stream = client.messages.stream({
@@ -169,6 +211,8 @@ Return a JSON object with these exact keys:
       ? (analysis.jobDescription?.trim() || inputText)
       : inputText;
 
+    const connectsToStore = body.connectsRequired ?? (isFullPageMode ? (analysis.connectsRequired ?? null) : null);
+
     const job = await prisma.job.create({
       data: {
         userId: session.user.id,
@@ -179,6 +223,8 @@ Return a JSON object with these exact keys:
         redFlags: analysis.redFlags,
         recommendedApproach: analysis.recommendedApproach,
         jobSummary: analysis.jobSummary,
+        jobCategory: analysis.jobCategory ?? null,
+        connectsRequired: connectsToStore,
         status: "analyzed",
         ...(isFullPageMode && {
           hireRate: analysis.hireRate ?? null,
@@ -192,9 +238,32 @@ Return a JSON object with these exact keys:
       },
     });
 
+    await prisma.fearPattern.create({
+      data: {
+        fearType: analysis.fearType,
+        triggerWords: analysis.triggerWords,
+        jobCategory: analysis.jobCategory ?? null,
+        confidence: 0.7,
+      },
+    });
+
+    const similarCount = await prisma.fearPattern.count({
+      where: { fearType: analysis.fearType },
+    });
+    const fearConfidence = Math.min(95, Math.round(similarCount * 15));
+    const fearType = analysis.fearType;
+    const openingLines = OPENING_LINES[fearType] ?? OPENING_LINES.other;
+
     return NextResponse.json({
       ...analysis,
+      connectsRequired: connectsToStore,
       jobId: job.id,
+      fearInsight: {
+        fearType,
+        confidence: fearConfidence,
+        basedOnCount: similarCount,
+        openingLines,
+      },
     });
   } catch (err) {
     console.error("[analyze] Unhandled error:", err);

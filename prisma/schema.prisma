@@ -66,6 +66,7 @@ model Profile {
   sampleProposals String[]
   tone           String?
   winPatterns    String[]
+  voiceDNA       Json?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 }
@@ -92,6 +93,17 @@ model Job {
   memberSince     String?
   clientRating    String?
   jobBudget       String?
+  jobCategory     String?
+  connectsRequired Int?
+}
+
+model FearPattern {
+  id           String   @id @default(cuid())
+  fearType     String
+  triggerWords String[]
+  jobCategory  String?
+  confidence   Float
+  createdAt    DateTime @default(now())
 }
 
 model Proposal {

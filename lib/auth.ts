@@ -17,7 +17,8 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     session({ session, user }) {
       if (session.user) {
-        (session.user as { id?: string }).id = user.id;
+        (session.user as { id?: string; plan?: string }).id = user.id;
+        (session.user as { id?: string; plan?: string }).plan = (user as { plan?: string }).plan ?? "free";
       }
       return session;
     },

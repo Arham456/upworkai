@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 import {
   Search,
   Loader2,
@@ -21,8 +22,24 @@ import {
   Calendar,
   ClipboardList,
   LayoutList,
+  Shield,
+  Zap,
 } from "lucide-react";
 import { Sidebar } from "../components/sidebar";
+
+function parseBudget(budgetStr: string | null | undefined): number {
+  if (!budgetStr) return 0;
+  const clean = budgetStr.replace(/[$,]/g, "");
+  const rangeMatch = clean.match(/(\d+(?:\.\d+)?)\s*[–\-]\s*(\d+(?:\.\d+)?)/);
+  if (rangeMatch) return (parseFloat(rangeMatch[1]) + parseFloat(rangeMatch[2])) / 2;
+  const kMatch = budgetStr.match(/(\d+(?:\.\d+)?)[Kk]/);
+  if (kMatch) return parseFloat(kMatch[1]) * 1000;
+  const plusMatch = clean.match(/(\d+(?:\.\d+)?)\+/);
+  if (plusMatch) return parseFloat(plusMatch[1]);
+  const numMatch = clean.match(/(\d+(?:\.\d+)?)/);
+  if (numMatch) return parseFloat(numMatch[1]);
+  return 0;
+}
 
 type InputMode = "description" | "fullPage";
 
@@ -44,6 +61,13 @@ interface AnalysisResult extends ClientIntel {
   redFlags: string[];
   recommendedApproach: string;
   jobSummary: string;
+  connectsRequired?: number | null;
+  fearInsight?: {
+    fearType: string;
+    confidence: number;
+    basedOnCount: number;
+    openingLines: string[];
+  };
 }
 
 const fadeUp: Variants = {
@@ -76,6 +100,158 @@ function competitionBadge(level: "Low" | "Medium" | "High") {
     High: "bg-red-500/15 text-red-400",
   };
   return styles[level];
+}
+
+function ProBlur({ children, isPro, featureName }: { children: React.ReactNode; isPro: boolean; featureName: string }) {
+  if (isPro) return <>{children}</>;
+  return (
+    <div className="relative rounded-xl overflow-hidden">
+      <div className="blur-sm pointer-events-none select-none opacity-50">{children}</div>
+      <div className="absolute inset-0 flex flex-col items-center justify-center bg-zinc-950/80 rounded-xl">
+        <div className="text-center space-y-3 p-6">
+          <div className="w-10 h-10 rounded-xl bg-green-500/10 border border-green-500/20 flex items-center justify-center mx-auto">
+            <Zap className="w-5 h-5 text-green-400" />
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-white">{featureName}</p>
+            <p className="text-xs text-zinc-400 mt-1">Upgrade to Pro to unlock this insight</p>
+          </div>
+          <Link href="/dashboard/upgrade" className="inline-flex items-center gap-1.5 rounded-lg bg-green-500 px-4 py-2 text-xs font-bold text-zinc-950 hover:bg-green-400 transition-colors">
+            <Zap className="w-3 h-3" />
+            Upgrade to Pro
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function FearInsightCard({ fearInsight, isPro }: { fearInsight: AnalysisResult["fearInsight"]; isPro: boolean }) {
+  const mockFear = {
+    fearType: "ghosting",
+    confidence: 78,
+    basedOnCount: 12,
+    openingLines: [
+      "I read your post — sounds like reliability has been the real issue, not capability.",
+      "Before I pitch anything, let me address what I think you've experienced: hired and ghosted.",
+    ],
+  };
+
+  const data = isPro ? fearInsight : mockFear;
+  if (!data) return null;
+
+  const fearLabel = data.fearType.charAt(0).toUpperCase() + data.fearType.slice(1);
+
+  return (
+    <motion.div variants={fadeUp}>
+      <ProBlur isPro={isPro} featureName="Fear Detection">
+        <div className="rounded-xl border border-orange-500/20 bg-orange-500/5 p-5 space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-xs font-medium text-orange-400 uppercase tracking-wide">
+              <Shield className="w-3.5 h-3.5" />
+              Fear Detection
+            </div>
+            <span className="rounded-full bg-orange-500/15 border border-orange-500/30 px-3 py-1 text-xs font-semibold text-orange-300">
+              {fearLabel} Fear
+            </span>
+          </div>
+
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between text-xs text-zinc-400">
+              <span>{data.confidence}% confident</span>
+              <span>Based on {data.basedOnCount} similar jobs analyzed</span>
+            </div>
+            <div className="h-1.5 rounded-full bg-zinc-800 overflow-hidden">
+              <div
+                className="h-full rounded-full bg-orange-500 transition-all"
+                style={{ width: `${data.confidence}%` }}
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <p className="text-xs font-medium text-zinc-500 uppercase tracking-wide">Top 3 Opening Lines</p>
+            <ol className="space-y-2">
+              {data.openingLines.slice(0, 3).map((line, i) => (
+                <li key={i} className="flex items-start gap-2.5 text-sm text-zinc-300">
+                  <span className="shrink-0 flex h-5 w-5 items-center justify-center rounded-full bg-orange-500/15 border border-orange-500/25 text-xs font-bold text-orange-400">
+                    {i + 1}
+                  </span>
+                  {line}
+                </li>
+              ))}
+            </ol>
+          </div>
+        </div>
+      </ProBlur>
+    </motion.div>
+  );
+}
+
+function ConnectRoiCard({
+  result,
+  connects,
+  isPro,
+}: {
+  result: AnalysisResult;
+  connects: number;
+  isPro: boolean;
+}) {
+  const mockRoi = { winProb: 80, expectedEarnings: 750, roiScore: 125, verdict: "Priority" as const };
+
+  const winProb = result.matchScore * 10;
+  const expectedEarnings = parseBudget(result.jobBudget);
+  const roiScore = connects > 0 ? Math.round((winProb / 100) * expectedEarnings / connects) : 0;
+  const verdict =
+    roiScore >= 60 ? "Priority" : roiScore >= 30 ? "Apply" : roiScore >= 10 ? "Consider" : "Skip";
+
+  const display = isPro
+    ? { winProb, expectedEarnings, roiScore, verdict }
+    : mockRoi;
+
+  const verdictColors = {
+    Skip: "bg-red-500/15 text-red-400 border-red-500/30",
+    Consider: "bg-yellow-500/15 text-yellow-400 border-yellow-500/30",
+    Apply: "bg-green-500/15 text-green-400 border-green-500/30",
+    Priority: "bg-green-500/20 text-green-300 border-green-500/40",
+  };
+
+  return (
+    <motion.div variants={fadeUp}>
+      <ProBlur isPro={isPro} featureName="Connect ROI Score">
+        <div className="rounded-xl border border-yellow-500/20 bg-yellow-500/5 p-5 space-y-4">
+          <div className="flex items-center gap-2 text-xs font-medium text-yellow-400 uppercase tracking-wide">
+            <TrendingUp className="w-3.5 h-3.5" />
+            Connect ROI
+          </div>
+
+          <div className="grid grid-cols-3 gap-3">
+            <div className="rounded-lg bg-zinc-800/50 px-3 py-2.5 space-y-0.5">
+              <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wide">Win Prob.</p>
+              <p className="text-lg font-bold text-yellow-400">{display.winProb}%</p>
+            </div>
+            {display.expectedEarnings > 0 && (
+              <div className="rounded-lg bg-zinc-800/50 px-3 py-2.5 space-y-0.5">
+                <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wide">Expected</p>
+                <p className="text-lg font-bold text-yellow-400">${display.expectedEarnings.toLocaleString()}</p>
+              </div>
+            )}
+            <div className="rounded-lg bg-zinc-800/50 px-3 py-2.5 space-y-0.5">
+              <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wide">ROI/connect</p>
+              <p className="text-lg font-bold text-yellow-400">${display.roiScore}</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-zinc-400">Verdict:</span>
+            <span className={`rounded-full border px-4 py-1 text-sm font-bold ${verdictColors[display.verdict as keyof typeof verdictColors]}`}>
+              {display.verdict}
+            </span>
+          </div>
+        </div>
+      </ProBlur>
+    </motion.div>
+  );
 }
 
 function hasClientIntel(result: AnalysisResult) {
@@ -112,6 +288,8 @@ function IntelItem({
 
 export default function AnalyzePage() {
   const router = useRouter();
+  const { data: session } = useSession();
+  const isPro = session?.user?.plan === "pro";
   const [inputMode, setInputMode] = useState<InputMode>("description");
   const [description, setDescription] = useState("");
   const [fullPageText, setFullPageText] = useState("");
@@ -119,6 +297,7 @@ export default function AnalyzePage() {
   const [error, setError] = useState<string | null>(null);
   const [upgradeRequired, setUpgradeRequired] = useState(false);
   const [result, setResult] = useState<AnalysisResult | null>(null);
+  const [connects, setConnects] = useState(6);
 
   async function handleAnalyze() {
     const inputText = inputMode === "fullPage" ? fullPageText : description;
@@ -135,8 +314,8 @@ export default function AnalyzePage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(
           inputMode === "fullPage"
-            ? { fullPageText: inputText }
-            : { description: inputText },
+            ? { fullPageText: inputText, connectsRequired: connects }
+            : { description: inputText, connectsRequired: connects },
         ),
       });
 
@@ -151,6 +330,9 @@ export default function AnalyzePage() {
 
       const data = (await res.json()) as AnalysisResult;
       setResult(data);
+      if (inputMode === "fullPage" && data.connectsRequired != null) {
+        setConnects(data.connectsRequired);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
@@ -234,6 +416,18 @@ export default function AnalyzePage() {
               rows={inputMode === "fullPage" ? 14 : 10}
               className="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-4 py-3 text-sm text-white placeholder-zinc-500 resize-none focus:outline-none focus:ring-1 focus:ring-green-500/60 focus:border-green-500/60 transition-colors"
             />
+
+            <div className="flex items-center gap-3">
+              <label className="text-sm text-zinc-400 shrink-0">Connects required:</label>
+              <input
+                type="number"
+                min={1}
+                max={100}
+                value={connects}
+                onChange={(e) => setConnects(Math.max(1, parseInt(e.target.value) || 1))}
+                className="w-20 rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-1.5 text-sm text-white text-center focus:outline-none focus:ring-1 focus:ring-green-500/60 focus:border-green-500/60 transition-colors"
+              />
+            </div>
 
             {error && (
               <p className="flex items-center gap-2 text-sm text-red-400">
@@ -417,6 +611,12 @@ export default function AnalyzePage() {
                     <p className="text-sm text-green-300">No red flags detected — looks like a clean posting.</p>
                   </motion.div>
                 )}
+
+                {/* Fear Detection */}
+                <FearInsightCard fearInsight={result.fearInsight} isPro={isPro} />
+
+                {/* Connect ROI */}
+                <ConnectRoiCard result={result} connects={connects} isPro={isPro} />
 
                 {/* CTA */}
                 <motion.div variants={fadeUp}>

@@ -31,10 +31,68 @@ export default async function DashboardPage() {
     }),
   ]);
 
+  const isPro = user?.plan === "pro";
+
+  const weekStart = new Date();
+  weekStart.setDate(weekStart.getDate() - 7);
+  const weeklyJobs = isPro
+    ? await prisma.job.findMany({
+        where: { userId, createdAt: { gte: weekStart } },
+        select: {
+          connectsRequired: true,
+          matchScore: true,
+          jobBudget: true,
+          jobCategory: true,
+          jobSummary: true,
+        },
+      })
+    : [];
+
+  function parseBudgetServer(budgetStr: string | null | undefined): number {
+    if (!budgetStr) return 0;
+    const clean = budgetStr.replace(/[$,]/g, "");
+    const rangeMatch = clean.match(/(\d+(?:\.\d+)?)\s*[–\-]\s*(\d+(?:\.\d+)?)/);
+    if (rangeMatch) return (parseFloat(rangeMatch[1]) + parseFloat(rangeMatch[2])) / 2;
+    const kMatch = budgetStr.match(/(\d+(?:\.\d+)?)[Kk]/);
+    if (kMatch) return parseFloat(kMatch[1]) * 1000;
+    const plusMatch = clean.match(/(\d+(?:\.\d+)?)\+/);
+    if (plusMatch) return parseFloat(plusMatch[1]);
+    const numMatch = clean.match(/(\d+(?:\.\d+)?)/);
+    if (numMatch) return parseFloat(numMatch[1]);
+    return 0;
+  }
+
+  const totalConnects = weeklyJobs.reduce((sum, j) => sum + (j.connectsRequired ?? 6), 0);
+  const totalExpectedValue = Math.round(
+    weeklyJobs.reduce((sum, j) => sum + ((j.matchScore ?? 0) / 10) * parseBudgetServer(j.jobBudget), 0),
+  );
+
+  const categoryRoi: Record<string, { total: number; count: number }> = {};
+  for (const j of weeklyJobs) {
+    const cat = j.jobCategory ?? "Unknown";
+    const connects = j.connectsRequired ?? 6;
+    const earnings = parseBudgetServer(j.jobBudget);
+    const roi = connects > 0 ? ((j.matchScore ?? 0) / 10) * earnings / connects : 0;
+    if (!categoryRoi[cat]) categoryRoi[cat] = { total: 0, count: 0 };
+    categoryRoi[cat].total += roi;
+    categoryRoi[cat].count += 1;
+  }
+
+  const categoryAvgs = Object.entries(categoryRoi).map(([cat, { total, count }]) => ({
+    cat,
+    avg: count > 0 ? total / count : 0,
+  }));
+
+  const bestCategory = categoryAvgs.length > 0
+    ? categoryAvgs.reduce((a, b) => (a.avg >= b.avg ? a : b)).cat
+    : null;
+  const worstCategory = categoryAvgs.length > 1
+    ? categoryAvgs.reduce((a, b) => (a.avg <= b.avg ? a : b)).cat
+    : null;
+
   const winRate =
     totalProposals > 0 ? Math.round((wonProposals / totalProposals) * 100) : 0;
 
-  const isPro = user?.plan === "pro";
   const proposalsRemaining = Math.max(0, 5 - totalProposals);
   const analysesRemaining = Math.max(0, 5 - jobsAnalyzed);
 
@@ -163,6 +221,46 @@ export default async function DashboardPage() {
                   </div>
                 </div>
               </div>
+            </div>
+          )}
+
+          {/* Weekly ROI Report — Pro only */}
+          {isPro && weeklyJobs.length > 0 && (
+            <div className="rounded-xl border border-yellow-500/20 bg-yellow-500/5 p-6 space-y-4">
+              <div className="flex items-center gap-2 text-xs font-medium text-yellow-400 uppercase tracking-wide">
+                <BarChart2 className="w-3.5 h-3.5" />
+                This Week&apos;s ROI
+              </div>
+
+              <div className="grid grid-cols-3 gap-3">
+                <div className="rounded-lg bg-zinc-800/50 px-3 py-2.5 space-y-0.5">
+                  <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wide">Connects Spent</p>
+                  <p className="text-lg font-bold text-yellow-400">{totalConnects}</p>
+                </div>
+                <div className="rounded-lg bg-zinc-800/50 px-3 py-2.5 space-y-0.5">
+                  <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wide">Jobs Analyzed</p>
+                  <p className="text-lg font-bold text-yellow-400">{weeklyJobs.length}</p>
+                </div>
+                <div className="rounded-lg bg-zinc-800/50 px-3 py-2.5 space-y-0.5">
+                  <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wide">Expected Value</p>
+                  <p className="text-lg font-bold text-yellow-400">${totalExpectedValue.toLocaleString()}</p>
+                </div>
+              </div>
+
+              {(bestCategory || worstCategory) && (
+                <div className="flex flex-wrap gap-3 text-sm">
+                  {bestCategory && (
+                    <span className="rounded-full bg-green-500/10 border border-green-500/20 px-3 py-1 text-xs text-green-400">
+                      Best: {bestCategory}
+                    </span>
+                  )}
+                  {worstCategory && worstCategory !== bestCategory && (
+                    <span className="rounded-full bg-red-500/10 border border-red-500/20 px-3 py-1 text-xs text-red-400">
+                      Worst: {worstCategory}
+                    </span>
+                  )}
+                </div>
+              )}
             </div>
           )}
 

@@ -67,6 +67,26 @@ export async function POST(request: NextRequest) {
 
     const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
+    const voiceDNASection = (() => {
+      if (!profile?.voiceDNA) return "";
+      const dna = profile.voiceDNA as {
+        tone?: string;
+        avgSentenceLength?: string;
+        phrasesAlwaysUsed?: string[];
+        phrasesNeverUsed?: string[];
+        structurePattern?: string;
+        uniqueCharacteristics?: string[];
+      };
+      return `
+VOICE DNA (match this writing style exactly):
+Tone: ${dna.tone ?? ""}
+Sentence length: ${dna.avgSentenceLength ?? ""}
+Phrases they always use: ${(dna.phrasesAlwaysUsed ?? []).join(", ")}
+Phrases they NEVER use (avoid these): ${(dna.phrasesNeverUsed ?? []).join(", ")}
+Structure pattern: ${dna.structurePattern ?? ""}
+Key characteristics: ${(dna.uniqueCharacteristics ?? []).join("; ")}`;
+    })();
+
     const profileSection = profile
       ? `FREELANCER PROFILE:
 Skills: ${profile.skills.join(", ") || "Not specified"}
@@ -78,7 +98,7 @@ ${
         .slice(0, 2)
         .join("\n\n---\n\n")}`
     : ""
-}`
+}${voiceDNASection}`
       : "FREELANCER PROFILE: Not configured — write a strong general proposal.";
 
     const clientIntelSection =
