@@ -207,28 +207,22 @@ export default function Home() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7, delay: 0.1, ease }}
-                className="text-4xl sm:text-5xl lg:text-[3.2rem] font-bold tracking-tight leading-[1.1] text-white"
+                className="text-4xl sm:text-5xl lg:text-[3.4rem] font-bold tracking-tight leading-[1.1] text-white"
               >
-                Freelancers Using UpworkAI{" "}
-                <span className="text-green-400">Win Jobs.</span>
+                Stop Losing Jobs to{" "}
                 <br />
-                <span className="text-zinc-400 text-3xl sm:text-4xl lg:text-[2.6rem]">
-                  Everyone Else Just Writes Proposals.
-                </span>
+                <span className="text-green-400">Weaker Freelancers.</span>
               </motion.h1>
 
               <motion.p
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7, delay: 0.2, ease }}
-                className="text-base text-zinc-400 leading-relaxed max-w-[520px]"
+                className="text-lg text-zinc-400 leading-relaxed max-w-[480px]"
               >
-                For $14/month — less than one hour of your work — UpworkAI
-                analyzes client psychology, writes proposals in your exact
-                voice, and tells you which jobs are worth your connects.{" "}
-                <span className="text-zinc-500">
-                  ChatGPT gives you a blank page. We give you a system.
-                </span>
+                UpworkAI reads every job post, finds what the client actually
+                fears, and writes a proposal that makes them choose you —
+                every single time.
               </motion.p>
 
               <motion.ul
@@ -260,11 +254,10 @@ export default function Home() {
                 <button
                   onClick={() => signIn("google")}
                   disabled={status === "loading"}
-                  className="group inline-flex items-center justify-center gap-2.5 rounded-full bg-green-500 hover:bg-green-400 px-7 py-3.5 text-base font-semibold text-zinc-950 shadow-lg shadow-green-500/20 hover:shadow-green-500/35 transition-all duration-200 disabled:opacity-60"
+                  className="group inline-flex items-center justify-center gap-3 rounded-full bg-green-500 hover:bg-green-400 px-9 py-4 text-lg font-bold text-zinc-950 shadow-xl shadow-green-500/25 hover:shadow-green-500/40 transition-all duration-200 disabled:opacity-60"
                 >
-                  <GoogleIcon />
-                  Start for Free
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                  Analyze Your First Job Free
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </button>
                 <p className="text-xs text-zinc-500">
                   Free forever · No credit card · 2 min setup
@@ -564,30 +557,27 @@ export default function Home() {
                       Feature
                     </span>
                   </th>
-                  {/* Competitor columns */}
+                  {/* Competitor columns — invisible spacer keeps baseline aligned with UpworkAI badge */}
                   {[
                     { name: "ChatGPT", price: "$20/mo" },
                     { name: "Grammarly", price: "$30/mo" },
                     { name: "Jasper", price: "$49/mo" },
                   ].map((col) => (
                     <th key={col.name} className="pb-4 px-2 text-center w-[16%]">
-                      <div className="inline-flex flex-col items-center gap-0.5">
+                      <div className="flex flex-col items-center gap-0.5">
+                        <div className="h-[18px]" aria-hidden />
                         <span className="text-sm font-semibold text-zinc-400">{col.name}</span>
                         <span className="text-xs text-zinc-600">{col.price}</span>
                       </div>
                     </th>
                   ))}
-                  {/* UpworkAI column */}
+                  {/* UpworkAI column — badge sits above name in normal flow */}
                   <th className="pb-4 px-2 text-center w-[16%]">
-                    <div className="inline-flex flex-col items-center gap-1">
-                      <div className="relative">
-                        <span className="text-sm font-bold text-green-400">UpworkAI</span>
-                        <div className="absolute -top-4 left-1/2 -translate-x-1/2 whitespace-nowrap">
-                          <span className="text-[9px] bg-green-500 text-zinc-950 font-bold px-2 py-0.5 rounded-full">
-                            Best Value
-                          </span>
-                        </div>
-                      </div>
+                    <div className="flex flex-col items-center gap-0.5">
+                      <span className="text-[9px] bg-green-500 text-zinc-950 font-bold px-2 py-0.5 rounded-full leading-[18px]">
+                        Best Value
+                      </span>
+                      <span className="text-sm font-bold text-green-400">UpworkAI</span>
                       <span className="text-xs text-green-500/70">$14/mo</span>
                     </div>
                   </th>
