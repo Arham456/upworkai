@@ -1,9 +1,9 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ArrowRight,
   BarChart2,
@@ -11,10 +11,12 @@ import {
   PenLine,
   Sparkles,
   Trophy,
+  X,
 } from "lucide-react";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
+// ── Animated shape background ─────────────────────────────
 function ElegantShape({
   className,
   delay = 0,
@@ -56,6 +58,43 @@ function ElegantShape({
   );
 }
 
+// ── Animated counter ──────────────────────────────────────
+function AnimatedCounter({
+  target,
+  prefix = "",
+  suffix = "",
+  duration = 1.8,
+}: {
+  target: number;
+  prefix?: string;
+  suffix?: string;
+  duration?: number;
+}) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-80px" });
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    if (!inView) return;
+    const start = performance.now();
+    const step = (now: number) => {
+      const elapsed = (now - start) / (duration * 1000);
+      const progress = Math.min(elapsed, 1);
+      // ease-out cubic
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setCount(Math.round(eased * target));
+      if (progress < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }, [inView, target, duration]);
+
+  return (
+    <span ref={ref}>
+      {prefix}{count}{suffix}
+    </span>
+  );
+}
+
 export default function Home() {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -79,10 +118,7 @@ export default function Home() {
 
       {/* Animated shape background */}
       <div aria-hidden className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        {/* Ambient glow */}
         <div className="absolute top-[-15%] left-1/2 -translate-x-1/2 w-[900px] h-[600px] rounded-full bg-green-500/10 blur-[140px]" />
-
-        {/* Floating shapes */}
         <ElegantShape
           delay={0.3}
           width={600}
@@ -135,7 +171,6 @@ export default function Home() {
             <span className="font-semibold text-white tracking-tight">UpworkAI</span>
           </div>
 
-          {/* Glowing sign-in button */}
           <div className="relative group">
             <div className="absolute -inset-px rounded-full bg-gradient-to-r from-green-500 to-emerald-400 opacity-0 group-hover:opacity-100 blur-sm transition-all duration-300" />
             <button
@@ -172,20 +207,28 @@ export default function Home() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7, delay: 0.1, ease }}
-                className="text-4xl sm:text-5xl lg:text-[3.4rem] font-bold tracking-tight leading-[1.1] text-white"
+                className="text-4xl sm:text-5xl lg:text-[3.2rem] font-bold tracking-tight leading-[1.1] text-white"
               >
-                Stop Wasting Connects on{" "}
-                <span className="text-green-400">Jobs You&apos;ll Never Win</span>
+                Freelancers Using UpworkAI{" "}
+                <span className="text-green-400">Win Jobs.</span>
+                <br />
+                <span className="text-zinc-400 text-3xl sm:text-4xl lg:text-[2.6rem]">
+                  Everyone Else Just Writes Proposals.
+                </span>
               </motion.h1>
 
               <motion.p
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7, delay: 0.2, ease }}
-                className="text-lg text-zinc-400 leading-relaxed max-w-[480px]"
+                className="text-base text-zinc-400 leading-relaxed max-w-[520px]"
               >
-                UpworkAI scores every job before you apply — so you only bid
-                on jobs you can win.
+                For $14/month — less than one hour of your work — UpworkAI
+                analyzes client psychology, writes proposals in your exact
+                voice, and tells you which jobs are worth your connects.{" "}
+                <span className="text-zinc-500">
+                  ChatGPT gives you a blank page. We give you a system.
+                </span>
               </motion.p>
 
               <motion.ul
@@ -236,12 +279,8 @@ export default function Home() {
               transition={{ duration: 0.9, delay: 0.35, ease }}
               className="relative"
             >
-              {/* Glow behind card */}
               <div className="absolute inset-[-10%] rounded-3xl bg-green-500/8 blur-3xl pointer-events-none" />
-
-              {/* Glass card */}
               <div className="relative rounded-2xl border border-white/10 bg-zinc-900/80 backdrop-blur-xl p-6 shadow-2xl shadow-black/40 space-y-5">
-                {/* Card header */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <span className="relative flex h-2 w-2">
@@ -257,7 +296,6 @@ export default function Home() {
                   </span>
                 </div>
 
-                {/* Score + bars */}
                 <div className="flex items-center gap-4">
                   <div className="flex flex-col items-center justify-center w-[76px] h-[76px] rounded-2xl bg-green-500/10 border border-green-500/20 shrink-0">
                     <span className="text-3xl font-bold text-green-400 leading-none">9</span>
@@ -295,7 +333,6 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* Client fear */}
                 <div className="rounded-xl bg-zinc-800/50 border border-zinc-700/50 px-4 py-3 space-y-1">
                   <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-widest">
                     Client&apos;s Core Fear
@@ -305,7 +342,6 @@ export default function Home() {
                   </p>
                 </div>
 
-                {/* Proposal snippet */}
                 <div className="rounded-xl bg-green-500/5 border border-green-500/20 px-4 py-3 space-y-2">
                   <div className="flex items-center gap-1.5">
                     <Sparkles className="w-3 h-3 text-green-400" />
@@ -329,7 +365,6 @@ export default function Home() {
                   </motion.div>
                 </div>
 
-                {/* Tags */}
                 <div className="flex flex-wrap gap-2">
                   <span className="text-xs bg-zinc-800 border border-zinc-700 text-zinc-400 px-2.5 py-0.5 rounded-full">
                     No budget set
@@ -344,6 +379,53 @@ export default function Home() {
               </div>
             </motion.div>
           </div>
+        </section>
+
+        {/* ── Value banner ─────────────────────────────────── */}
+        <section className="max-w-7xl mx-auto px-6 sm:px-10 pb-20">
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="relative rounded-2xl border border-green-500/20 bg-zinc-900/60 backdrop-blur-sm overflow-hidden"
+          >
+            {/* Glow */}
+            <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 via-transparent to-emerald-500/5 pointer-events-none" />
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-32 bg-green-500/8 blur-3xl pointer-events-none" />
+
+            <div className="relative px-6 sm:px-10 py-10 space-y-8">
+              <p className="text-center text-lg sm:text-xl md:text-2xl font-semibold text-white leading-snug">
+                One extra job won ={" "}
+                <span className="text-green-400">
+                  21 months of UpworkAI paid for
+                </span>
+              </p>
+
+              <div className="grid grid-cols-3 gap-3 sm:gap-5">
+                {[
+                  { label: "Average Upwork job", prefix: "$", target: 300, suffix: "", note: "typical contract" },
+                  { label: "UpworkAI cost", prefix: "$", target: 14, suffix: "/mo", note: "all features included" },
+                  { label: "Your ROI", prefix: "", target: 21, suffix: "x", note: "return on investment" },
+                ].map(({ label, prefix, target, suffix, note }, i) => (
+                  <motion.div
+                    key={label}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.12, duration: 0.5 }}
+                    className="rounded-xl border border-zinc-800 bg-zinc-950/60 px-4 py-5 sm:px-6 sm:py-6 text-center space-y-1.5"
+                  >
+                    <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-green-400 tabular-nums">
+                      <AnimatedCounter target={target} prefix={prefix} suffix={suffix} />
+                    </p>
+                    <p className="text-xs sm:text-sm font-medium text-zinc-200">{label}</p>
+                    <p className="text-[10px] sm:text-xs text-zinc-600">{note}</p>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
         </section>
 
         {/* ── Social proof bar ─────────────────────────────── */}
@@ -446,6 +528,151 @@ export default function Home() {
           </div>
         </section>
 
+        {/* ── Comparison table ─────────────────────────────── */}
+        <section className="max-w-7xl mx-auto px-6 sm:px-10 pb-28 space-y-10">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center space-y-3"
+          >
+            <span className="text-xs font-semibold text-green-400 uppercase tracking-widest">
+              Comparison
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
+              Why UpworkAI Beats Everything Else
+            </h2>
+            <p className="text-zinc-400 max-w-md mx-auto text-sm">
+              More powerful. More personal. Less expensive.
+            </p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="overflow-x-auto"
+          >
+            <table className="w-full min-w-[640px] border-collapse">
+              <thead>
+                <tr>
+                  {/* Feature label column */}
+                  <th className="text-left pb-4 pr-4 w-[36%]">
+                    <span className="text-xs font-semibold text-zinc-500 uppercase tracking-widest">
+                      Feature
+                    </span>
+                  </th>
+                  {/* Competitor columns */}
+                  {[
+                    { name: "ChatGPT", price: "$20/mo" },
+                    { name: "Grammarly", price: "$30/mo" },
+                    { name: "Jasper", price: "$49/mo" },
+                  ].map((col) => (
+                    <th key={col.name} className="pb-4 px-2 text-center w-[16%]">
+                      <div className="inline-flex flex-col items-center gap-0.5">
+                        <span className="text-sm font-semibold text-zinc-400">{col.name}</span>
+                        <span className="text-xs text-zinc-600">{col.price}</span>
+                      </div>
+                    </th>
+                  ))}
+                  {/* UpworkAI column */}
+                  <th className="pb-4 px-2 text-center w-[16%]">
+                    <div className="inline-flex flex-col items-center gap-1">
+                      <div className="relative">
+                        <span className="text-sm font-bold text-green-400">UpworkAI</span>
+                        <div className="absolute -top-4 left-1/2 -translate-x-1/2 whitespace-nowrap">
+                          <span className="text-[9px] bg-green-500 text-zinc-950 font-bold px-2 py-0.5 rounded-full">
+                            Best Value
+                          </span>
+                        </div>
+                      </div>
+                      <span className="text-xs text-green-500/70">$14/mo</span>
+                    </div>
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-zinc-800/60">
+                {[
+                  "Remembers your writing voice",
+                  "Analyzes client psychology",
+                  "Scores jobs before you apply",
+                  "Learns from your wins over time",
+                  "Predicts client fear with confidence %",
+                  "Built specifically for Upwork",
+                  "Price per month",
+                ].map((feature, i) => {
+                  const isPrice = feature === "Price per month";
+                  return (
+                    <motion.tr
+                      key={feature}
+                      initial={{ opacity: 0, x: -10 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: i * 0.06, duration: 0.4 }}
+                      className="group hover:bg-zinc-800/30 transition-colors"
+                    >
+                      <td className="py-3.5 pr-4 text-sm text-zinc-300 font-medium">
+                        {feature}
+                      </td>
+                      {/* Competitors — all ❌ except price */}
+                      {[
+                        { price: "$20/mo" },
+                        { price: "$30/mo" },
+                        { price: "$49/mo" },
+                      ].map((comp, j) => (
+                        <td key={j} className="py-3.5 px-2 text-center">
+                          {isPrice ? (
+                            <span className="text-sm text-zinc-500 font-medium">{comp.price}</span>
+                          ) : (
+                            <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-red-500/10">
+                              <X className="w-3 h-3 text-red-400" />
+                            </span>
+                          )}
+                        </td>
+                      ))}
+                      {/* UpworkAI — all ✅ */}
+                      <td className="py-3.5 px-2 text-center relative">
+                        {/* Green side accent on the column */}
+                        <div className="absolute inset-y-0 inset-x-0 border-x border-green-500/20 bg-green-500/[0.03] pointer-events-none" />
+                        {isPrice ? (
+                          <span className="relative text-sm font-bold text-green-400">$14/mo</span>
+                        ) : (
+                          <span className="relative inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-500/15">
+                            <Check className="w-3 h-3 text-green-400" />
+                          </span>
+                        )}
+                      </td>
+                    </motion.tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </motion.div>
+
+          {/* Table CTA */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2"
+          >
+            <p className="text-zinc-400 text-sm font-medium">
+              Stop paying more for less. Start winning today.
+            </p>
+            <button
+              onClick={() => signIn("google")}
+              disabled={status === "loading"}
+              className="group inline-flex items-center gap-2 rounded-full bg-green-500 hover:bg-green-400 px-6 py-2.5 text-sm font-semibold text-zinc-950 shadow-lg shadow-green-500/20 hover:shadow-green-500/30 transition-all duration-200 disabled:opacity-60"
+            >
+              Start for Free
+              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+            </button>
+          </motion.div>
+        </section>
+
         {/* ── Before / After ───────────────────────────────── */}
         <section className="max-w-7xl mx-auto px-6 sm:px-10 py-10 pb-28">
           <motion.div
@@ -467,7 +694,6 @@ export default function Home() {
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            {/* Before */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -512,7 +738,6 @@ export default function Home() {
               </div>
             </motion.div>
 
-            {/* After */}
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -572,7 +797,6 @@ export default function Home() {
             transition={{ duration: 0.6 }}
             className="relative rounded-3xl border border-zinc-800 bg-zinc-900/60 p-12 sm:p-16 text-center space-y-7 overflow-hidden"
           >
-            {/* Glow */}
             <div className="absolute inset-0 bg-gradient-to-b from-green-500/5 to-transparent pointer-events-none" />
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-48 bg-green-500/10 blur-3xl pointer-events-none" />
 
