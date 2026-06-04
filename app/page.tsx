@@ -92,8 +92,8 @@ export default function Home() {
                 transition={{ duration: 0.7, delay: 0.1, ease }}
                 className="text-4xl sm:text-5xl lg:text-[3.4rem] font-bold tracking-tight leading-[1.1] text-white"
               >
-                Stop Losing Jobs to{" "}
-                <span className="text-green-400">Weaker Freelancers</span>
+                Stop Wasting Connects on{" "}
+                <span className="text-green-400">Jobs You&apos;ll Never Win</span>
               </motion.h1>
 
               <motion.p
@@ -102,8 +102,8 @@ export default function Home() {
                 transition={{ duration: 0.7, delay: 0.2, ease }}
                 className="text-lg text-zinc-400 leading-relaxed max-w-[480px]"
               >
-                UpworkAI reads every job post, finds what the client actually
-                fears, and writes a proposal that makes them choose you.
+                UpworkAI scores every job before you apply — so you only bid
+                on jobs you can win.
               </motion.p>
 
               <motion.ul
@@ -113,9 +113,9 @@ export default function Home() {
                 className="space-y-3"
               >
                 {[
+                  "Scores jobs so you skip the ones you can't win",
                   "Analyzes client psychology in seconds",
                   "Writes proposals in your voice",
-                  "Scores jobs before you waste connects",
                 ].map((item) => (
                   <li key={item} className="flex items-center gap-3">
                     <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-green-500/20 border border-green-500/30">
@@ -460,9 +460,9 @@ export default function Home() {
                   never missed a deadline in four years.
                 </p>
                 <p>
-                  Your project needs [specific detail from their post]. I&apos;ve
-                  built this exact thing for [relevant example]. Here&apos;s what week
-                  one looks like if we work together...
+                  Your project needs a Shopify integration with custom inventory
+                  sync. I built this exact system for a fashion retailer last
+                  quarter — here&apos;s what week one looks like if we work together...
                 </p>
               </div>
               <div className="flex flex-wrap gap-2 pt-1 border-t border-green-500/10">

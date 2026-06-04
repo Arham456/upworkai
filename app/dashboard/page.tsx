@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth/next";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, Sparkles, Zap } from "lucide-react";
+import { ArrowRight, BarChart2, CheckCircle2, Sparkles, Zap } from "lucide-react";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Sidebar } from "./components/sidebar";
@@ -36,17 +36,19 @@ export default async function DashboardPage() {
 
   const isPro = user?.plan === "pro";
   const proposalsRemaining = Math.max(0, 5 - totalProposals);
-  const analysesRemaining = Math.max(0, 3 - jobsAnalyzed);
+  const analysesRemaining = Math.max(0, 5 - jobsAnalyzed);
 
-  const step1Done = !!(profile && profile.skills.length > 0 && profile.niche);
-  const step2Done = jobsAnalyzed > 0;
+  const isNewUser = jobsAnalyzed === 0 && totalProposals === 0;
+
+  const step1Done = jobsAnalyzed > 0;
+  const step2Done = !!(profile && profile.skills.length > 0 && profile.niche);
   const step3Done = totalProposals > 0;
   const allDone = step1Done && step2Done && step3Done;
 
   const steps = [
-    { step: "1", label: "Set up your profile", done: step1Done },
-    { step: "2", label: "Paste a job description", done: step2Done },
-    { step: "3", label: "Get your AI proposal", done: step3Done },
+    { step: "1", label: "Analyze a job", done: step1Done },
+    { step: "2", label: "Set up your profile", done: step2Done },
+    { step: "3", label: "Write your first proposal", done: step3Done },
   ];
 
   return (
@@ -64,14 +66,40 @@ export default async function DashboardPage() {
             </p>
           </div>
 
-          <StatsCards
-            totalProposals={totalProposals}
-            winRate={winRate}
-            jobsAnalyzed={jobsAnalyzed}
-          />
+          {isNewUser ? (
+            <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-10 flex flex-col items-center text-center space-y-5">
+              <div className="w-14 h-14 rounded-2xl bg-green-500/10 border border-green-500/20 flex items-center justify-center">
+                <BarChart2 className="w-7 h-7 text-green-400" />
+              </div>
+              <div className="space-y-2">
+                <h2 className="text-xl font-bold text-white">
+                  Find out if a job is worth your connects
+                </h2>
+                <p className="text-zinc-400 text-sm max-w-sm mx-auto leading-relaxed">
+                  Paste any Upwork job posting and get a match score, the
+                  client&apos;s core concern, and whether it&apos;s worth
+                  applying to — in seconds.
+                </p>
+              </div>
+              <Link
+                href="/dashboard/analyze"
+                className="inline-flex items-center gap-2 rounded-xl bg-green-500 px-6 py-3 text-sm font-bold text-zinc-950 hover:bg-green-400 transition-colors"
+              >
+                Analyze your first job
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+              <p className="text-xs text-zinc-600">Start here — no profile setup needed</p>
+            </div>
+          ) : (
+            <StatsCards
+              totalProposals={totalProposals}
+              winRate={winRate}
+              jobsAnalyzed={jobsAnalyzed}
+            />
+          )}
 
           {/* Free plan usage */}
-          {!isPro && (
+          {!isPro && !isNewUser && (
             <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-6 space-y-5">
               <div className="flex items-center justify-between">
                 <h2 className="text-sm font-semibold text-zinc-400 uppercase tracking-wide">
@@ -115,7 +143,7 @@ export default async function DashboardPage() {
                 <div>
                   <div className="flex justify-between mb-1.5">
                     <span className="text-sm text-zinc-300">
-                      {jobsAnalyzed} of 3 free analyses used
+                      {jobsAnalyzed} of 5 free analyses used
                     </span>
                     <span
                       className={`text-xs font-medium ${
@@ -130,7 +158,7 @@ export default async function DashboardPage() {
                       className={`h-full rounded-full transition-all ${
                         analysesRemaining <= 1 ? "bg-red-500" : "bg-green-500"
                       }`}
-                      style={{ width: `${Math.min(100, (jobsAnalyzed / 3) * 100)}%` }}
+                      style={{ width: `${Math.min(100, (jobsAnalyzed / 5) * 100)}%` }}
                     />
                   </div>
                 </div>
@@ -176,29 +204,35 @@ export default async function DashboardPage() {
                 ) : (
                   <>
                     <h2 className="text-lg font-semibold text-white">
-                      Get Started — Set Up Your Profile
+                      {!step1Done
+                        ? "Analyze your first job — instant results"
+                        : !step2Done
+                        ? "Set up your profile for better results"
+                        : "Write your first proposal"}
                     </h2>
                     <p className="text-zinc-400 text-sm mt-1 leading-relaxed">
-                      Before writing proposals, tell the AI about your skills,
-                      niche, and experience. This lets it tailor every proposal to
-                      your voice and strengths.
+                      {!step1Done
+                        ? "See your match score, the client's core concern, and whether a job is worth your connects — before you spend them."
+                        : !step2Done
+                        ? "Tell the AI your skills and niche so it tailors every proposal to your voice and strengths."
+                        : "You've scored a job and set up your profile. Now let UpworkAI write a proposal in your voice."}
                     </p>
                     <div className="mt-4 flex flex-wrap gap-3">
                       {!step1Done && (
                         <Link
-                          href="/dashboard/profile"
+                          href="/dashboard/analyze"
                           className="inline-flex items-center gap-2 rounded-lg bg-green-500 px-4 py-2 text-sm font-semibold text-zinc-950 hover:bg-green-400 transition-colors"
                         >
-                          Set up profile
+                          Analyze your first job
                           <ArrowRight className="w-4 h-4" />
                         </Link>
                       )}
                       {step1Done && !step2Done && (
                         <Link
-                          href="/dashboard/analyze"
+                          href="/dashboard/profile"
                           className="inline-flex items-center gap-2 rounded-lg bg-green-500 px-4 py-2 text-sm font-semibold text-zinc-950 hover:bg-green-400 transition-colors"
                         >
-                          Analyze a job
+                          Set up your profile
                           <ArrowRight className="w-4 h-4" />
                         </Link>
                       )}
@@ -211,12 +245,14 @@ export default async function DashboardPage() {
                           <ArrowRight className="w-4 h-4" />
                         </Link>
                       )}
-                      <Link
-                        href="/dashboard/analyze"
-                        className="inline-flex items-center gap-2 rounded-lg border border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors"
-                      >
-                        Analyze a job first
-                      </Link>
+                      {step1Done && (
+                        <Link
+                          href="/dashboard/analyze"
+                          className="inline-flex items-center gap-2 rounded-lg border border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors"
+                        >
+                          Analyze another job
+                        </Link>
+                      )}
                     </div>
                   </>
                 )}

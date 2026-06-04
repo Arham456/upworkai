@@ -159,7 +159,7 @@ export default function AnalyzePage() {
           {upgradeRequired && (
             <div className="rounded-xl border border-zinc-700 bg-zinc-900 p-6 space-y-4">
               <p className="text-zinc-200 leading-relaxed">
-                You&apos;ve analyzed 3 jobs on the free plan. Upgrade to Pro for unlimited job analysis.
+                You&apos;ve analyzed 5 jobs on the free plan. Upgrade to Pro for unlimited job analysis.
               </p>
               <Link
                 href="/dashboard/upgrade"

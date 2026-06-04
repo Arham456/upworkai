@@ -8,7 +8,7 @@ import { CheckoutButton } from "./components/checkout-button";
 
 const FREE_FEATURES = [
   { text: "5 proposals to get your first win", included: true },
-  { text: "3 job analyses", included: true },
+  { text: "5 job analyses", included: true },
   { text: "Basic proposal generation", included: true },
   { text: "Win/loss tracking", included: true },
   { text: "Unlimited proposals", included: false },
