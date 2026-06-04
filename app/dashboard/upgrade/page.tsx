@@ -7,22 +7,29 @@ import { Sidebar } from "../components/sidebar";
 import { CheckoutButton } from "./components/checkout-button";
 
 const FREE_FEATURES = [
-  { text: "5 proposals to get your first win", included: true },
-  { text: "5 job analyses", included: true },
+  { text: "5 job analyses to get started", included: true },
+  { text: "5 proposals lifetime", included: true },
+  { text: "Job scoring with match score", included: true },
+  { text: "Connect ROI score (basic)", included: true },
   { text: "Basic proposal generation", included: true },
   { text: "Win/loss tracking", included: true },
-  { text: "Unlimited proposals", included: false },
-  { text: "AI tone matching", included: false },
-  { text: "No watermark", included: false },
+  { text: "Mobile friendly", included: true },
+  { text: "Voice DNA & tone matching", included: false },
+  { text: "Client Intelligence extraction", included: false },
+  { text: "Client Fear Database", included: false },
 ];
 
 const PRO_FEATURES = [
+  { text: "Unlimited job analyses", included: true },
   { text: "Unlimited proposals", included: true },
-  { text: "Unlimited job analysis", included: true },
+  { text: "No watermark on proposals", included: true },
+  { text: "Voice DNA — AI learns your exact writing style", included: true },
+  { text: "Client Intelligence (hire rate, spend, rating)", included: true },
+  { text: "Client Fear Database — predicts fear with confidence %", included: true },
+  { text: "Connect ROI Score with weekly report", included: true },
+  { text: "Win pattern learning over time", included: true },
   { text: "AI tone matching from your samples", included: true },
-  { text: "Win pattern learning", included: true },
-  { text: "No watermark", included: true },
-  { text: "Weekly performance reports", included: true },
+  { text: "Priority support", included: true },
 ];
 
 export default async function UpgradePage() {
@@ -96,7 +103,7 @@ export default async function UpgradePage() {
               </ul>
 
               <div className="rounded-lg border border-zinc-700 py-2.5 text-center text-sm font-medium text-zinc-500">
-                Your current plan
+                {isPro ? "Previous plan" : "Your current plan"}
               </div>
             </div>
 

@@ -2,6 +2,20 @@ import { getServerSession } from "next-auth/next";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { ArrowRight, BarChart2, CheckCircle2, Sparkles, Zap } from "lucide-react";
+
+function parseBudget(budgetStr: string | null | undefined): number {
+  if (!budgetStr) return 0;
+  const clean = budgetStr.replace(/[$,]/g, "");
+  const rangeMatch = clean.match(/(\d+(?:\.\d+)?)\s*[–\-]\s*(\d+(?:\.\d+)?)/);
+  if (rangeMatch) return (parseFloat(rangeMatch[1]) + parseFloat(rangeMatch[2])) / 2;
+  const kMatch = budgetStr.match(/(\d+(?:\.\d+)?)[Kk]/);
+  if (kMatch) return parseFloat(kMatch[1]) * 1000;
+  const plusMatch = clean.match(/(\d+(?:\.\d+)?)\+/);
+  if (plusMatch) return parseFloat(plusMatch[1]);
+  const numMatch = clean.match(/(\d+(?:\.\d+)?)/);
+  if (numMatch) return parseFloat(numMatch[1]);
+  return 0;
+}
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Sidebar } from "./components/sidebar";
@@ -48,30 +62,16 @@ export default async function DashboardPage() {
       })
     : [];
 
-  function parseBudgetServer(budgetStr: string | null | undefined): number {
-    if (!budgetStr) return 0;
-    const clean = budgetStr.replace(/[$,]/g, "");
-    const rangeMatch = clean.match(/(\d+(?:\.\d+)?)\s*[–\-]\s*(\d+(?:\.\d+)?)/);
-    if (rangeMatch) return (parseFloat(rangeMatch[1]) + parseFloat(rangeMatch[2])) / 2;
-    const kMatch = budgetStr.match(/(\d+(?:\.\d+)?)[Kk]/);
-    if (kMatch) return parseFloat(kMatch[1]) * 1000;
-    const plusMatch = clean.match(/(\d+(?:\.\d+)?)\+/);
-    if (plusMatch) return parseFloat(plusMatch[1]);
-    const numMatch = clean.match(/(\d+(?:\.\d+)?)/);
-    if (numMatch) return parseFloat(numMatch[1]);
-    return 0;
-  }
-
   const totalConnects = weeklyJobs.reduce((sum, j) => sum + (j.connectsRequired ?? 6), 0);
   const totalExpectedValue = Math.round(
-    weeklyJobs.reduce((sum, j) => sum + ((j.matchScore ?? 0) / 10) * parseBudgetServer(j.jobBudget), 0),
+    weeklyJobs.reduce((sum, j) => sum + ((j.matchScore ?? 0) / 10) * parseBudget(j.jobBudget), 0),
   );
 
   const categoryRoi: Record<string, { total: number; count: number }> = {};
   for (const j of weeklyJobs) {
     const cat = j.jobCategory ?? "Unknown";
     const connects = j.connectsRequired ?? 6;
-    const earnings = parseBudgetServer(j.jobBudget);
+    const earnings = parseBudget(j.jobBudget);
     const roi = connects > 0 ? ((j.matchScore ?? 0) / 10) * earnings / connects : 0;
     if (!categoryRoi[cat]) categoryRoi[cat] = { total: 0, count: 0 };
     categoryRoi[cat].total += roi;

@@ -482,39 +482,40 @@ export default function AnalyzePage() {
                 exit="exit"
                 className="space-y-4"
               >
-                {/* Client Intelligence card — shown first when available */}
-                {hasClientIntel(result) && (
-                  <motion.div
-                    variants={fadeUp}
-                    className="rounded-xl border border-blue-500/20 bg-blue-500/5 p-5 space-y-3"
-                  >
-                    <div className="flex items-center gap-2 text-xs font-medium text-blue-400 uppercase tracking-wide">
-                      <Brain className="w-3.5 h-3.5" />
-                      Client Intelligence
-                    </div>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                      {result.hireRate && (
-                        <IntelItem icon={TrendingUp} label="Hire Rate" value={result.hireRate} />
-                      )}
-                      {result.totalSpent && (
-                        <IntelItem icon={DollarSign} label="Total Spent" value={result.totalSpent} />
-                      )}
-                      {result.jobBudget && (
-                        <IntelItem icon={DollarSign} label="Budget" value={result.jobBudget} />
-                      )}
-                      {result.proposalCount && (
-                        <IntelItem icon={ClipboardList} label="Proposals Sent" value={result.proposalCount} />
-                      )}
-                      {result.clientRating && (
-                        <IntelItem icon={Star} label="Client Rating" value={result.clientRating} />
-                      )}
-                      {result.clientLocation && (
-                        <IntelItem icon={Globe} label="Location" value={result.clientLocation} />
-                      )}
-                      {result.memberSince && (
-                        <IntelItem icon={Calendar} label="Member Since" value={result.memberSince} />
-                      )}
-                    </div>
+                {/* Client Intelligence — Pro only; free users see blurred mock */}
+                {(hasClientIntel(result) || (!isPro && inputMode === "fullPage")) && (
+                  <motion.div variants={fadeUp}>
+                    <ProBlur isPro={isPro} featureName="Client Intelligence">
+                      <div className="rounded-xl border border-blue-500/20 bg-blue-500/5 p-5 space-y-3">
+                        <div className="flex items-center gap-2 text-xs font-medium text-blue-400 uppercase tracking-wide">
+                          <Brain className="w-3.5 h-3.5" />
+                          Client Intelligence
+                        </div>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                          {isPro ? (
+                            <>
+                              {result.hireRate && <IntelItem icon={TrendingUp} label="Hire Rate" value={result.hireRate} />}
+                              {result.totalSpent && <IntelItem icon={DollarSign} label="Total Spent" value={result.totalSpent} />}
+                              {result.jobBudget && <IntelItem icon={DollarSign} label="Budget" value={result.jobBudget} />}
+                              {result.proposalCount && <IntelItem icon={ClipboardList} label="Proposals Sent" value={result.proposalCount} />}
+                              {result.clientRating && <IntelItem icon={Star} label="Client Rating" value={result.clientRating} />}
+                              {result.clientLocation && <IntelItem icon={Globe} label="Location" value={result.clientLocation} />}
+                              {result.memberSince && <IntelItem icon={Calendar} label="Member Since" value={result.memberSince} />}
+                            </>
+                          ) : (
+                            <>
+                              <IntelItem icon={TrendingUp} label="Hire Rate" value="87%" />
+                              <IntelItem icon={DollarSign} label="Total Spent" value="$45K+" />
+                              <IntelItem icon={DollarSign} label="Budget" value="$500–$1,500" />
+                              <IntelItem icon={ClipboardList} label="Proposals Sent" value="10 to 20" />
+                              <IntelItem icon={Star} label="Client Rating" value="4.9" />
+                              <IntelItem icon={Globe} label="Location" value="United States" />
+                              <IntelItem icon={Calendar} label="Member Since" value="March 2021" />
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </ProBlur>
                   </motion.div>
                 )}
 

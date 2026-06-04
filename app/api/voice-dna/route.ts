@@ -31,6 +31,17 @@ export async function POST() {
       );
     }
 
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { plan: true },
+    });
+    if (user?.plan !== "pro") {
+      return NextResponse.json(
+        { error: "Voice DNA is a Pro feature. Upgrade to unlock it." },
+        { status: 403 },
+      );
+    }
+
     const profile = await prisma.profile.findUnique({
       where: { userId: session.user.id },
       select: { sampleProposals: true },
