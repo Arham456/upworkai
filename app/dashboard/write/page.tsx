@@ -28,6 +28,13 @@ export default async function WritePage({ searchParams }: Props) {
         competitionLevel: true,
         matchScore: true,
         redFlags: true,
+        hireRate: true,
+        totalSpent: true,
+        proposalCount: true,
+        clientLocation: true,
+        memberSince: true,
+        clientRating: true,
+        jobBudget: true,
       },
     });
   }

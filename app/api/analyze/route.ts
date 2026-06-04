@@ -14,6 +14,15 @@ interface AnalysisResult {
   redFlags: string[];
   recommendedApproach: string;
   jobSummary: string;
+  // full-page mode extras
+  jobDescription?: string;
+  hireRate?: string | null;
+  totalSpent?: string | null;
+  proposalCount?: string | null;
+  clientLocation?: string | null;
+  memberSince?: string | null;
+  clientRating?: string | null;
+  jobBudget?: string | null;
 }
 
 export async function POST(request: NextRequest) {
@@ -25,8 +34,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const body = (await request.json()) as { description: string };
-    if (!body.description?.trim()) {
+    const body = (await request.json()) as {
+      description?: string;
+      fullPageText?: string;
+    };
+
+    const isFullPageMode = !!body.fullPageText?.trim();
+    const inputText = isFullPageMode
+      ? body.fullPageText!.trim()
+      : body.description?.trim();
+
+    if (!inputText) {
       return NextResponse.json({ error: "Job description is required" }, { status: 400 });
     }
 
@@ -56,7 +74,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Initialize inside the handler so any constructor error is caught
     const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
     const profile = await prisma.profile.findUnique({
@@ -72,10 +89,31 @@ export async function POST(request: NextRequest) {
 - Sample proposals available: ${profile.sampleProposals.length > 0 ? "Yes" : "No"}`
       : "Freelancer profile: Not set up yet.";
 
+    const clientIntelFields = isFullPageMode
+      ? `,
+  "jobDescription": <string — extract ONLY the job description text, excluding client info sections>,
+  "hireRate": <string e.g. "85%" or null if not found>,
+  "totalSpent": <string e.g. "$50K+" or null if not found>,
+  "proposalCount": <string e.g. "10 to 20" or null if not found>,
+  "clientLocation": <string e.g. "United States" or null if not found>,
+  "memberSince": <string e.g. "January 2020" or null if not found>,
+  "clientRating": <string e.g. "4.95" or null if not found>,
+  "jobBudget": <string e.g. "$500–$1,000" or null if not found>`
+      : "";
+
+    const inputLabel = isFullPageMode
+      ? "Full Upwork job page (includes job description + client info sections like 'About the client' and 'Activity on this job'):"
+      : "Job posting:";
+
+    const clientIntelInstruction = isFullPageMode
+      ? "\n\nIMPORTANT: This is a full job page paste. Extract the client intelligence fields from the 'About the client' and 'Activity on this job' sections. Use the client's hire rate, spending history, and proposal count to inform the matchScore, competitionLevel, and recommendedApproach."
+      : "";
+
     const userMessage = `${profileContext}
 
-Job posting:
-${body.description.trim()}
+${inputLabel}
+${inputText}
+${clientIntelInstruction}
 
 Return a JSON object with these exact keys:
 {
@@ -84,7 +122,7 @@ Return a JSON object with these exact keys:
   "competitionLevel": <"Low" | "Medium" | "High">,
   "redFlags": <array of strings — potential issues or concerns>,
   "recommendedApproach": <string — how this freelancer should position themselves>,
-  "jobSummary": <string — 1-2 sentence summary of what the job requires>
+  "jobSummary": <string — 1-2 sentence summary of what the job requires>${clientIntelFields}
 }`;
 
     const stream = client.messages.stream({
@@ -115,11 +153,8 @@ Return a JSON object with these exact keys:
 
     let analysis: AnalysisResult;
     try {
-      // Extract the first {...} block, tolerating markdown fences or extra prose
       const jsonMatch = rawText.match(/\{[\s\S]*\}/);
-      if (!jsonMatch) {
-        throw new Error("No JSON object found in response");
-      }
+      if (!jsonMatch) throw new Error("No JSON object found in response");
       analysis = JSON.parse(jsonMatch[0]) as AnalysisResult;
     } catch (parseErr) {
       console.error("[analyze] JSON parse error:", parseErr, "\nRaw text was:", rawText);
@@ -129,10 +164,15 @@ Return a JSON object with these exact keys:
       );
     }
 
+    // In full-page mode, store the extracted clean description; fallback to full text
+    const descriptionToStore = isFullPageMode
+      ? (analysis.jobDescription?.trim() || inputText)
+      : inputText;
+
     const job = await prisma.job.create({
       data: {
         userId: session.user.id,
-        description: body.description.trim(),
+        description: descriptionToStore,
         matchScore: analysis.matchScore,
         clientConcern: analysis.clientConcern,
         competitionLevel: analysis.competitionLevel,
@@ -140,10 +180,22 @@ Return a JSON object with these exact keys:
         recommendedApproach: analysis.recommendedApproach,
         jobSummary: analysis.jobSummary,
         status: "analyzed",
+        ...(isFullPageMode && {
+          hireRate: analysis.hireRate ?? null,
+          totalSpent: analysis.totalSpent ?? null,
+          proposalCount: analysis.proposalCount ?? null,
+          clientLocation: analysis.clientLocation ?? null,
+          memberSince: analysis.memberSince ?? null,
+          clientRating: analysis.clientRating ?? null,
+          jobBudget: analysis.jobBudget ?? null,
+        }),
       },
     });
 
-    return NextResponse.json({ ...analysis, jobId: job.id });
+    return NextResponse.json({
+      ...analysis,
+      jobId: job.id,
+    });
   } catch (err) {
     console.error("[analyze] Unhandled error:", err);
     const message = err instanceof Error ? err.message : "Unexpected server error";

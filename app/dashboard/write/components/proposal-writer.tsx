@@ -15,6 +15,12 @@ import {
   AlertCircle,
   TrendingUp,
   ArrowRight,
+  Brain,
+  DollarSign,
+  Globe,
+  Star,
+  Calendar,
+  ClipboardList,
 } from "lucide-react";
 
 interface Job {
@@ -26,6 +32,14 @@ interface Job {
   competitionLevel: string | null;
   matchScore: number | null;
   redFlags: string[];
+  // client intelligence
+  hireRate: string | null;
+  totalSpent: string | null;
+  proposalCount: string | null;
+  clientLocation: string | null;
+  memberSince: string | null;
+  clientRating: string | null;
+  jobBudget: string | null;
 }
 
 interface Props {
@@ -36,6 +50,38 @@ function scoreColor(score: number) {
   if (score >= 8) return "text-green-400";
   if (score >= 5) return "text-yellow-400";
   return "text-red-400";
+}
+
+function IntelItem({
+  icon: Icon,
+  label,
+  value,
+}: {
+  icon: React.ElementType;
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className="flex flex-col gap-1 rounded-lg bg-zinc-800/50 px-3 py-2.5">
+      <div className="flex items-center gap-1.5 text-[10px] font-medium text-zinc-500 uppercase tracking-wide">
+        <Icon className="w-3 h-3" />
+        {label}
+      </div>
+      <p className="text-sm font-semibold text-zinc-200">{value}</p>
+    </div>
+  );
+}
+
+function hasClientIntel(job: Job) {
+  return !!(
+    job.hireRate ||
+    job.totalSpent ||
+    job.proposalCount ||
+    job.clientLocation ||
+    job.memberSince ||
+    job.clientRating ||
+    job.jobBudget
+  );
 }
 
 export function ProposalWriter({ job }: Props) {
@@ -127,10 +173,43 @@ export function ProposalWriter({ job }: Props) {
         <h1 className="text-2xl font-bold text-white">Write Proposal</h1>
         <p className="text-zinc-400 mt-1 text-sm">
           {job
-            ? "AI will use your profile and job analysis to craft a personalized proposal."
+            ? "AI will use your profile, job analysis, and client intelligence to craft a personalized proposal."
             : "Enter a job description below to generate a personalized proposal."}
         </p>
       </div>
+
+      {/* Client Intelligence card */}
+      {job && hasClientIntel(job) && (
+        <div className="rounded-xl border border-blue-500/20 bg-blue-500/5 p-5 space-y-3">
+          <div className="flex items-center gap-2 text-xs font-medium text-blue-400 uppercase tracking-wide">
+            <Brain className="w-3.5 h-3.5" />
+            Client Intelligence
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            {job.hireRate && (
+              <IntelItem icon={TrendingUp} label="Hire Rate" value={job.hireRate} />
+            )}
+            {job.totalSpent && (
+              <IntelItem icon={DollarSign} label="Total Spent" value={job.totalSpent} />
+            )}
+            {job.jobBudget && (
+              <IntelItem icon={DollarSign} label="Budget" value={job.jobBudget} />
+            )}
+            {job.proposalCount && (
+              <IntelItem icon={ClipboardList} label="Proposals Sent" value={job.proposalCount} />
+            )}
+            {job.clientRating && (
+              <IntelItem icon={Star} label="Client Rating" value={job.clientRating} />
+            )}
+            {job.clientLocation && (
+              <IntelItem icon={Globe} label="Location" value={job.clientLocation} />
+            )}
+            {job.memberSince && (
+              <IntelItem icon={Calendar} label="Member Since" value={job.memberSince} />
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Job context card */}
       {job && (
@@ -280,7 +359,7 @@ export function ProposalWriter({ job }: Props) {
               </div>
             </div>
 
-            {/* Action bar — only shown after generation completes */}
+            {/* Action bar */}
             {proposal && !isGenerating && (
               <div className="flex flex-wrap items-center gap-2 px-5 py-4 border-t border-zinc-800 bg-zinc-950/50">
                 <button

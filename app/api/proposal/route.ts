@@ -81,6 +81,21 @@ ${
 }`
       : "FREELANCER PROFILE: Not configured — write a strong general proposal.";
 
+    const clientIntelSection =
+      job &&
+      (job.hireRate || job.totalSpent || job.proposalCount || job.clientLocation || job.memberSince || job.clientRating || job.jobBudget)
+        ? `
+CLIENT INTELLIGENCE (extracted from their job page):
+${job.hireRate ? `- Hire rate: ${job.hireRate} — reference their track record if it's strong` : ""}
+${job.totalSpent ? `- Total spent on Upwork: ${job.totalSpent}` : ""}
+${job.jobBudget ? `- Job budget: ${job.jobBudget}` : ""}
+${job.proposalCount ? `- Proposals already sent: ${job.proposalCount} — calibrate how competitive your opener needs to be` : ""}
+${job.clientRating ? `- Client rating: ${job.clientRating}/5` : ""}
+${job.clientLocation ? `- Client location: ${job.clientLocation}` : ""}
+${job.memberSince ? `- Upwork member since: ${job.memberSince}` : ""}
+Use this intelligence subtly — don't recite it robotically. Let it inform your tone and positioning.`
+        : "";
+
     const analysisSection = job
       ? `
 JOB ANALYSIS (from prior AI analysis):
@@ -88,7 +103,7 @@ Summary: ${job.jobSummary ?? "N/A"}
 Client's core concern: ${job.clientConcern ?? "N/A"}
 Recommended approach: ${job.recommendedApproach ?? "N/A"}
 Competition level: ${job.competitionLevel ?? "N/A"}
-${job.redFlags.length > 0 ? `Red flags to address or avoid: ${job.redFlags.join(", ")}` : "No red flags."}`
+${job.redFlags.length > 0 ? `Red flags to address or avoid: ${job.redFlags.join(", ")}` : "No red flags."}${clientIntelSection}`
       : "";
 
     const userMessage = `${profileSection}

@@ -14,10 +14,29 @@ import {
   FileText,
   ArrowRight,
   CheckCircle,
+  Globe,
+  Brain,
+  Star,
+  DollarSign,
+  Calendar,
+  ClipboardList,
+  LayoutList,
 } from "lucide-react";
 import { Sidebar } from "../components/sidebar";
 
-interface AnalysisResult {
+type InputMode = "description" | "fullPage";
+
+interface ClientIntel {
+  hireRate?: string | null;
+  totalSpent?: string | null;
+  proposalCount?: string | null;
+  clientLocation?: string | null;
+  memberSince?: string | null;
+  clientRating?: string | null;
+  jobBudget?: string | null;
+}
+
+interface AnalysisResult extends ClientIntel {
   jobId: string;
   matchScore: number;
   clientConcern: string;
@@ -59,16 +78,52 @@ function competitionBadge(level: "Low" | "Medium" | "High") {
   return styles[level];
 }
 
+function hasClientIntel(result: AnalysisResult) {
+  return !!(
+    result.hireRate ||
+    result.totalSpent ||
+    result.proposalCount ||
+    result.clientLocation ||
+    result.memberSince ||
+    result.clientRating ||
+    result.jobBudget
+  );
+}
+
+function IntelItem({
+  icon: Icon,
+  label,
+  value,
+}: {
+  icon: React.ElementType;
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className="flex flex-col gap-1 rounded-lg bg-zinc-800/50 px-3 py-2.5">
+      <div className="flex items-center gap-1.5 text-[10px] font-medium text-zinc-500 uppercase tracking-wide">
+        <Icon className="w-3 h-3" />
+        {label}
+      </div>
+      <p className="text-sm font-semibold text-zinc-200">{value}</p>
+    </div>
+  );
+}
+
 export default function AnalyzePage() {
   const router = useRouter();
+  const [inputMode, setInputMode] = useState<InputMode>("description");
   const [description, setDescription] = useState("");
+  const [fullPageText, setFullPageText] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [upgradeRequired, setUpgradeRequired] = useState(false);
   const [result, setResult] = useState<AnalysisResult | null>(null);
 
   async function handleAnalyze() {
-    if (!description.trim()) return;
+    const inputText = inputMode === "fullPage" ? fullPageText : description;
+    if (!inputText.trim()) return;
+
     setLoading(true);
     setError(null);
     setUpgradeRequired(false);
@@ -78,7 +133,11 @@ export default function AnalyzePage() {
       const res = await fetch("/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ description }),
+        body: JSON.stringify(
+          inputMode === "fullPage"
+            ? { fullPageText: inputText }
+            : { description: inputText },
+        ),
       });
 
       if (!res.ok) {
@@ -101,9 +160,11 @@ export default function AnalyzePage() {
 
   function handleWriteProposal() {
     if (!result) return;
-    const params = new URLSearchParams({ jobId: result.jobId });
-    router.push(`/dashboard/write?${params.toString()}`);
+    router.push(`/dashboard/write?jobId=${result.jobId}`);
   }
+
+  const inputValue = inputMode === "fullPage" ? fullPageText : description;
+  const setInputValue = inputMode === "fullPage" ? setFullPageText : setDescription;
 
   return (
     <div className="flex h-screen bg-zinc-950 overflow-hidden">
@@ -114,31 +175,76 @@ export default function AnalyzePage() {
           <div>
             <h1 className="text-2xl font-bold text-white">Analyze Job</h1>
             <p className="text-zinc-400 mt-1 text-sm">
-              Paste a job description and get AI-powered insights before writing your proposal.
+              Score a job and uncover the client&apos;s real concern before writing your proposal.
             </p>
           </div>
 
           {/* Input card */}
           <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-6 space-y-4">
+            {/* Mode toggle */}
+            <div className="flex items-center gap-1 rounded-lg bg-zinc-950 border border-zinc-800 p-1 w-fit">
+              <button
+                onClick={() => setInputMode("description")}
+                className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+                  inputMode === "description"
+                    ? "bg-zinc-700 text-white"
+                    : "text-zinc-500 hover:text-zinc-300"
+                }`}
+              >
+                <FileText className="w-3.5 h-3.5" />
+                Job description
+              </button>
+              <button
+                onClick={() => setInputMode("fullPage")}
+                className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+                  inputMode === "fullPage"
+                    ? "bg-zinc-700 text-white"
+                    : "text-zinc-500 hover:text-zinc-300"
+                }`}
+              >
+                <LayoutList className="w-3.5 h-3.5" />
+                Paste full job page
+                <span className="rounded-full bg-green-500/15 border border-green-500/25 text-green-400 px-1.5 py-0 text-[10px] font-semibold">
+                  More intel
+                </span>
+              </button>
+            </div>
+
+            {/* Mode hint */}
+            {inputMode === "fullPage" && (
+              <p className="text-xs text-zinc-500 leading-relaxed">
+                Copy everything from the Upwork job page — job description, &ldquo;About the client&rdquo;,
+                and &ldquo;Activity on this job&rdquo; sections. The AI will extract hire rate, total spent,
+                proposal count, budget, and more.
+              </p>
+            )}
+
             <label className="block text-sm font-medium text-zinc-300">
-              Job description
+              {inputMode === "fullPage" ? "Full job page text" : "Job description"}
             </label>
+
             <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Paste the full Upwork job posting here..."
-              rows={10}
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              placeholder={
+                inputMode === "fullPage"
+                  ? "Paste the entire Upwork job page here — title, description, 'About the client', 'Activity on this job'…"
+                  : "Paste the full Upwork job posting here…"
+              }
+              rows={inputMode === "fullPage" ? 14 : 10}
               className="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-4 py-3 text-sm text-white placeholder-zinc-500 resize-none focus:outline-none focus:ring-1 focus:ring-green-500/60 focus:border-green-500/60 transition-colors"
             />
+
             {error && (
               <p className="flex items-center gap-2 text-sm text-red-400">
                 <AlertTriangle className="w-4 h-4 shrink-0" />
                 {error}
               </p>
             )}
+
             <button
               onClick={handleAnalyze}
-              disabled={loading || !description.trim()}
+              disabled={loading || !inputValue.trim()}
               className="flex items-center gap-2 rounded-lg bg-green-500 px-5 py-2.5 text-sm font-semibold text-zinc-950 hover:bg-green-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {loading ? (
@@ -182,6 +288,42 @@ export default function AnalyzePage() {
                 exit="exit"
                 className="space-y-4"
               >
+                {/* Client Intelligence card — shown first when available */}
+                {hasClientIntel(result) && (
+                  <motion.div
+                    variants={fadeUp}
+                    className="rounded-xl border border-blue-500/20 bg-blue-500/5 p-5 space-y-3"
+                  >
+                    <div className="flex items-center gap-2 text-xs font-medium text-blue-400 uppercase tracking-wide">
+                      <Brain className="w-3.5 h-3.5" />
+                      Client Intelligence
+                    </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                      {result.hireRate && (
+                        <IntelItem icon={TrendingUp} label="Hire Rate" value={result.hireRate} />
+                      )}
+                      {result.totalSpent && (
+                        <IntelItem icon={DollarSign} label="Total Spent" value={result.totalSpent} />
+                      )}
+                      {result.jobBudget && (
+                        <IntelItem icon={DollarSign} label="Budget" value={result.jobBudget} />
+                      )}
+                      {result.proposalCount && (
+                        <IntelItem icon={ClipboardList} label="Proposals Sent" value={result.proposalCount} />
+                      )}
+                      {result.clientRating && (
+                        <IntelItem icon={Star} label="Client Rating" value={result.clientRating} />
+                      )}
+                      {result.clientLocation && (
+                        <IntelItem icon={Globe} label="Location" value={result.clientLocation} />
+                      )}
+                      {result.memberSince && (
+                        <IntelItem icon={Calendar} label="Member Since" value={result.memberSince} />
+                      )}
+                    </div>
+                  </motion.div>
+                )}
+
                 {/* Header row: match score + competition */}
                 <motion.div variants={fadeUp} className="grid grid-cols-2 gap-4">
                   <div
