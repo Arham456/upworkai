@@ -9,19 +9,20 @@ import { CheckoutButton } from "./components/checkout-button";
 const FREE_FEATURES = [
   { text: "5 proposals to get your first win", included: true },
   { text: "3 job analyses", included: true },
-  { text: "Win / loss tracking", included: true },
-  { text: "Profile setup", included: true },
+  { text: "Basic proposal generation", included: true },
+  { text: "Win/loss tracking", included: true },
   { text: "Unlimited proposals", included: false },
+  { text: "AI tone matching", included: false },
   { text: "No watermark", included: false },
 ];
 
 const PRO_FEATURES = [
   { text: "Unlimited proposals", included: true },
   { text: "Unlimited job analysis", included: true },
-  { text: "No watermark on proposals", included: true },
-  { text: "Win / loss tracking", included: true },
-  { text: "AI tone matching from samples", included: true },
-  { text: "Priority support", included: true },
+  { text: "AI tone matching from your samples", included: true },
+  { text: "Win pattern learning", included: true },
+  { text: "No watermark", included: true },
+  { text: "Weekly performance reports", included: true },
 ];
 
 export default async function UpgradePage() {
