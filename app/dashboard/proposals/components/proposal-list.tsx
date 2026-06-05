@@ -35,12 +35,12 @@ const STATUS_CONFIG = {
   pending: {
     label: "Pending",
     icon: Clock,
-    classes: "bg-yellow-500/15 text-yellow-400 border-yellow-500/20",
+    classes: "bg-amber-500/15 text-amber-400 border-amber-500/20",
   },
   won: {
     label: "Won",
     icon: Trophy,
-    classes: "bg-green-500/15 text-green-400 border-green-500/20",
+    classes: "bg-emerald-500/15 text-emerald-400 border-emerald-500/20",
   },
   lost: {
     label: "Lost",
@@ -97,10 +97,10 @@ export function ProposalList({ initialProposals }: Props) {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-white">My Proposals</h1>
-          <p className="text-zinc-400 mt-1 text-sm">Track and manage your saved proposals.</p>
+          <h1 className="text-2xl font-bold text-white tracking-tight">My Proposals</h1>
+          <p className="text-zinc-500 mt-1 text-sm">Track and manage your saved proposals.</p>
         </div>
-        <div className="flex flex-col items-center justify-center rounded-xl border border-zinc-800 bg-zinc-900 py-20 text-center">
+        <div className="flex flex-col items-center justify-center rounded-xl border border-zinc-800 bg-[#111111] py-20 text-center">
           <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-zinc-800 mb-4">
             <FolderOpen className="w-6 h-6 text-zinc-500" />
           </div>
@@ -110,7 +110,7 @@ export function ProposalList({ initialProposals }: Props) {
           </p>
           <Link
             href="/dashboard/write"
-            className="inline-flex items-center gap-2 rounded-lg bg-green-500 px-4 py-2 text-sm font-semibold text-zinc-950 hover:bg-green-400 transition-colors"
+            className="inline-flex items-center gap-2 rounded-lg bg-violet-600 hover:bg-violet-700 px-4 py-2 text-sm font-semibold text-white transition-colors"
           >
             <PenLine className="w-4 h-4" />
             Write a Proposal
@@ -125,24 +125,22 @@ export function ProposalList({ initialProposals }: Props) {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-end gap-3 justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">My Proposals</h1>
-          <p className="text-zinc-400 mt-1 text-sm">
+          <h1 className="text-2xl font-bold text-white tracking-tight">My Proposals</h1>
+          <p className="text-zinc-500 mt-1 text-sm">
             {proposals.length} total · {wonCount} won · {pendingCount} pending
           </p>
         </div>
         <Link
           href="/dashboard/write"
-          className="flex items-center gap-2 rounded-lg bg-green-500 px-4 py-2 text-sm font-semibold text-zinc-950 hover:bg-green-400 transition-colors"
+          className="flex items-center gap-2 rounded-lg bg-violet-600 hover:bg-violet-700 px-4 py-2 text-sm font-semibold text-white transition-colors"
         >
           <PenLine className="w-4 h-4" />
           New Proposal
         </Link>
       </div>
 
-      {/* Proposal cards */}
       <div className="space-y-3">
         {proposals.map((proposal) => {
           const isExpanded = expandedId === proposal.id;
@@ -154,9 +152,8 @@ export function ProposalList({ initialProposals }: Props) {
           return (
             <div
               key={proposal.id}
-              className="rounded-xl border border-zinc-800 bg-zinc-900 overflow-hidden"
+              className="rounded-xl border border-zinc-800 bg-[#111111] overflow-hidden hover:border-zinc-700 transition-colors"
             >
-              {/* Card header — always visible */}
               <div className="px-5 py-4">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
@@ -193,7 +190,6 @@ export function ProposalList({ initialProposals }: Props) {
                 </div>
               </div>
 
-              {/* Expanded content */}
               <AnimatePresence initial={false}>
                 {isExpanded && (
                   <motion.div
@@ -204,23 +200,21 @@ export function ProposalList({ initialProposals }: Props) {
                     transition={{ duration: 0.22, ease: "easeOut" }}
                     className="overflow-hidden"
                   >
-                    {/* Full proposal text */}
                     <div className="px-5 pb-4 border-t border-zinc-800 pt-4">
                       <p className="text-xs text-zinc-500 uppercase tracking-wide mb-3">
                         Proposal
                       </p>
-                      <div className="text-sm text-zinc-200 whitespace-pre-wrap leading-relaxed bg-zinc-950/50 rounded-lg p-4 border border-zinc-800">
+                      <div className="text-sm text-zinc-200 whitespace-pre-wrap leading-relaxed bg-[#0a0a0a]/50 rounded-lg p-4 border border-zinc-800">
                         {proposal.content}
                       </div>
                     </div>
 
-                    {/* Status action buttons */}
                     <div className="flex items-center gap-2 px-5 pb-5">
                       {proposal.status !== "won" && (
                         <button
                           onClick={() => updateStatus(proposal.id, "won")}
                           disabled={isUpdating}
-                          className="flex items-center gap-1.5 rounded-lg bg-green-500/15 border border-green-500/25 px-3 py-1.5 text-xs font-medium text-green-400 hover:bg-green-500/25 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                          className="flex items-center gap-1.5 rounded-lg bg-emerald-500/15 border border-emerald-500/25 px-3 py-1.5 text-xs font-medium text-emerald-400 hover:bg-emerald-500/25 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                         >
                           {isUpdating ? (
                             <Loader2 className="w-3 h-3 animate-spin" />

@@ -32,7 +32,6 @@ interface Job {
   competitionLevel: string | null;
   matchScore: number | null;
   redFlags: string[];
-  // client intelligence
   hireRate: string | null;
   totalSpent: string | null;
   proposalCount: string | null;
@@ -47,20 +46,12 @@ interface Props {
 }
 
 function scoreColor(score: number) {
-  if (score >= 8) return "text-green-400";
-  if (score >= 5) return "text-yellow-400";
+  if (score >= 8) return "text-violet-400";
+  if (score >= 5) return "text-amber-400";
   return "text-red-400";
 }
 
-function IntelItem({
-  icon: Icon,
-  label,
-  value,
-}: {
-  icon: React.ElementType;
-  label: string;
-  value: string;
-}) {
+function IntelItem({ icon: Icon, label, value }: { icon: React.ElementType; label: string; value: string }) {
   return (
     <div className="flex flex-col gap-1 rounded-lg bg-zinc-800/50 px-3 py-2.5">
       <div className="flex items-center gap-1.5 text-[10px] font-medium text-zinc-500 uppercase tracking-wide">
@@ -170,8 +161,8 @@ export function ProposalWriter({ job }: Props) {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-white">Write Proposal</h1>
-        <p className="text-zinc-400 mt-1 text-sm">
+        <h1 className="text-2xl font-bold text-white tracking-tight">Write Proposal</h1>
+        <p className="text-zinc-500 mt-1 text-sm">
           {job
             ? "AI will use your profile, job analysis, and client intelligence to craft a personalized proposal."
             : "Enter a job description below to generate a personalized proposal."}
@@ -186,34 +177,20 @@ export function ProposalWriter({ job }: Props) {
             Client Intelligence
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-            {job.hireRate && (
-              <IntelItem icon={TrendingUp} label="Hire Rate" value={job.hireRate} />
-            )}
-            {job.totalSpent && (
-              <IntelItem icon={DollarSign} label="Total Spent" value={job.totalSpent} />
-            )}
-            {job.jobBudget && (
-              <IntelItem icon={DollarSign} label="Budget" value={job.jobBudget} />
-            )}
-            {job.proposalCount && (
-              <IntelItem icon={ClipboardList} label="Proposals Sent" value={job.proposalCount} />
-            )}
-            {job.clientRating && (
-              <IntelItem icon={Star} label="Client Rating" value={job.clientRating} />
-            )}
-            {job.clientLocation && (
-              <IntelItem icon={Globe} label="Location" value={job.clientLocation} />
-            )}
-            {job.memberSince && (
-              <IntelItem icon={Calendar} label="Member Since" value={job.memberSince} />
-            )}
+            {job.hireRate && <IntelItem icon={TrendingUp} label="Hire Rate" value={job.hireRate} />}
+            {job.totalSpent && <IntelItem icon={DollarSign} label="Total Spent" value={job.totalSpent} />}
+            {job.jobBudget && <IntelItem icon={DollarSign} label="Budget" value={job.jobBudget} />}
+            {job.proposalCount && <IntelItem icon={ClipboardList} label="Proposals Sent" value={job.proposalCount} />}
+            {job.clientRating && <IntelItem icon={Star} label="Client Rating" value={job.clientRating} />}
+            {job.clientLocation && <IntelItem icon={Globe} label="Location" value={job.clientLocation} />}
+            {job.memberSince && <IntelItem icon={Calendar} label="Member Since" value={job.memberSince} />}
           </div>
         </div>
       )}
 
       {/* Job context card */}
       {job && (
-        <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5 space-y-4">
+        <div className="rounded-xl border border-zinc-800 bg-[#111111] p-5 space-y-4 border-l-[3px] border-l-violet-500">
           <div className="flex items-center gap-2 text-xs font-medium text-zinc-400 uppercase tracking-wide">
             <BookOpen className="w-3.5 h-3.5" />
             Job Context
@@ -229,7 +206,7 @@ export function ProposalWriter({ job }: Props) {
 
             {job.clientConcern && (
               <div>
-                <p className="text-xs text-zinc-500 mb-1">Client&apos;s Core Concern</p>
+                <p className="text-xs text-zinc-500 mb-1">Client&apos;s Core Fear</p>
                 <p className="text-sm text-zinc-300 leading-relaxed">{job.clientConcern}</p>
               </div>
             )}
@@ -256,7 +233,7 @@ export function ProposalWriter({ job }: Props) {
 
       {/* Manual job input */}
       {!job && (
-        <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-5 space-y-3">
+        <div className="rounded-xl border border-zinc-800 bg-[#111111] p-5 space-y-3">
           <label className="block text-sm font-medium text-zinc-300">
             Job Description
           </label>
@@ -265,11 +242,11 @@ export function ProposalWriter({ job }: Props) {
             onChange={(e) => setManualDescription(e.target.value)}
             placeholder="Paste the Upwork job posting here…"
             rows={9}
-            className="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-4 py-3 text-sm text-white placeholder-zinc-500 resize-none focus:outline-none focus:ring-1 focus:ring-green-500/60 focus:border-green-500/60 transition-colors"
+            className="w-full rounded-lg border border-zinc-800 bg-[#0a0a0a] px-4 py-3 text-sm text-white placeholder-zinc-500 resize-none focus:outline-none focus:border-violet-500 transition-colors"
           />
           <p className="text-xs text-zinc-500">
             Tip: run{" "}
-            <a href="/dashboard/analyze" className="text-green-400 hover:underline">
+            <a href="/dashboard/analyze" className="text-violet-400 hover:underline">
               Analyze Job
             </a>{" "}
             first to unlock smarter, insight-driven proposals.
@@ -281,7 +258,7 @@ export function ProposalWriter({ job }: Props) {
       <button
         onClick={handleGenerate}
         disabled={!canGenerate || isGenerating}
-        className="flex w-full sm:w-auto justify-center items-center gap-2 rounded-lg bg-green-500 px-5 py-2.5 text-sm font-semibold text-zinc-950 hover:bg-green-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        className="flex w-full sm:w-auto justify-center items-center gap-2 rounded-lg bg-violet-600 hover:bg-violet-700 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
         {isGenerating ? (
           <>
@@ -298,14 +275,14 @@ export function ProposalWriter({ job }: Props) {
 
       {/* Upgrade wall */}
       {upgradeRequired && (
-        <div className="rounded-xl border border-zinc-700 bg-zinc-900 p-6 space-y-4">
+        <div className="rounded-xl border border-zinc-800 bg-[#111111] p-6 space-y-4">
           <p className="text-zinc-200 leading-relaxed">
             You&apos;ve used all 5 free proposals. Free plan was designed to get you your first win.
             If it worked — Pro is how you keep winning. $14/month — less than what you earn in one hour.
           </p>
           <Link
             href="/dashboard/upgrade"
-            className="inline-flex items-center gap-2 rounded-lg bg-green-500 px-5 py-2.5 text-sm font-semibold text-zinc-950 hover:bg-green-400 transition-colors"
+            className="inline-flex items-center gap-2 rounded-lg bg-violet-600 hover:bg-violet-700 px-5 py-2.5 text-sm font-semibold text-white transition-colors"
           >
             Upgrade to Pro
             <ArrowRight className="w-4 h-4" />
@@ -330,28 +307,26 @@ export function ProposalWriter({ job }: Props) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.3, ease: "easeOut" }}
-            className="rounded-xl border border-zinc-800 bg-zinc-900 overflow-hidden"
+            className="rounded-xl border border-zinc-800 bg-[#111111] overflow-hidden"
           >
-            {/* Card header */}
             <div className="flex items-center justify-between px-5 py-3 border-b border-zinc-800">
               <div className="flex items-center gap-2 text-sm font-medium text-zinc-300">
                 <PenLine className="w-4 h-4" />
                 Your Proposal
               </div>
               {isGenerating && (
-                <span className="flex items-center gap-1.5 text-xs text-green-400">
-                  <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+                <span className="flex items-center gap-1.5 text-xs text-violet-400">
+                  <span className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse" />
                   Writing…
                 </span>
               )}
             </div>
 
-            {/* Proposal text */}
             <div className="p-5">
               <div className="text-sm text-zinc-200 whitespace-pre-wrap leading-relaxed min-h-[100px]">
                 {proposal}
                 {isGenerating && (
-                  <span className="inline-block w-0.5 h-[1.1em] bg-green-400 ml-0.5 animate-pulse align-middle" />
+                  <span className="inline-block w-0.5 h-[1.1em] bg-violet-400 ml-0.5 animate-pulse align-middle" />
                 )}
                 {!proposal && isGenerating && (
                   <span className="text-zinc-500">Thinking…</span>
@@ -359,15 +334,14 @@ export function ProposalWriter({ job }: Props) {
               </div>
             </div>
 
-            {/* Action bar */}
             {proposal && !isGenerating && (
-              <div className="flex flex-wrap items-center gap-2 px-5 py-4 border-t border-zinc-800 bg-zinc-950/50">
+              <div className="flex flex-wrap items-center gap-2 px-5 py-4 border-t border-zinc-800 bg-[#0a0a0a]/50">
                 <button
                   onClick={handleCopy}
                   className="flex items-center gap-1.5 rounded-lg border border-zinc-700 px-3 py-1.5 text-xs font-medium text-zinc-300 hover:text-white hover:bg-zinc-800 transition-colors"
                 >
                   {copied ? (
-                    <Check className="w-3.5 h-3.5 text-green-400" />
+                    <Check className="w-3.5 h-3.5 text-emerald-400" />
                   ) : (
                     <Copy className="w-3.5 h-3.5" />
                   )}
@@ -385,7 +359,7 @@ export function ProposalWriter({ job }: Props) {
                 <div className="flex-1" />
 
                 {savedId ? (
-                  <span className="flex items-center gap-1.5 text-xs font-medium text-green-400">
+                  <span className="flex items-center gap-1.5 text-xs font-medium text-emerald-400">
                     <Check className="w-3.5 h-3.5" />
                     Saved to My Proposals
                   </span>
@@ -393,7 +367,7 @@ export function ProposalWriter({ job }: Props) {
                   <button
                     onClick={handleSave}
                     disabled={isSaving}
-                    className="flex items-center gap-1.5 rounded-lg bg-green-500 px-3 py-1.5 text-xs font-semibold text-zinc-950 hover:bg-green-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="flex items-center gap-1.5 rounded-lg bg-violet-600 hover:bg-violet-700 px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
                     {isSaving ? (
                       <Loader2 className="w-3.5 h-3.5 animate-spin" />

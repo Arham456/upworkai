@@ -9,56 +9,121 @@ import {
   BarChart2,
   Check,
   PenLine,
-  Sparkles,
   Trophy,
   X,
+  Zap,
 } from "lucide-react";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
-// ── Animated shape background ─────────────────────────────
-function ElegantShape({
-  className,
-  delay = 0,
-  width = 400,
-  height = 100,
-  rotate = 0,
-  gradient = "from-white/[0.08]",
-}: {
-  className?: string;
-  delay?: number;
-  width?: number;
-  height?: number;
-  rotate?: number;
-  gradient?: string;
-}) {
+// ── Particle Canvas ────────────────────────────────────────
+function ParticleCanvas() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    let animId: number;
+
+    interface Particle {
+      x: number;
+      y: number;
+      size: number;
+      speed: number;
+      opacity: number;
+    }
+
+    const particles: Particle[] = [];
+
+    function resize() {
+      canvas!.width = window.innerWidth;
+      canvas!.height = window.innerHeight;
+    }
+
+    resize();
+    window.addEventListener("resize", resize);
+
+    for (let i = 0; i < 80; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        size: Math.random() * 1.5 + 0.3,
+        speed: Math.random() * 0.35 + 0.1,
+        opacity: Math.random() * 0.4 + 0.05,
+      });
+    }
+
+    function animate() {
+      ctx!.clearRect(0, 0, canvas!.width, canvas!.height);
+      for (const p of particles) {
+        ctx!.beginPath();
+        ctx!.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx!.fillStyle = `rgba(255, 255, 255, ${p.opacity})`;
+        ctx!.fill();
+        p.y -= p.speed;
+        if (p.y < -p.size) {
+          p.y = canvas!.height + p.size;
+          p.x = Math.random() * canvas!.width;
+        }
+      }
+      animId = requestAnimationFrame(animate);
+    }
+
+    animate();
+
+    return () => {
+      cancelAnimationFrame(animId);
+      window.removeEventListener("resize", resize);
+    };
+  }, []);
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: -150, rotate: rotate - 15 }}
-      animate={{ opacity: 1, y: 0, rotate: rotate }}
-      transition={{
-        duration: 2.4,
-        delay,
-        ease: [0.23, 0.86, 0.39, 0.96],
-        opacity: { duration: 1.2 },
-      }}
-      className={`absolute ${className ?? ""}`}
-    >
-      <motion.div
-        animate={{ y: [0, 15, 0] }}
-        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-        style={{ width, height }}
-        className="relative"
-      >
-        <div
-          className={`absolute inset-0 rounded-full bg-gradient-to-r to-transparent ${gradient} backdrop-blur-[2px] border-2 border-white/[0.15] shadow-[0_8px_32px_0_rgba(255,255,255,0.1)] after:absolute after:inset-0 after:rounded-full after:bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.2),transparent_70%)]`}
-        />
-      </motion.div>
-    </motion.div>
+    <canvas
+      ref={canvasRef}
+      className="fixed inset-0 pointer-events-none z-0"
+      style={{ mixBlendMode: "screen", opacity: 0.6 }}
+    />
   );
 }
 
-// ── Animated counter ──────────────────────────────────────
+// ── Animated Grid Lines ───────────────────────────────────
+function GridLines() {
+  return (
+    <div aria-hidden className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+      {[28, 52, 76].map((top, i) => (
+        <div
+          key={`h${i}`}
+          className="absolute left-0 h-px"
+          style={{
+            top: `${top}%`,
+            backgroundColor: "#27272a",
+            opacity: 0.75,
+            animation: `drawLineH 1.8s ease forwards ${0.3 + i * 0.25}s`,
+            width: 0,
+          }}
+        />
+      ))}
+      {[25, 50, 75].map((left, i) => (
+        <div
+          key={`v${i}`}
+          className="absolute top-0 w-px"
+          style={{
+            left: `${left}%`,
+            backgroundColor: "#27272a",
+            opacity: 0.75,
+            animation: `drawLineV 1.8s ease forwards ${0.5 + i * 0.25}s`,
+            height: 0,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
+// ── Animated Counter ──────────────────────────────────────
 function AnimatedCounter({
   target,
   prefix = "",
@@ -80,7 +145,6 @@ function AnimatedCounter({
     const step = (now: number) => {
       const elapsed = (now - start) / (duration * 1000);
       const progress = Math.min(elapsed, 1);
-      // ease-out cubic
       const eased = 1 - Math.pow(1 - progress, 3);
       setCount(Math.round(eased * target));
       if (progress < 1) requestAnimationFrame(step);
@@ -104,293 +168,148 @@ export default function Home() {
   }, [session, router]);
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white relative overflow-x-hidden">
-      {/* Grain texture */}
+    <div className="min-h-screen bg-[#0a0a0a] text-white relative overflow-x-hidden">
+      <ParticleCanvas />
+      <GridLines />
+
+      {/* Violet ambient glow */}
       <div
         aria-hidden
-        className="fixed inset-0 pointer-events-none z-0 opacity-[0.35]"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E")`,
-          backgroundRepeat: "repeat",
-          backgroundSize: "200px 200px",
-        }}
+        className="fixed top-[-20%] left-1/2 -translate-x-1/2 w-[700px] h-[500px] rounded-full pointer-events-none z-0"
+        style={{ background: "radial-gradient(ellipse, rgba(124,58,237,0.08) 0%, transparent 70%)" }}
       />
-
-      {/* Animated shape background */}
-      <div aria-hidden className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        <div className="absolute top-[-15%] left-1/2 -translate-x-1/2 w-[900px] h-[600px] rounded-full bg-green-500/10 blur-[140px]" />
-        <ElegantShape
-          delay={0.3}
-          width={600}
-          height={140}
-          rotate={12}
-          gradient="from-green-500/[0.15]"
-          className="left-[-10%] md:left-[-5%] top-[15%] md:top-[20%]"
-        />
-        <ElegantShape
-          delay={0.5}
-          width={500}
-          height={120}
-          rotate={-15}
-          gradient="from-emerald-500/[0.15]"
-          className="right-[-5%] md:right-[0%] top-[70%] md:top-[75%]"
-        />
-        <ElegantShape
-          delay={0.4}
-          width={300}
-          height={80}
-          rotate={-8}
-          gradient="from-green-400/[0.15]"
-          className="left-[5%] md:left-[10%] bottom-[5%] md:bottom-[10%]"
-        />
-        <ElegantShape
-          delay={0.6}
-          width={200}
-          height={60}
-          rotate={20}
-          gradient="from-teal-500/[0.15]"
-          className="right-[15%] md:right-[20%] top-[10%] md:top-[15%]"
-        />
-        <ElegantShape
-          delay={0.7}
-          width={150}
-          height={40}
-          rotate={-25}
-          gradient="from-green-300/[0.15]"
-          className="left-[20%] md:left-[25%] top-[5%] md:top-[10%]"
-        />
-      </div>
 
       <div className="relative z-10">
         {/* ── Navbar ───────────────────────────────────────── */}
-        <header className="flex items-center justify-between px-6 sm:px-10 py-5 max-w-7xl mx-auto">
+        <header className="sticky top-0 z-50 flex items-center justify-between px-6 sm:px-10 py-4 border-b border-zinc-800 bg-[#0a0a0a]/95 backdrop-blur-md">
           <div className="flex items-center gap-2">
-            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-green-500/20 border border-green-500/30">
-              <Sparkles className="w-4 h-4 text-green-400" />
-            </div>
-            <span className="font-semibold text-white tracking-tight">UpworkAI</span>
+            <span className="w-2 h-2 rounded-full bg-violet-500 shrink-0" />
+            <span className="font-bold text-white tracking-tight">UpworkAI</span>
           </div>
-
-          <div className="relative group">
-            <div className="absolute -inset-px rounded-full bg-gradient-to-r from-green-500 to-emerald-400 opacity-0 group-hover:opacity-100 blur-sm transition-all duration-300" />
-            <button
-              onClick={() => signIn("google")}
-              disabled={status === "loading"}
-              className="relative flex items-center gap-2 rounded-full border border-zinc-700 group-hover:border-transparent bg-zinc-900 px-5 py-2 text-sm font-medium text-zinc-300 hover:text-white transition-all duration-200 disabled:opacity-60"
-            >
-              Sign in
-            </button>
-          </div>
+          <button
+            onClick={() => signIn("google")}
+            disabled={status === "loading"}
+            className="flex items-center gap-2 rounded-lg border border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/5 transition-all duration-200 disabled:opacity-60"
+          >
+            Sign in
+          </button>
         </header>
 
         {/* ── Hero ─────────────────────────────────────────── */}
-        <section className="max-w-7xl mx-auto px-6 sm:px-10 pt-16 pb-20 lg:pt-20 lg:pb-28">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-20 items-center">
-
-            {/* Left — copy */}
-            <div className="space-y-7">
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, ease }}
-              >
-                <span className="inline-flex items-center gap-2 rounded-full border border-green-500/30 bg-green-500/10 px-4 py-1.5 text-sm text-green-400 font-medium">
-                  <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
-                  </span>
-                  Trusted by 500+ freelancers
-                </span>
-              </motion.div>
-
-              <motion.h1
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, delay: 0.1, ease }}
-                className="text-4xl sm:text-5xl lg:text-[3.4rem] font-bold tracking-tight leading-[1.1] text-white"
-              >
-                Stop Losing Jobs to{" "}
-                <br />
-                <span className="text-green-400">Weaker Freelancers.</span>
-              </motion.h1>
-
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, delay: 0.2, ease }}
-                className="text-lg text-zinc-400 leading-relaxed max-w-[480px]"
-              >
-                UpworkAI reads every job post, finds what the client actually
-                fears, and writes a proposal that makes them choose you —
-                every single time.
-              </motion.p>
-
-              <motion.ul
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, delay: 0.3, ease }}
-                className="space-y-3"
-              >
-                {[
-                  "Scores jobs so you skip the ones you can't win",
-                  "Analyzes client psychology in seconds",
-                  "Writes proposals in your voice",
-                ].map((item) => (
-                  <li key={item} className="flex items-center gap-3">
-                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-green-500/20 border border-green-500/30">
-                      <Check className="w-3 h-3 text-green-400" />
-                    </span>
-                    <span className="text-sm text-zinc-300">{item}</span>
-                  </li>
-                ))}
-              </motion.ul>
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, delay: 0.4, ease }}
-                className="flex flex-col sm:flex-row sm:items-center gap-4"
-              >
-                <button
-                  onClick={() => signIn("google")}
-                  disabled={status === "loading"}
-                  className="group inline-flex items-center justify-center gap-3 rounded-full bg-green-500 hover:bg-green-400 px-9 py-4 text-lg font-bold text-zinc-950 shadow-xl shadow-green-500/25 hover:shadow-green-500/40 transition-all duration-200 disabled:opacity-60"
-                >
-                  Analyze Your First Job Free
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </button>
-                <p className="text-xs text-zinc-500">
-                  Free forever · No credit card · 2 min setup
-                </p>
-              </motion.div>
-            </div>
-
-            {/* Right — mock UI card */}
+        <section className="min-h-[calc(100vh-57px)] flex items-center justify-center px-6 sm:px-10 py-20">
+          <div className="max-w-4xl mx-auto text-center space-y-8">
             <motion.div
-              initial={{ opacity: 0, x: 32, y: 16 }}
-              animate={{ opacity: 1, x: 0, y: 0 }}
-              transition={{ duration: 0.9, delay: 0.35, ease }}
-              className="relative"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease }}
             >
-              <div className="absolute inset-[-10%] rounded-3xl bg-green-500/8 blur-3xl pointer-events-none" />
-              <div className="relative rounded-2xl border border-white/10 bg-zinc-900/80 backdrop-blur-xl p-6 shadow-2xl shadow-black/40 space-y-5">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="relative flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
-                    </span>
-                    <span className="text-xs font-medium text-zinc-400 uppercase tracking-widest">
-                      AI Analysis
-                    </span>
-                  </div>
-                  <span className="text-xs text-zinc-600 bg-zinc-800 px-2.5 py-0.5 rounded-full">
-                    Just now
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-4">
-                  <div className="flex flex-col items-center justify-center w-[76px] h-[76px] rounded-2xl bg-green-500/10 border border-green-500/20 shrink-0">
-                    <span className="text-3xl font-bold text-green-400 leading-none">9</span>
-                    <span className="text-[10px] text-zinc-500 mt-0.5">/10 match</span>
-                  </div>
-                  <div className="flex-1 space-y-2.5">
-                    <div>
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-xs text-zinc-500">Competition</span>
-                        <span className="text-xs text-red-400 font-medium">High</span>
-                      </div>
-                      <div className="h-1.5 w-full bg-zinc-800 rounded-full overflow-hidden">
-                        <motion.div
-                          initial={{ width: 0 }}
-                          animate={{ width: "78%" }}
-                          transition={{ delay: 1.1, duration: 0.8, ease: "easeOut" }}
-                          className="h-full bg-gradient-to-r from-yellow-500 to-red-500 rounded-full"
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-xs text-zinc-500">Your fit</span>
-                        <span className="text-xs text-green-400 font-medium">Excellent</span>
-                      </div>
-                      <div className="h-1.5 w-full bg-zinc-800 rounded-full overflow-hidden">
-                        <motion.div
-                          initial={{ width: 0 }}
-                          animate={{ width: "90%" }}
-                          transition={{ delay: 1.2, duration: 0.8, ease: "easeOut" }}
-                          className="h-full bg-gradient-to-r from-green-500 to-emerald-400 rounded-full"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="rounded-xl bg-zinc-800/50 border border-zinc-700/50 px-4 py-3 space-y-1">
-                  <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-widest">
-                    Client&apos;s Core Fear
-                  </p>
-                  <p className="text-sm text-zinc-200 leading-snug">
-                    &ldquo;Being ghosted again by an unreliable developer mid-project&rdquo;
-                  </p>
-                </div>
-
-                <div className="rounded-xl bg-green-500/5 border border-green-500/20 px-4 py-3 space-y-2">
-                  <div className="flex items-center gap-1.5">
-                    <Sparkles className="w-3 h-3 text-green-400" />
-                    <span className="text-xs font-medium text-green-400">
-                      Generated Proposal
-                    </span>
-                  </div>
-                  <p className="text-xs text-zinc-300 leading-relaxed">
-                    &ldquo;I read your post carefully — it sounds like you&apos;ve been through
-                    the hired-and-ghosted cycle before. Here&apos;s my commitment: daily
-                    Slack updates, a shared board you can check anytime, and three
-                    client references before we start...&rdquo;
-                  </p>
-                  <motion.div
-                    animate={{ opacity: [1, 0.3, 1] }}
-                    transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                    className="flex items-center gap-1.5"
-                  >
-                    <div className="w-0.5 h-3.5 bg-green-400 rounded-full" />
-                    <span className="text-xs text-zinc-500">Writing…</span>
-                  </motion.div>
-                </div>
-
-                <div className="flex flex-wrap gap-2">
-                  <span className="text-xs bg-zinc-800 border border-zinc-700 text-zinc-400 px-2.5 py-0.5 rounded-full">
-                    No budget set
-                  </span>
-                  <span className="text-xs bg-green-500/10 border border-green-500/20 text-green-400 px-2.5 py-0.5 rounded-full">
-                    ✓ Clear scope
-                  </span>
-                  <span className="text-xs bg-green-500/10 border border-green-500/20 text-green-400 px-2.5 py-0.5 rounded-full">
-                    ✓ Long-term potential
-                  </span>
-                </div>
-              </div>
+              <span className="text-xs font-semibold text-zinc-500 uppercase tracking-[0.2em]">
+                AI-Powered Proposal Intelligence
+              </span>
             </motion.div>
+
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.1, ease }}
+              className="font-bold tracking-tight leading-[0.95]"
+              style={{ fontSize: "clamp(48px, 8vw, 96px)" }}
+            >
+              <span className="text-white block">Stop Losing Jobs</span>
+              <span className="block bg-gradient-to-r from-violet-400 to-purple-600 bg-clip-text text-transparent">
+                to Weaker Freelancers.
+              </span>
+            </motion.h1>
+
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.2, ease }}
+              className="text-zinc-400 max-w-lg mx-auto text-lg leading-relaxed"
+            >
+              UpworkAI reads every job post, finds what the client actually
+              fears, and writes a proposal that makes them choose you —
+              every single time.
+            </motion.p>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.3, ease }}
+              className="flex flex-col sm:flex-row items-center justify-center gap-4"
+            >
+              <motion.button
+                whileTap={{ scale: 0.98 }}
+                onClick={() => signIn("google")}
+                disabled={status === "loading"}
+                className="group inline-flex items-center justify-center gap-2 rounded-lg bg-violet-600 hover:bg-violet-700 px-8 py-4 text-base font-semibold text-white shadow-lg shadow-violet-600/25 transition-all duration-200 disabled:opacity-60"
+              >
+                Analyze Your First Job Free
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+              </motion.button>
+
+              <motion.button
+                whileTap={{ scale: 0.98 }}
+                onClick={() => {
+                  document.getElementById("features")?.scrollIntoView({ behavior: "smooth" });
+                }}
+                className="inline-flex items-center gap-2 rounded-lg border border-zinc-700 px-8 py-4 text-base font-medium text-zinc-300 hover:border-zinc-500 hover:text-white transition-all duration-200"
+              >
+                See How It Works
+              </motion.button>
+            </motion.div>
+
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5, duration: 0.5 }}
+              className="text-xs text-zinc-600"
+            >
+              Free forever · No credit card · 2 min setup
+            </motion.p>
           </div>
         </section>
 
-        {/* ── Value banner ─────────────────────────────────── */}
-        <section className="max-w-7xl mx-auto px-6 sm:px-10 pb-20">
+        {/* ── Social Proof Bar ─────────────────────────────── */}
+        <motion.section
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8, duration: 0.6 }}
+          className="border-y border-zinc-800/60 bg-transparent py-4"
+        >
+          <div className="max-w-7xl mx-auto px-6 sm:px-10 flex flex-col sm:flex-row items-center justify-center gap-3">
+            <span className="text-sm text-zinc-500">
+              Trusted by freelancers from 50+ countries
+            </span>
+            <div className="hidden sm:block w-px h-4 bg-zinc-700" />
+            <div className="flex items-center gap-1">
+              {["🇺🇸","🇬🇧","🇮🇳","🇵🇰","🇩🇪","🇫🇷","🇧🇷","🇨🇦","🇦🇺","🇳🇬"].map((flag) => (
+                <span
+                  key={flag}
+                  className="text-base hover:scale-125 transition-transform cursor-default"
+                >
+                  {flag}
+                </span>
+              ))}
+            </div>
+          </div>
+        </motion.section>
+
+        {/* ── Value Banner ─────────────────────────────────── */}
+        <section className="max-w-7xl mx-auto px-6 sm:px-10 py-20">
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="relative rounded-2xl border border-green-500/20 bg-zinc-900/60 backdrop-blur-sm overflow-hidden"
+            className="relative rounded-2xl border border-zinc-800 bg-[#111111] overflow-hidden"
           >
-            {/* Glow */}
-            <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 via-transparent to-emerald-500/5 pointer-events-none" />
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-32 bg-green-500/8 blur-3xl pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-br from-violet-500/5 via-transparent to-purple-500/5 pointer-events-none" />
 
             <div className="relative px-6 sm:px-10 py-10 space-y-8">
               <p className="text-center text-lg sm:text-xl md:text-2xl font-semibold text-white leading-snug">
                 One extra job won ={" "}
-                <span className="text-green-400">
+                <span className="text-violet-400">
                   21 months of UpworkAI paid for
                 </span>
               </p>
@@ -407,9 +326,9 @@ export default function Home() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: i * 0.12, duration: 0.5 }}
-                    className="rounded-xl border border-zinc-800 bg-zinc-950/60 px-4 py-5 sm:px-6 sm:py-6 text-center space-y-1.5"
+                    className="rounded-xl border border-zinc-800 bg-[#0a0a0a]/60 px-4 py-5 sm:px-6 sm:py-6 text-center space-y-1.5"
                   >
-                    <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-green-400 tabular-nums">
+                    <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-violet-400 tabular-nums">
                       <AnimatedCounter target={target} prefix={prefix} suffix={suffix} />
                     </p>
                     <p className="text-xs sm:text-sm font-medium text-zinc-200">{label}</p>
@@ -421,33 +340,8 @@ export default function Home() {
           </motion.div>
         </section>
 
-        {/* ── Social proof bar ─────────────────────────────── */}
-        <motion.section
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.8, duration: 0.6 }}
-          className="border-y border-zinc-800/60 bg-zinc-900/30 backdrop-blur-sm py-4"
-        >
-          <div className="max-w-7xl mx-auto px-6 sm:px-10 flex flex-col sm:flex-row items-center justify-center gap-3">
-            <span className="text-sm text-zinc-500">
-              Join freelancers from 50+ countries
-            </span>
-            <div className="hidden sm:block w-px h-4 bg-zinc-700" />
-            <div className="flex items-center gap-1">
-              {["🇺🇸","🇬🇧","🇮🇳","🇵🇰","🇩🇪","🇫🇷","🇧🇷","🇨🇦","🇦🇺","🇳🇬"].map((flag) => (
-                <span
-                  key={flag}
-                  className="text-base hover:scale-125 transition-transform cursor-default"
-                >
-                  {flag}
-                </span>
-              ))}
-            </div>
-          </div>
-        </motion.section>
-
         {/* ── Features ─────────────────────────────────────── */}
-        <section className="max-w-7xl mx-auto px-6 sm:px-10 py-24 space-y-14">
+        <section id="features" className="max-w-7xl mx-auto px-6 sm:px-10 pb-24 space-y-14">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -455,7 +349,7 @@ export default function Home() {
             transition={{ duration: 0.6 }}
             className="text-center space-y-3"
           >
-            <span className="text-xs font-semibold text-green-400 uppercase tracking-widest">
+            <span className="text-xs font-semibold text-violet-400 uppercase tracking-widest">
               Features
             </span>
             <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
@@ -472,45 +366,37 @@ export default function Home() {
                 icon: BarChart2,
                 title: "Job Analyzer",
                 desc: "Find the client's real fear before applying. Know if a job is worth your connects before you spend them.",
-                color: "text-blue-400",
-                bg: "bg-blue-400/10",
-                border: "border-blue-400/15 bg-blue-500/[0.03]",
               },
               {
                 icon: PenLine,
                 title: "Proposal Writer",
                 desc: "AI writes in your voice — not generic templates. Every proposal sounds like you read their post twice.",
-                color: "text-green-400",
-                bg: "bg-green-400/10",
-                border: "border-green-500/30 bg-green-500/5 ring-1 ring-green-500/20",
                 badge: "Most popular",
               },
               {
                 icon: Trophy,
                 title: "Win Tracker",
                 desc: "Track won and lost proposals. Learn exactly what works so you stop repeating what doesn't.",
-                color: "text-yellow-400",
-                bg: "bg-yellow-400/10",
-                border: "border-yellow-400/15 bg-yellow-500/[0.03]",
               },
-            ].map(({ icon: Icon, title, desc, color, bg, border, badge }, i) => (
+            ].map(({ icon: Icon, title, desc, badge }, i) => (
               <motion.div
                 key={title}
                 initial={{ opacity: 0, y: 24 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1, duration: 0.6 }}
-                className={`relative rounded-2xl border p-6 space-y-4 ${border}`}
+                whileHover={{ scale: 1.02 }}
+                className="relative rounded-xl border border-zinc-800 bg-[#111111] p-6 space-y-4 hover:border-violet-500/40 transition-colors duration-300 cursor-default"
               >
                 {badge && (
                   <div className="absolute -top-3 left-6">
-                    <span className="text-xs bg-green-500 text-zinc-950 font-semibold px-3 py-0.5 rounded-full">
+                    <span className="text-xs bg-violet-600 text-white font-semibold px-3 py-0.5 rounded-full">
                       {badge}
                     </span>
                   </div>
                 )}
-                <div className={`w-10 h-10 rounded-xl ${bg} flex items-center justify-center`}>
-                  <Icon className={`w-5 h-5 ${color}`} />
+                <div className="w-10 h-10 rounded-xl bg-violet-500/15 flex items-center justify-center">
+                  <Icon className="w-5 h-5 text-violet-400" />
                 </div>
                 <div>
                   <h3 className="text-base font-semibold text-white mb-1.5">{title}</h3>
@@ -521,7 +407,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ── Comparison table ─────────────────────────────── */}
+        {/* ── Comparison Table ─────────────────────────────── */}
         <section className="max-w-7xl mx-auto px-6 sm:px-10 pb-28 space-y-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -530,7 +416,7 @@ export default function Home() {
             transition={{ duration: 0.6 }}
             className="text-center space-y-3"
           >
-            <span className="text-xs font-semibold text-green-400 uppercase tracking-widest">
+            <span className="text-xs font-semibold text-violet-400 uppercase tracking-widest">
               Comparison
             </span>
             <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
@@ -551,13 +437,11 @@ export default function Home() {
             <table className="w-full min-w-[640px] border-collapse">
               <thead>
                 <tr>
-                  {/* Feature label column */}
                   <th className="text-left pb-4 pr-4 w-[36%]">
                     <span className="text-xs font-semibold text-zinc-500 uppercase tracking-widest">
                       Feature
                     </span>
                   </th>
-                  {/* Competitor columns — invisible spacer keeps baseline aligned with UpworkAI badge */}
                   {[
                     { name: "ChatGPT", price: "$20/mo" },
                     { name: "Grammarly", price: "$30/mo" },
@@ -571,14 +455,13 @@ export default function Home() {
                       </div>
                     </th>
                   ))}
-                  {/* UpworkAI column — badge sits above name in normal flow */}
                   <th className="pb-4 px-2 text-center w-[16%]">
                     <div className="flex flex-col items-center gap-0.5">
-                      <span className="text-[9px] bg-green-500 text-zinc-950 font-bold px-2 py-0.5 rounded-full leading-[18px]">
+                      <span className="text-[9px] bg-violet-600 text-white font-bold px-2 py-0.5 rounded-full leading-[18px]">
                         Best Value
                       </span>
-                      <span className="text-sm font-bold text-green-400">UpworkAI</span>
-                      <span className="text-xs text-green-500/70">$14/mo</span>
+                      <span className="text-sm font-bold text-violet-400">UpworkAI</span>
+                      <span className="text-xs text-violet-500/70">$14/mo</span>
                     </div>
                   </th>
                 </tr>
@@ -606,12 +489,7 @@ export default function Home() {
                       <td className="py-3.5 pr-4 text-sm text-zinc-300 font-medium">
                         {feature}
                       </td>
-                      {/* Competitors — all ❌ except price */}
-                      {[
-                        { price: "$20/mo" },
-                        { price: "$30/mo" },
-                        { price: "$49/mo" },
-                      ].map((comp, j) => (
+                      {[{ price: "$20/mo" }, { price: "$30/mo" }, { price: "$49/mo" }].map((comp, j) => (
                         <td key={j} className="py-3.5 px-2 text-center">
                           {isPrice ? (
                             <span className="text-sm text-zinc-500 font-medium">{comp.price}</span>
@@ -622,15 +500,13 @@ export default function Home() {
                           )}
                         </td>
                       ))}
-                      {/* UpworkAI — all ✅ */}
                       <td className="py-3.5 px-2 text-center relative">
-                        {/* Green side accent on the column */}
-                        <div className="absolute inset-y-0 inset-x-0 border-x border-green-500/20 bg-green-500/[0.03] pointer-events-none" />
+                        <div className="absolute inset-y-0 inset-x-0 border-x border-violet-500/20 bg-violet-500/[0.03] pointer-events-none" />
                         {isPrice ? (
-                          <span className="relative text-sm font-bold text-green-400">$14/mo</span>
+                          <span className="relative text-sm font-bold text-violet-400">$14/mo</span>
                         ) : (
-                          <span className="relative inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-500/15">
-                            <Check className="w-3 h-3 text-green-400" />
+                          <span className="relative inline-flex items-center justify-center w-6 h-6 rounded-full bg-violet-500/15">
+                            <Check className="w-3 h-3 text-violet-400" />
                           </span>
                         )}
                       </td>
@@ -641,7 +517,6 @@ export default function Home() {
             </table>
           </motion.div>
 
-          {/* Table CTA */}
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -652,19 +527,20 @@ export default function Home() {
             <p className="text-zinc-400 text-sm font-medium">
               Stop paying more for less. Start winning today.
             </p>
-            <button
+            <motion.button
+              whileTap={{ scale: 0.98 }}
               onClick={() => signIn("google")}
               disabled={status === "loading"}
-              className="group inline-flex items-center gap-2 rounded-full bg-green-500 hover:bg-green-400 px-6 py-2.5 text-sm font-semibold text-zinc-950 shadow-lg shadow-green-500/20 hover:shadow-green-500/30 transition-all duration-200 disabled:opacity-60"
+              className="group inline-flex items-center gap-2 rounded-lg bg-violet-600 hover:bg-violet-700 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-violet-600/20 transition-all duration-200 disabled:opacity-60"
             >
               Start for Free
               <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-            </button>
+            </motion.button>
           </motion.div>
         </section>
 
         {/* ── Before / After ───────────────────────────────── */}
-        <section className="max-w-7xl mx-auto px-6 sm:px-10 py-10 pb-28">
+        <section className="max-w-7xl mx-auto px-6 sm:px-10 pb-28">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -672,7 +548,7 @@ export default function Home() {
             transition={{ duration: 0.6 }}
             className="text-center space-y-3 mb-12"
           >
-            <span className="text-xs font-semibold text-green-400 uppercase tracking-widest">
+            <span className="text-xs font-semibold text-violet-400 uppercase tracking-widest">
               Before vs After
             </span>
             <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
@@ -689,13 +565,11 @@ export default function Home() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
-              className="rounded-2xl border border-red-500/20 bg-red-500/5 p-6 space-y-5"
+              className="rounded-xl border border-red-500/20 bg-red-500/5 p-6 space-y-5"
             >
               <div className="flex items-center gap-2">
                 <div className="w-2.5 h-2.5 rounded-full bg-red-500" />
-                <span className="text-sm font-semibold text-red-400">
-                  Generic Proposal
-                </span>
+                <span className="text-sm font-semibold text-red-400">Generic Proposal</span>
               </div>
               <div className="space-y-2 text-sm text-zinc-400 leading-relaxed">
                 <p>Hello,</p>
@@ -708,23 +582,18 @@ export default function Home() {
                   I have worked on similar projects before and can deliver high
                   quality work on time.
                 </p>
-                <p>
-                  Please check my profile for my portfolio. I am available to
-                  start immediately.
-                </p>
+                <p>Please check my profile for my portfolio. I am available to start immediately.</p>
                 <p>Best regards</p>
               </div>
               <div className="flex flex-wrap gap-2 pt-1 border-t border-red-500/10">
-                {["No research", "Generic opener", "No social proof", "Gets ignored"].map(
-                  (tag) => (
-                    <span
-                      key={tag}
-                      className="text-xs bg-red-500/10 border border-red-500/20 text-red-400 px-2.5 py-0.5 rounded-full"
-                    >
-                      {tag}
-                    </span>
-                  )
-                )}
+                {["No research", "Generic opener", "No social proof", "Gets ignored"].map((tag) => (
+                  <span
+                    key={tag}
+                    className="text-xs bg-red-500/10 border border-red-500/20 text-red-400 px-2.5 py-0.5 rounded-full"
+                  >
+                    {tag}
+                  </span>
+                ))}
               </div>
             </motion.div>
 
@@ -733,16 +602,14 @@ export default function Home() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
-              className="rounded-2xl border border-green-500/20 bg-green-500/5 p-6 space-y-5"
+              className="rounded-xl border border-violet-500/25 bg-violet-500/5 p-6 space-y-5"
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="w-2.5 h-2.5 rounded-full bg-green-500" />
-                  <span className="text-sm font-semibold text-green-400">
-                    UpworkAI Proposal
-                  </span>
+                  <div className="w-2.5 h-2.5 rounded-full bg-violet-500" />
+                  <span className="text-sm font-semibold text-violet-400">UpworkAI Proposal</span>
                 </div>
-                <span className="text-xs bg-green-500 text-zinc-950 font-bold px-2.5 py-0.5 rounded-full">
+                <span className="text-xs bg-violet-600 text-white font-bold px-2.5 py-0.5 rounded-full">
                   Hired
                 </span>
               </div>
@@ -762,39 +629,41 @@ export default function Home() {
                   quarter — here&apos;s what week one looks like if we work together...
                 </p>
               </div>
-              <div className="flex flex-wrap gap-2 pt-1 border-t border-green-500/10">
-                {["Addresses fear", "Specific research", "Social proof", "Gets hired"].map(
-                  (tag) => (
-                    <span
-                      key={tag}
-                      className="text-xs bg-green-500/15 border border-green-500/25 text-green-400 px-2.5 py-0.5 rounded-full"
-                    >
-                      {tag}
-                    </span>
-                  )
-                )}
+              <div className="flex flex-wrap gap-2 pt-1 border-t border-violet-500/15">
+                {["Addresses fear", "Specific research", "Social proof", "Gets hired"].map((tag) => (
+                  <span
+                    key={tag}
+                    className="text-xs bg-violet-500/15 border border-violet-500/25 text-violet-400 px-2.5 py-0.5 rounded-full"
+                  >
+                    {tag}
+                  </span>
+                ))}
               </div>
             </motion.div>
           </div>
         </section>
 
-        {/* ── CTA ──────────────────────────────────────────── */}
+        {/* ── Bottom CTA ───────────────────────────────────── */}
         <section className="max-w-7xl mx-auto px-6 sm:px-10 pb-24">
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="relative rounded-3xl border border-zinc-800 bg-zinc-900/60 p-12 sm:p-16 text-center space-y-7 overflow-hidden"
+            className="relative rounded-2xl border border-zinc-800 bg-[#111111] p-12 sm:p-16 text-center space-y-7 overflow-hidden"
           >
-            <div className="absolute inset-0 bg-gradient-to-b from-green-500/5 to-transparent pointer-events-none" />
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-48 bg-green-500/10 blur-3xl pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-b from-violet-600/5 to-transparent pointer-events-none" />
+            <div
+              aria-hidden
+              className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-48 pointer-events-none"
+              style={{ background: "radial-gradient(ellipse, rgba(124,58,237,0.1) 0%, transparent 70%)" }}
+            />
 
             <div className="relative space-y-4">
-              <span className="inline-flex items-center gap-2 rounded-full border border-green-500/30 bg-green-500/10 px-4 py-1.5 text-sm text-green-400 font-medium">
-                <Sparkles className="w-3.5 h-3.5" />
+              <div className="flex items-center justify-center gap-2 text-xs font-medium text-violet-400 uppercase tracking-widest">
+                <Zap className="w-3.5 h-3.5" />
                 Free to start
-              </span>
+              </div>
               <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
                 Start Writing Winning Proposals Today
               </h2>
@@ -804,16 +673,17 @@ export default function Home() {
             </div>
 
             <div className="relative flex flex-col sm:flex-row items-center justify-center gap-3">
-              <button
+              <motion.button
+                whileTap={{ scale: 0.98 }}
                 onClick={() => signIn("google")}
                 disabled={status === "loading"}
-                className="group inline-flex items-center gap-2.5 rounded-full bg-green-500 hover:bg-green-400 px-8 py-4 text-base font-semibold text-zinc-950 shadow-lg shadow-green-500/25 hover:shadow-green-500/40 transition-all duration-200 disabled:opacity-60"
+                className="group inline-flex items-center gap-2.5 rounded-lg bg-violet-600 hover:bg-violet-700 px-8 py-4 text-base font-semibold text-white shadow-lg shadow-violet-600/25 transition-all duration-200 disabled:opacity-60"
               >
                 <GoogleIcon />
                 Get Started Free
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-              </button>
-              <p className="text-xs text-zinc-500">No credit card required</p>
+              </motion.button>
+              <p className="text-xs text-zinc-600">No credit card required</p>
             </div>
           </motion.div>
         </section>
@@ -822,14 +692,10 @@ export default function Home() {
         <footer className="border-t border-zinc-800/60 py-8 px-6 sm:px-10">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="flex items-center justify-center w-6 h-6 rounded-md bg-green-500/20">
-                <Sparkles className="w-3 h-3 text-green-400" />
-              </div>
+              <span className="w-1.5 h-1.5 rounded-full bg-violet-500" />
               <span className="text-sm font-medium text-zinc-500">UpworkAI</span>
             </div>
-            <p className="text-xs text-zinc-600">
-              © 2026 UpworkAI. Built for freelancers.
-            </p>
+            <p className="text-xs text-zinc-600">© 2026 UpworkAI. Built for freelancers.</p>
           </div>
         </footer>
       </div>

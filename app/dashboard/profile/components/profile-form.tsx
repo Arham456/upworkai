@@ -77,16 +77,19 @@ function ProBlur({ children, isPro, featureName }: { children: React.ReactNode; 
   return (
     <div className="relative rounded-xl overflow-hidden">
       <div className="blur-sm pointer-events-none select-none opacity-50">{children}</div>
-      <div className="absolute inset-0 flex flex-col items-center justify-center bg-zinc-950/80 rounded-xl">
+      <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#0a0a0a]/80 rounded-xl">
         <div className="text-center space-y-3 p-6">
-          <div className="w-10 h-10 rounded-xl bg-green-500/10 border border-green-500/20 flex items-center justify-center mx-auto">
-            <Zap className="w-5 h-5 text-green-400" />
+          <div className="w-10 h-10 rounded-xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center mx-auto">
+            <Zap className="w-5 h-5 text-violet-400" />
           </div>
           <div>
             <p className="text-sm font-semibold text-white">{featureName}</p>
             <p className="text-xs text-zinc-400 mt-1">Upgrade to Pro to unlock this insight</p>
           </div>
-          <Link href="/dashboard/upgrade" className="inline-flex items-center gap-1.5 rounded-lg bg-green-500 px-4 py-2 text-xs font-bold text-zinc-950 hover:bg-green-400 transition-colors">
+          <Link
+            href="/dashboard/upgrade"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-violet-600 hover:bg-violet-700 px-4 py-2 text-xs font-bold text-white transition-colors"
+          >
             <Zap className="w-3 h-3" />
             Upgrade to Pro
           </Link>
@@ -96,7 +99,17 @@ function ProBlur({ children, isPro, featureName }: { children: React.ReactNode; 
   );
 }
 
-function VoiceDnaCard({ dnaData, loading, isPro, showDashboardCta }: { dnaData: VoiceDNAData; loading: boolean; isPro: boolean; showDashboardCta?: boolean }) {
+function VoiceDnaCard({
+  dnaData,
+  loading,
+  isPro,
+  showDashboardCta,
+}: {
+  dnaData: VoiceDNAData;
+  loading: boolean;
+  isPro: boolean;
+  showDashboardCta?: boolean;
+}) {
   const displayData = isPro ? dnaData : MOCK_DNA;
 
   if (loading) {
@@ -137,7 +150,7 @@ function VoiceDnaCard({ dnaData, loading, isPro, showDashboardCta }: { dnaData: 
           <p className="text-xs font-medium text-zinc-500 uppercase tracking-wide">Always uses</p>
           <div className="flex flex-wrap gap-1.5">
             {displayData.phrasesAlwaysUsed.map((p, i) => (
-              <span key={i} className="rounded-full bg-green-500/10 border border-green-500/20 px-2.5 py-0.5 text-xs text-green-400">
+              <span key={i} className="rounded-full bg-violet-500/10 border border-violet-500/20 px-2.5 py-0.5 text-xs text-violet-400">
                 {p}
               </span>
             ))}
@@ -176,7 +189,7 @@ function VoiceDnaCard({ dnaData, loading, isPro, showDashboardCta }: { dnaData: 
           <div className="pt-2 border-t border-violet-500/20">
             <Link
               href="/dashboard"
-              className="inline-flex items-center gap-2 rounded-lg bg-green-500 px-4 py-2 text-sm font-semibold text-zinc-950 hover:bg-green-400 transition-colors"
+              className="inline-flex items-center gap-2 rounded-lg bg-violet-600 hover:bg-violet-700 px-4 py-2 text-sm font-semibold text-white transition-colors"
             >
               <Check className="w-4 h-4" />
               Profile saved — Go to Dashboard
@@ -267,7 +280,6 @@ export function ProfileForm({
         } finally {
           setDnaLoading(false);
         }
-        // Stay on profile page so user sees their Voice DNA
         return;
       }
 
@@ -281,15 +293,14 @@ export function ProfileForm({
 
   return (
     <div className="space-y-8">
-      {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-white">Profile Setup</h1>
-        <p className="text-zinc-400 text-sm mt-1">
+        <h1 className="text-2xl font-bold text-white tracking-tight">Profile Setup</h1>
+        <p className="text-zinc-500 text-sm mt-1">
           Help the AI write proposals that sound exactly like you.
         </p>
       </div>
 
-      {/* Progress bar */}
+      {/* Progress steps */}
       <div className="space-y-3">
         <div className="flex items-center gap-0">
           {STEPS.map((s, i) => (
@@ -302,9 +313,9 @@ export function ProfileForm({
                 <span
                   className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold transition-colors ${
                     step > s.number
-                      ? "bg-green-500 text-zinc-950"
+                      ? "bg-violet-600 text-white"
                       : step === s.number
-                      ? "bg-green-500/20 border-2 border-green-500 text-green-400"
+                      ? "bg-violet-500/20 border-2 border-violet-500 text-violet-400"
                       : "bg-zinc-800 border border-zinc-700 text-zinc-500"
                   }`}
                 >
@@ -319,8 +330,9 @@ export function ProfileForm({
                 </span>
               </button>
               {i < STEPS.length - 1 && (
-                <div className="flex-1 h-px mx-2 mb-5 transition-colors"
-                  style={{ background: step > s.number ? "#22c55e" : "#3f3f46" }}
+                <div
+                  className="flex-1 h-px mx-2 mb-5 transition-colors"
+                  style={{ background: step > s.number ? "#7C3AED" : "#3f3f46" }}
                 />
               )}
             </div>
@@ -380,7 +392,6 @@ export function ProfileForm({
         />
       )}
 
-      {/* Free user Voice DNA preview — always shown on profile page */}
       {!isPro && !dnaData && !dnaLoading && (
         <VoiceDnaCard dnaData={null} loading={false} isPro={false} />
       )}
@@ -400,7 +411,7 @@ export function ProfileForm({
           <button
             onClick={() => navigate(step + 1)}
             disabled={step === 1 && form.skills.length === 0}
-            className="flex items-center gap-1.5 rounded-lg bg-green-500 px-5 py-2 text-sm font-semibold text-zinc-950 hover:bg-green-400 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            className="flex items-center gap-1.5 rounded-lg bg-violet-600 hover:bg-violet-700 px-5 py-2 text-sm font-semibold text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
             Continue
             <ChevronRight className="w-4 h-4" />
@@ -409,7 +420,7 @@ export function ProfileForm({
           <button
             onClick={handleSave}
             disabled={saving || saved}
-            className="flex items-center gap-2 rounded-lg bg-green-500 px-5 py-2 text-sm font-semibold text-zinc-950 hover:bg-green-400 transition-colors disabled:opacity-60"
+            className="flex items-center gap-2 rounded-lg bg-violet-600 hover:bg-violet-700 px-5 py-2 text-sm font-semibold text-white transition-colors disabled:opacity-60"
           >
             {saving ? (
               <>
@@ -467,7 +478,7 @@ function StepSkills({
           onChange={(e) => onChange(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), onAdd())}
           placeholder="e.g. React, Copywriting, UI Design…"
-          className="flex-1 rounded-lg border border-zinc-700 bg-zinc-800/60 px-4 py-2.5 text-sm text-white placeholder-zinc-500 focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500/30 transition-colors"
+          className="flex-1 rounded-lg border border-zinc-800 bg-[#0a0a0a] px-4 py-2.5 text-sm text-white placeholder-zinc-500 focus:border-violet-500 focus:outline-none transition-colors"
         />
         <button
           onClick={onAdd}
@@ -482,12 +493,12 @@ function StepSkills({
           {skills.map((skill) => (
             <span
               key={skill}
-              className="flex items-center gap-1.5 rounded-full bg-green-500/15 border border-green-500/30 px-3 py-1 text-sm text-green-400"
+              className="flex items-center gap-1.5 rounded-full bg-violet-500/15 border border-violet-500/30 px-3 py-1 text-sm text-violet-400"
             >
               {skill}
               <button
                 onClick={() => onRemove(skill)}
-                className="text-green-500/60 hover:text-green-300 transition-colors"
+                className="text-violet-500/60 hover:text-violet-300 transition-colors"
                 aria-label={`Remove ${skill}`}
               >
                 <X className="w-3 h-3" />
@@ -502,24 +513,22 @@ function StepSkills({
       <div className="space-y-1">
         <p className="text-xs text-zinc-600">Examples:</p>
         <div className="flex flex-wrap gap-1.5">
-          {["React", "Node.js", "Graphic Design", "Copywriting", "Python", "SEO"].map(
-            (ex) => (
-              <button
-                key={ex}
-                onClick={() => {
-                  if (!skills.includes(ex)) {
-                    onRemove(""); // no-op, just type-safe
-                    onChange(ex);
-                    setTimeout(() => onAdd(), 0);
-                  }
-                }}
-                disabled={skills.includes(ex)}
-                className="rounded-full border border-zinc-700 px-2.5 py-0.5 text-xs text-zinc-500 hover:text-zinc-200 hover:border-zinc-500 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-              >
-                {ex}
-              </button>
-            )
-          )}
+          {["React", "Node.js", "Graphic Design", "Copywriting", "Python", "SEO"].map((ex) => (
+            <button
+              key={ex}
+              onClick={() => {
+                if (!skills.includes(ex)) {
+                  onRemove("");
+                  onChange(ex);
+                  setTimeout(() => onAdd(), 0);
+                }
+              }}
+              disabled={skills.includes(ex)}
+              className="rounded-full border border-zinc-700 px-2.5 py-0.5 text-xs text-zinc-500 hover:text-zinc-200 hover:border-zinc-500 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+            >
+              {ex}
+            </button>
+          ))}
         </div>
       </div>
     </div>
@@ -555,14 +564,12 @@ function StepNiche({
           onChange={(e) => onChange("niche", e.target.value)}
           placeholder='e.g. "I build SaaS dashboards for startup founders using React and Node.js"'
           rows={3}
-          className="w-full rounded-lg border border-zinc-700 bg-zinc-800/60 px-4 py-2.5 text-sm text-white placeholder-zinc-500 focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500/30 transition-colors resize-none"
+          className="w-full rounded-lg border border-zinc-800 bg-[#0a0a0a] px-4 py-2.5 text-sm text-white placeholder-zinc-500 focus:border-violet-500 focus:outline-none transition-colors resize-none"
         />
       </div>
 
       <div className="space-y-1.5">
-        <label className="block text-sm font-medium text-zinc-300">
-          Experience level
-        </label>
+        <label className="block text-sm font-medium text-zinc-300">Experience level</label>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
           {EXPERIENCE_OPTIONS.map((opt) => (
             <button
@@ -570,13 +577,13 @@ function StepNiche({
               onClick={() => onChange("experience", opt.value)}
               className={`rounded-lg border p-3 text-left transition-colors ${
                 experience === opt.value
-                  ? "border-green-500 bg-green-500/10"
+                  ? "border-violet-500 bg-violet-500/10"
                   : "border-zinc-700 bg-zinc-800/40 hover:border-zinc-500"
               }`}
             >
               <p
                 className={`text-sm font-medium ${
-                  experience === opt.value ? "text-green-400" : "text-zinc-200"
+                  experience === opt.value ? "text-violet-400" : "text-zinc-200"
                 }`}
               >
                 {opt.label}
@@ -597,20 +604,14 @@ function StepNiche({
           value={upworkUrl}
           onChange={(e) => onChange("upworkUrl", e.target.value)}
           placeholder="https://www.upwork.com/freelancers/~..."
-          className="w-full rounded-lg border border-zinc-700 bg-zinc-800/60 px-4 py-2.5 text-sm text-white placeholder-zinc-500 focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500/30 transition-colors"
+          className="w-full rounded-lg border border-zinc-800 bg-[#0a0a0a] px-4 py-2.5 text-sm text-white placeholder-zinc-500 focus:border-violet-500 focus:outline-none transition-colors"
         />
       </div>
     </div>
   );
 }
 
-function StepStyle({
-  value,
-  onChange,
-}: {
-  value: string;
-  onChange: (v: string) => void;
-}) {
+function StepStyle({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   return (
     <div className="space-y-5">
       <div>
@@ -626,7 +627,7 @@ function StepStyle({
           onChange={(e) => onChange(e.target.value)}
           placeholder="Paste your best proposals here…"
           rows={10}
-          className="w-full rounded-lg border border-zinc-700 bg-zinc-800/60 px-4 py-3 text-sm text-white placeholder-zinc-500 focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500/30 transition-colors resize-none leading-relaxed"
+          className="w-full rounded-lg border border-zinc-800 bg-[#0a0a0a] px-4 py-3 text-sm text-white placeholder-zinc-500 focus:border-violet-500 focus:outline-none transition-colors resize-none leading-relaxed"
         />
         <p className="text-xs text-zinc-600">
           The AI will learn your tone, hook style, and voice from these samples.
@@ -664,7 +665,7 @@ function StepReview({ form, error }: { form: FormData; error: string }) {
                 {form.skills.map((s) => (
                   <span
                     key={s}
-                    className="rounded-full bg-green-500/15 border border-green-500/30 px-2.5 py-0.5 text-xs text-green-400"
+                    className="rounded-full bg-violet-500/15 border border-violet-500/30 px-2.5 py-0.5 text-xs text-violet-400"
                   >
                     {s}
                   </span>
@@ -728,15 +729,9 @@ function StepReview({ form, error }: { form: FormData; error: string }) {
   );
 }
 
-function ReviewRow({
-  label,
-  value,
-}: {
-  label: string;
-  value: React.ReactNode;
-}) {
+function ReviewRow({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-4 rounded-lg border border-zinc-800 bg-zinc-900 px-4 py-3">
+    <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-4 rounded-lg border border-zinc-800 bg-[#111111] px-4 py-3">
       <span className="shrink-0 text-xs font-medium text-zinc-500 sm:w-32 sm:pt-0.5">
         {label}
       </span>

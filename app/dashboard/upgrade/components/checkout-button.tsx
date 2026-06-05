@@ -28,7 +28,7 @@ export function CheckoutButton() {
       <button
         onClick={handleUpgrade}
         disabled={loading}
-        className="flex w-full items-center justify-center gap-2 rounded-xl bg-green-500 py-3 text-sm font-semibold text-zinc-950 hover:bg-green-400 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
+        className="flex w-full items-center justify-center gap-2 rounded-xl bg-violet-600 py-3 text-sm font-semibold text-white hover:bg-violet-700 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
       >
         {loading ? (
           <Loader2 className="w-4 h-4 animate-spin" />

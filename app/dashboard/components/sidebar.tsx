@@ -11,7 +11,6 @@ import {
   PenLine,
   FolderOpen,
   UserCircle,
-  Sparkles,
   LogOut,
   Zap,
   Menu,
@@ -24,16 +23,27 @@ const navItems = [
   { label: "Write Proposal", href: "/dashboard/write", icon: PenLine },
   { label: "My Proposals", href: "/dashboard/proposals", icon: FolderOpen },
   { label: "Profile Setup", href: "/dashboard/profile", icon: UserCircle },
-  { label: "Upgrade to Pro", href: "/dashboard/upgrade", icon: Zap },
 ];
+
+function UserInitials({ name }: { name?: string | null }) {
+  const initials = name
+    ? name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase()
+    : "?";
+  return (
+    <div className="w-8 h-8 rounded-full bg-violet-600 flex items-center justify-center shrink-0">
+      <span className="text-xs font-bold text-white">{initials}</span>
+    </div>
+  );
+}
 
 function NavContent({ onLinkClick }: { onLinkClick?: () => void }) {
   const pathname = usePathname();
   const { data: session } = useSession();
+  const isPro = session?.user?.plan === "pro";
 
   return (
     <>
-      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+      <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
         {navItems.map(({ label, href, icon: Icon }) => {
           const isActive =
             href === "/dashboard"
@@ -44,10 +54,10 @@ function NavContent({ onLinkClick }: { onLinkClick?: () => void }) {
               key={href}
               href={href}
               onClick={onLinkClick}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
                 isActive
-                  ? "bg-green-500/15 text-green-400"
-                  : "text-zinc-400 hover:text-white hover:bg-zinc-800"
+                  ? "bg-violet-500/10 text-violet-400 shadow-[inset_3px_0_0_0_#7C3AED]"
+                  : "text-zinc-400 hover:text-white hover:bg-white/5"
               }`}
             >
               <Icon className="w-4 h-4 shrink-0" />
@@ -56,6 +66,20 @@ function NavContent({ onLinkClick }: { onLinkClick?: () => void }) {
           );
         })}
       </nav>
+
+      <div className="px-3 py-3 space-y-3 shrink-0">
+        {/* Upgrade button — free users only */}
+        {!isPro && (
+          <Link
+            href="/dashboard/upgrade"
+            onClick={onLinkClick}
+            className="flex items-center justify-center gap-2 w-full rounded-lg bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 px-4 py-2.5 text-sm font-semibold text-white transition-all duration-200"
+          >
+            <Zap className="w-4 h-4" />
+            Upgrade to Pro
+          </Link>
+        )}
+      </div>
 
       <div className="px-4 py-4 border-t border-zinc-800 space-y-3 shrink-0">
         <div className="flex items-center gap-3 min-w-0">
@@ -67,12 +91,19 @@ function NavContent({ onLinkClick }: { onLinkClick?: () => void }) {
               className="w-8 h-8 rounded-full shrink-0"
             />
           ) : (
-            <div className="w-8 h-8 rounded-full bg-zinc-700 shrink-0" />
+            <UserInitials name={session?.user?.name} />
           )}
-          <div className="min-w-0">
-            <p className="text-sm font-medium text-white truncate">
-              {session?.user?.name}
-            </p>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2">
+              <p className="text-sm font-medium text-white truncate">
+                {session?.user?.name}
+              </p>
+              {isPro && (
+                <span className="shrink-0 rounded-full bg-violet-500/20 border border-violet-500/30 px-1.5 py-0 text-[10px] font-bold text-violet-400 leading-4">
+                  PRO
+                </span>
+              )}
+            </div>
             <p className="text-xs text-zinc-500 truncate">
               {session?.user?.email}
             </p>
@@ -80,7 +111,7 @@ function NavContent({ onLinkClick }: { onLinkClick?: () => void }) {
         </div>
         <button
           onClick={() => signOut({ callbackUrl: "/" })}
-          className="flex w-full items-center gap-2 rounded-lg px-2 py-2 text-xs text-zinc-500 hover:text-white hover:bg-zinc-800 transition-colors"
+          className="flex w-full items-center gap-2 rounded-lg px-2 py-2 text-xs text-zinc-500 hover:text-red-400 hover:bg-red-500/5 transition-colors"
         >
           <LogOut className="w-3.5 h-3.5" />
           Sign out
@@ -94,7 +125,6 @@ export function Sidebar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
 
-  // Close drawer whenever the route changes
   useEffect(() => {
     setMobileOpen(false);
   }, [pathname]);
@@ -102,18 +132,14 @@ export function Sidebar() {
   return (
     <>
       {/* ── Mobile top bar ───────────────────────────────── */}
-      <div className="md:hidden fixed top-0 inset-x-0 z-40 flex items-center justify-between h-14 px-4 bg-zinc-900/95 backdrop-blur-md border-b border-zinc-800">
+      <div className="md:hidden fixed top-0 inset-x-0 z-40 flex items-center justify-between h-14 px-4 bg-[#111111]/95 backdrop-blur-md border-b border-zinc-800">
         <div className="flex items-center gap-2">
-          <div className="flex items-center justify-center w-7 h-7 rounded-lg bg-green-500/20">
-            <Sparkles className="w-3.5 h-3.5 text-green-400" />
-          </div>
-          <span className="font-semibold text-white text-sm tracking-tight">
-            UpworkAI
-          </span>
+          <span className="w-2 h-2 rounded-full bg-violet-500 shrink-0" />
+          <span className="font-bold text-white text-sm tracking-tight">UpworkAI</span>
         </div>
         <button
           onClick={() => setMobileOpen(true)}
-          className="flex items-center justify-center w-9 h-9 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
+          className="flex items-center justify-center w-9 h-9 rounded-lg text-zinc-400 hover:text-white hover:bg-white/5 transition-colors"
           aria-label="Open menu"
         >
           <Menu className="w-5 h-5" />
@@ -144,20 +170,16 @@ export function Sidebar() {
             animate={{ x: 0 }}
             exit={{ x: "-100%" }}
             transition={{ duration: 0.25, ease: "easeOut" }}
-            className="md:hidden fixed top-0 left-0 h-full z-50 w-72 flex flex-col bg-zinc-900 border-r border-zinc-800"
+            className="md:hidden fixed top-0 left-0 h-full z-50 w-72 flex flex-col bg-[#111111] border-r border-zinc-800"
           >
             <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-800 shrink-0">
               <div className="flex items-center gap-2">
-                <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-green-500/20">
-                  <Sparkles className="w-4 h-4 text-green-400" />
-                </div>
-                <span className="font-semibold text-white tracking-tight">
-                  UpworkAI
-                </span>
+                <span className="w-2 h-2 rounded-full bg-violet-500 shrink-0" />
+                <span className="font-bold text-white tracking-tight">UpworkAI</span>
               </div>
               <button
                 onClick={() => setMobileOpen(false)}
-                className="flex items-center justify-center w-8 h-8 rounded-lg text-zinc-500 hover:text-white hover:bg-zinc-800 transition-colors"
+                className="flex items-center justify-center w-8 h-8 rounded-lg text-zinc-500 hover:text-white hover:bg-white/5 transition-colors"
                 aria-label="Close menu"
               >
                 <X className="w-4 h-4" />
@@ -171,14 +193,10 @@ export function Sidebar() {
       </AnimatePresence>
 
       {/* ── Desktop sidebar ──────────────────────────────── */}
-      <aside className="hidden md:flex flex-col w-60 border-r border-zinc-800 bg-zinc-900/50 shrink-0">
+      <aside className="hidden md:flex flex-col w-60 border-r border-zinc-800 bg-[#111111] shrink-0">
         <div className="flex items-center gap-2 px-5 py-5 border-b border-zinc-800">
-          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-green-500/20">
-            <Sparkles className="w-4 h-4 text-green-400" />
-          </div>
-          <span className="font-semibold text-white tracking-tight">
-            UpworkAI
-          </span>
+          <span className="w-2 h-2 rounded-full bg-violet-500 shrink-0" />
+          <span className="font-bold text-white tracking-tight">UpworkAI</span>
         </div>
         <NavContent />
       </aside>
