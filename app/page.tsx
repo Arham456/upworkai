@@ -365,11 +365,11 @@ export default function Home() {
                       <motion.div
                         initial={{ opacity: 0, scale: 0.96 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        className="flex items-center gap-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-4"
+                        className="flex items-center gap-3 rounded-xl border border-violet-500/30 bg-violet-600/10 px-4 py-4"
                       >
-                        <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                        <p className="text-sm text-emerald-400">
-                          You&apos;re on the list! Check your email.
+                        <Check className="w-4 h-4 text-violet-400 shrink-0" />
+                        <p className="text-sm text-violet-300">
+                          You&apos;re on the list! We&apos;ll be in touch soon. 🎉
                         </p>
                       </motion.div>
                     ) : (
