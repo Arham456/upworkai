@@ -6,7 +6,9 @@ export async function POST(request: NextRequest) {
     const body = await request.json() as { email?: string };
     const email = body.email?.trim().toLowerCase();
 
-    if (!email || !email.includes("@")) {
+    console.log("[waitlist] received email:", email);
+
+    if (!email || !email.includes("@") || email.length < 5) {
       return NextResponse.json({ error: "Valid email required" }, { status: 400 });
     }
 
@@ -16,8 +18,10 @@ export async function POST(request: NextRequest) {
       create: { email },
     });
 
+    console.log("[waitlist] upserted:", email);
     return NextResponse.json({ success: true });
-  } catch {
+  } catch (err) {
+    console.error("[waitlist] error:", err);
     return NextResponse.json({ error: "Something went wrong" }, { status: 500 });
   }
 }

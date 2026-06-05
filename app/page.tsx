@@ -219,100 +219,112 @@ export default function Home() {
 
         {/* -- Hero ------------------------------------------- */}
         <section className="min-h-[calc(100vh-57px)] flex items-center px-4 sm:px-10 py-16">
-          <div className="max-w-7xl mx-auto w-full">
-            <div className="grid grid-cols-1 lg:grid-cols-[55fr_45fr] gap-12 lg:gap-16 items-center">
+          <div className="max-w-6xl mx-auto w-full">
+            <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-16 items-center">
 
               {/* Left: copy */}
               <div className="space-y-8">
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, ease }}
-                >
-                  <span className="text-xs font-semibold text-zinc-500 uppercase tracking-[0.2em]">
-                    AI-Powered Proposal Intelligence
-                  </span>
-                </motion.div>
-
                 <motion.h1
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 24 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.7, delay: 0.1, ease }}
-                  className="font-bold tracking-tight leading-[1.0]"
-                  style={{ fontSize: "clamp(36px, 5vw, 64px)" }}
+                  transition={{ duration: 0.7, ease }}
+                  className="font-bold tracking-tight"
+                  style={{ fontSize: "clamp(40px, 5vw, 72px)", lineHeight: 1.05 }}
                 >
-                  <span className="text-white block">Stop Losing Jobs to</span>
-                  <span className="block bg-gradient-to-r from-violet-400 to-purple-600 bg-clip-text text-transparent">
-                    Weaker Freelancers.
+                  <span className="text-white block">Stop Losing Jobs</span>
+                  <span className="block bg-gradient-to-r from-violet-400 to-purple-500 bg-clip-text text-transparent">
+                    to Weaker Freelancers.
                   </span>
                 </motion.h1>
 
                 <motion.p
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.7, delay: 0.2, ease }}
-                  className="text-zinc-400 text-lg leading-relaxed max-w-xl"
+                  transition={{ duration: 0.7, delay: 0.15, ease }}
+                  className="text-zinc-400 text-lg leading-relaxed max-w-md"
                 >
-                  UpworkAI reads every job post, finds what the client actually
-                  fears, and writes a proposal that makes them choose you.
+                  UpworkAI finds what clients actually fear and writes proposals
+                  that make them choose you.
                 </motion.p>
 
                 <motion.ul
                   initial={{ opacity: 0, y: 16 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.3, ease }}
-                  className="space-y-3"
+                  transition={{ duration: 0.6, delay: 0.28, ease }}
+                  className="space-y-3.5"
                 >
                   {[
-                    "Analyzes client psychology in seconds",
-                    "Writes proposals in your exact voice",
-                    "Scores jobs before you waste connects",
+                    "Analyze client psychology in seconds",
+                    "Write proposals in your exact voice",
+                    "Score jobs before wasting connects",
                   ].map((point) => (
                     <li key={point} className="flex items-center gap-3 text-sm text-zinc-300">
-                      <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-violet-600/20 border border-violet-500/30">
-                        <Check className="w-3 h-3 text-violet-400" />
-                      </span>
+                      <span className="text-violet-400 font-bold text-base leading-none shrink-0">&#8594;</span>
                       {point}
                     </li>
                   ))}
                 </motion.ul>
 
+                {/* Social proof */}
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  transition={{ delay: 0.5, duration: 0.6 }}
-                  className="flex flex-col sm:flex-row sm:items-center gap-3"
+                  transition={{ delay: 0.45, duration: 0.6 }}
+                  className="flex items-center gap-3 pt-2"
                 >
-                  <span className="text-xs text-zinc-500">
-                    Trusted by 500+ freelancers from 50+ countries
-                  </span>
-                  <div className="flex items-center gap-1">
-                    {["🇺🇸","🇬🇧","🇮🇳","🇵🇰","🇩🇪","🇫🇷","🇧🇷","🇨🇦","🇦🇺","🇳🇬"].map((flag) => (
-                      <span key={flag} className="text-sm hover:scale-125 transition-transform cursor-default">
-                        {flag}
-                      </span>
+                  {/* Avatar stack */}
+                  <div className="flex -space-x-2">
+                    {[
+                      { initials: "AK", bg: "bg-violet-600" },
+                      { initials: "SR", bg: "bg-blue-600" },
+                      { initials: "MJ", bg: "bg-emerald-600" },
+                      { initials: "PL", bg: "bg-orange-500" },
+                      { initials: "TC", bg: "bg-pink-600" },
+                    ].map(({ initials, bg }) => (
+                      <div
+                        key={initials}
+                        className={`w-7 h-7 rounded-full ${bg} border-2 border-[#0a0a0a] flex items-center justify-center`}
+                      >
+                        <span className="text-[9px] font-bold text-white">{initials}</span>
+                      </div>
                     ))}
                   </div>
+                  <span className="text-xs text-zinc-500">
+                    <span className="text-zinc-300 font-medium">500+</span> freelancers already winning more jobs
+                  </span>
                 </motion.div>
               </div>
 
               {/* Right: signup card */}
               <motion.div
-                initial={{ opacity: 0, x: 32 }}
+                initial={{ opacity: 0, x: 28 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.7, delay: 0.2, ease }}
+                transition={{ duration: 0.7, delay: 0.18, ease }}
+                className="relative max-w-sm w-full mx-auto lg:mx-0"
               >
-                <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-8 space-y-6 shadow-2xl shadow-black/40">
-                  <div className="space-y-1">
-                    <h2 className="text-xl font-bold text-white">Start for Free</h2>
-                    <p className="text-sm text-zinc-500">Join 500+ freelancers winning more jobs</p>
-                  </div>
+                {/* Violet glow behind card */}
+                <div
+                  aria-hidden
+                  className="absolute -inset-4 rounded-3xl pointer-events-none"
+                  style={{ background: "radial-gradient(ellipse at center, rgba(124,58,237,0.18) 0%, transparent 70%)" }}
+                />
+
+                <div
+                  className="relative rounded-2xl p-8 space-y-5"
+                  style={{
+                    background: "rgba(255,255,255,0.03)",
+                    backdropFilter: "blur(20px)",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                    boxShadow: "0 0 40px rgba(124,58,237,0.10), 0 24px 48px rgba(0,0,0,0.4)",
+                  }}
+                >
+                  <p className="text-xs font-semibold text-violet-400 uppercase tracking-widest">Get started free</p>
 
                   {/* Google button */}
                   <button
                     onClick={() => signIn("google")}
                     disabled={status === "loading"}
-                    className="w-full flex items-center justify-center gap-3 rounded-xl bg-white hover:bg-zinc-100 py-4 text-sm font-semibold text-zinc-900 transition-colors disabled:opacity-60"
+                    className="w-full flex items-center justify-center gap-3 rounded-xl bg-white hover:bg-zinc-100 py-3.5 text-sm font-medium text-zinc-900 transition-colors disabled:opacity-60"
                   >
                     <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24">
                       <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -325,9 +337,9 @@ export default function Home() {
 
                   {/* Divider */}
                   <div className="flex items-center gap-3">
-                    <div className="flex-1 h-px bg-zinc-800" />
-                    <span className="text-xs text-zinc-600">or enter your email</span>
-                    <div className="flex-1 h-px bg-zinc-800" />
+                    <div className="flex-1 h-px" style={{ background: "rgba(255,255,255,0.08)" }} />
+                    <span className="text-xs text-zinc-600">or</span>
+                    <div className="flex-1 h-px" style={{ background: "rgba(255,255,255,0.08)" }} />
                   </div>
 
                   {/* Email / waitlist form */}
@@ -340,7 +352,7 @@ export default function Home() {
                       >
                         <Check className="w-4 h-4 text-emerald-400 shrink-0" />
                         <p className="text-sm text-emerald-400">
-                          You&apos;re on the list!
+                          You&apos;re on the list! Check your email.
                         </p>
                       </motion.div>
                     ) : (
@@ -349,15 +361,21 @@ export default function Home() {
                           type="email"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
-                          placeholder="your@email.com"
-                          className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-3 text-sm text-white placeholder-zinc-500 focus:border-violet-500 focus:outline-none transition-colors"
+                          placeholder="Enter your email"
+                          className="w-full rounded-xl px-4 py-3 text-sm text-white placeholder-zinc-500 focus:outline-none transition-colors"
+                          style={{
+                            background: "rgba(255,255,255,0.05)",
+                            border: "1px solid rgba(255,255,255,0.10)",
+                          }}
+                          onFocus={(e) => { e.currentTarget.style.borderColor = "rgba(139,92,246,0.7)"; }}
+                          onBlur={(e) => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.10)"; }}
                         />
                         <button
                           type="submit"
                           disabled={!email.trim() || waitlistState === "loading"}
-                          className="w-full rounded-xl bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 py-3 text-sm font-semibold text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="w-full rounded-xl bg-violet-600 hover:bg-violet-700 py-3 text-sm font-semibold text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          {waitlistState === "loading" ? "Joining..." : "Get Early Access"}
+                          {waitlistState === "loading" ? "Joining..." : "Get Early Access →"}
                         </button>
                         {waitlistState === "error" && (
                           <p className="text-xs text-red-400 text-center">Something went wrong. Try again.</p>
@@ -366,21 +384,9 @@ export default function Home() {
                     )}
                   </form>
 
-                  {/* Footer */}
-                  <div className="space-y-2.5 text-center">
-                    <p className="text-xs text-zinc-600">
-                      Free forever · No credit card · 2 min setup
-                    </p>
-                    <p className="text-xs text-zinc-500">
-                      Already have an account?{" "}
-                      <button
-                        onClick={() => signIn("google")}
-                        className="text-violet-400 hover:text-violet-300 transition-colors"
-                      >
-                        Sign in &rarr;
-                      </button>
-                    </p>
-                  </div>
+                  <p className="text-xs text-zinc-600 text-center">
+                    Free forever &middot; No credit card required
+                  </p>
                 </div>
               </motion.div>
 
