@@ -172,15 +172,15 @@ export default function Home() {
     if (session) router.push("/dashboard");
   }, [session, router]);
 
-  async function handleWaitlist(e: React.FormEvent) {
-    e.preventDefault();
-    if (!email.trim() || waitlistState === "loading") return;
+  async function handleWaitlist() {
+    const emailValue = email.trim();
+    if (!emailValue || waitlistState === "loading") return;
     setWaitlistState("loading");
     try {
       const res = await fetch("/api/waitlist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email: emailValue }),
       });
       if (!res.ok) throw new Error();
       setWaitlistState("success");
@@ -342,8 +342,8 @@ export default function Home() {
                     <div className="flex-1 h-px" style={{ background: "rgba(255,255,255,0.08)" }} />
                   </div>
 
-                  {/* Email / waitlist form */}
-                  <form onSubmit={handleWaitlist} className="space-y-3">
+                  {/* Email / waitlist */}
+                  <div className="space-y-3">
                     {waitlistState === "success" ? (
                       <motion.div
                         initial={{ opacity: 0, scale: 0.96 }}
@@ -361,6 +361,7 @@ export default function Home() {
                           type="email"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
+                          onKeyDown={(e) => { if (e.key === "Enter") handleWaitlist(); }}
                           placeholder="Enter your email"
                           className="w-full rounded-xl px-4 py-3 text-sm text-white placeholder-zinc-500 focus:outline-none transition-colors"
                           style={{
@@ -371,7 +372,8 @@ export default function Home() {
                           onBlur={(e) => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.10)"; }}
                         />
                         <button
-                          type="submit"
+                          type="button"
+                          onClick={handleWaitlist}
                           disabled={!email.trim() || waitlistState === "loading"}
                           className="w-full rounded-xl bg-violet-600 hover:bg-violet-700 py-3 text-sm font-semibold text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
@@ -382,7 +384,7 @@ export default function Home() {
                         )}
                       </>
                     )}
-                  </form>
+                  </div>
 
                   <p className="text-xs text-zinc-600 text-center">
                     Free forever &middot; No credit card required
