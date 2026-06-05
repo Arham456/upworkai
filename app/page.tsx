@@ -228,7 +228,7 @@ export default function Home() {
               className="text-zinc-400 max-w-lg mx-auto text-lg leading-relaxed"
             >
               UpworkAI reads every job post, finds what the client actually
-              fears, and writes a proposal that makes them choose you â€”
+              fears, and writes a proposal that makes them choose you —
               every single time.
             </motion.p>
 
@@ -265,7 +265,7 @@ export default function Home() {
               transition={{ delay: 0.5, duration: 0.5 }}
               className="text-xs text-zinc-600"
             >
-              Free forever Â· No credit card Â· 2 min setup
+              Free forever · No credit card · 2 min setup
             </motion.p>
           </div>
         </section>
@@ -283,7 +283,7 @@ export default function Home() {
             </span>
             <div className="hidden sm:block w-px h-4 bg-zinc-700" />
             <div className="flex items-center gap-1">
-              {["ðŸ‡ºðŸ‡¸","ðŸ‡¬ðŸ‡§","ðŸ‡®ðŸ‡³","ðŸ‡µðŸ‡°","ðŸ‡©ðŸ‡ª","ðŸ‡«ðŸ‡·","ðŸ‡§ðŸ‡·","ðŸ‡¨ðŸ‡¦","ðŸ‡¦ðŸ‡º","ðŸ‡³ðŸ‡¬"].map((flag) => (
+              {["🇺🇸","🇬🇧","🇮🇳","🇵🇰","🇩🇪","🇫🇷","🇧🇷","🇨🇦","🇦🇺","🇳🇬"].map((flag) => (
                 <span
                   key={flag}
                   className="text-base hover:scale-125 transition-transform cursor-default"
@@ -370,7 +370,7 @@ export default function Home() {
               {
                 icon: PenLine,
                 title: "Proposal Writer",
-                desc: "AI writes in your voice â€” not generic templates. Every proposal sounds like you read their post twice.",
+                desc: "AI writes in your voice — not generic templates. Every proposal sounds like you read their post twice.",
                 badge: "Most popular",
               },
               {
@@ -433,66 +433,12 @@ export default function Home() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="block md:hidden space-y-3"
+            className=”overflow-x-auto -mx-1 px-1”
           >
-            {[
-              "Remembers your writing voice",
-              "Analyzes client psychology",
-              "Scores jobs before you apply",
-              "Learns from your wins over time",
-              "Predicts client fear with confidence %",
-              "Built specifically for Upwork",
-            ].map((feature) => (
-              <div key={feature} className="rounded-xl border border-zinc-800 bg-[#111111] overflow-hidden">
-                <div className="px-4 py-3 text-sm font-medium text-zinc-200 border-b border-zinc-800">
-                  {feature}
-                </div>
-                <div className="divide-y divide-zinc-800">
-                  <div className="flex items-center justify-between px-4 py-3">
-                    <span className="text-xs text-zinc-500">Others</span>
-                    <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-red-500/10">
-                      <X className="w-3 h-3 text-red-400" />
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between px-4 py-3 bg-violet-500/[0.04] border-l-[3px] border-l-violet-500">
-                    <span className="text-xs font-semibold text-violet-400">UpworkAI</span>
-                    <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-violet-500/15">
-                      <Check className="w-3 h-3 text-violet-400" />
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ))}
-            {/* Price row */}
-            <div className="rounded-xl border border-zinc-800 bg-[#111111] overflow-hidden">
-              <div className="px-4 py-3 text-sm font-medium text-zinc-200 border-b border-zinc-800">
-                Price per month
-              </div>
-              <div className="divide-y divide-zinc-800">
-                <div className="flex items-center justify-between px-4 py-3">
-                  <span className="text-xs text-zinc-500">ChatGPT / Grammarly / Jasper</span>
-                  <span className="text-sm text-zinc-500 font-medium">$20â€“$49</span>
-                </div>
-                <div className="flex items-center justify-between px-4 py-3 bg-violet-500/[0.04] border-l-[3px] border-l-violet-500">
-                  <span className="text-xs font-semibold text-violet-400">UpworkAI</span>
-                  <span className="text-sm font-bold text-violet-400">$14/mo</span>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* â”€â”€ Desktop: full table (hidden below md) â”€â”€â”€â”€â”€â”€â”€â”€ */}
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="hidden md:block overflow-x-auto"
-          >
-            <table className="w-full min-w-[640px] border-collapse">
+            <table className=”w-full min-w-[600px] border-collapse”>
               <thead>
                 <tr>
-                  <th className="text-left pb-4 pr-4 w-[36%]">
+                  <th className="text-left pb-4 pr-4 min-w-[160px]">
                     <span className="text-xs font-semibold text-zinc-500 uppercase tracking-widest">
                       Feature
                     </span>
@@ -571,6 +517,7 @@ export default function Home() {
               </tbody>
             </table>
           </motion.div>
+          <p className="text-center text-xs text-zinc-600 mt-2 md:hidden">← scroll to compare →</p>
 
           <motion.div
             initial={{ opacity: 0, y: 16 }}
@@ -670,7 +617,7 @@ export default function Home() {
               </div>
               <div className="space-y-2 text-sm text-zinc-300 leading-relaxed">
                 <p>
-                  I read your post twice â€” sounds like you&apos;ve been through the
+                  I read your post twice — sounds like you&apos;ve been through the
                   hired-and-ghosted cycle before, and you&apos;re done with it.
                 </p>
                 <p>
@@ -681,7 +628,7 @@ export default function Home() {
                 <p>
                   Your project needs a Shopify integration with custom inventory
                   sync. I built this exact system for a fashion retailer last
-                  quarter â€” here&apos;s what week one looks like if we work together...
+                  quarter — here&apos;s what week one looks like if we work together...
                 </p>
               </div>
               <div className="flex flex-wrap gap-2 pt-1 border-t border-violet-500/15">
@@ -750,7 +697,7 @@ export default function Home() {
               <span className="w-1.5 h-1.5 rounded-full bg-violet-500" />
               <span className="text-sm font-medium text-zinc-500">UpworkAI</span>
             </div>
-            <p className="text-xs text-zinc-600">Â© 2026 UpworkAI. Built for freelancers.</p>
+            <p className="text-xs text-zinc-600">© 2026 UpworkAI. Built for freelancers.</p>
           </div>
         </footer>
       </div>
