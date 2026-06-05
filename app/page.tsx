@@ -427,14 +427,7 @@ export default function Home() {
             </p>
           </motion.div>
 
-          {/* â”€â”€ Mobile: card list (hidden on md+) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className=”overflow-x-auto -mx-1 px-1”
-          >
+          <div className=”overflow-x-auto -mx-1 px-1”>
             <table className=”w-full min-w-[600px] border-collapse”>
               <thead>
                 <tr>
@@ -516,7 +509,7 @@ export default function Home() {
                 })}
               </tbody>
             </table>
-          </motion.div>
+          </div>
           <p className="text-center text-xs text-zinc-600 mt-2 md:hidden">← scroll to compare →</p>
 
           <motion.div
