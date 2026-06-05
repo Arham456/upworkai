@@ -26,24 +26,21 @@ export async function POST(request: NextRequest) {
       jobDescription?: string;
     };
 
-    // Enforce free-tier limit (5 proposals lifetime)
+    // Enforce free-tier limit (5 proposals generated lifetime)
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { plan: true },
+      select: { plan: true, proposalsGenerated: true },
     });
     const isFreePlan = user?.plan !== "pro";
-    if (isFreePlan) {
-      const count = await prisma.proposal.count({ where: { userId: session.user.id } });
-      if (count >= 5) {
-        return Response.json(
-          {
-            error:
-              "You've used all 5 free proposals. Free plan was designed to get you your first win. If it worked — Pro is how you keep winning. $14/month — less than what you earn in one hour.",
-            upgradeRequired: true,
-          },
-          { status: 403 },
-        );
-      }
+    if (isFreePlan && (user?.proposalsGenerated ?? 0) >= 5) {
+      return Response.json(
+        {
+          error:
+            "You've used all 5 free proposals. Free plan was designed to get you your first win. If it worked — Pro is how you keep winning. $14/month — less than what you earn in one hour.",
+          upgradeRequired: true,
+        },
+        { status: 403 },
+      );
     }
 
     const profile = await prisma.profile.findUnique({
@@ -166,6 +163,11 @@ Write a compelling, personalized proposal. Address the client's core concern dir
                 "\n\n---\nWritten with UpworkAI Free — upgrade to Pro for unlimited proposals with no watermark.",
               ),
             );
+            // Increment generated count AFTER successful stream (not on error)
+            await prisma.user.update({
+              where: { id: session.user.id },
+              data: { proposalsGenerated: { increment: 1 } },
+            }).catch(console.error);
           }
         } catch (streamErr) {
           console.error("[proposal] Stream error:", streamErr);

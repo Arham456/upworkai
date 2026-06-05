@@ -46,7 +46,7 @@ export default async function DashboardPage() {
     }),
     prisma.user.findUnique({
       where: { id: userId },
-      select: { plan: true },
+      select: { plan: true, proposalsGenerated: true },
     }),
   ]);
 
@@ -98,7 +98,8 @@ export default async function DashboardPage() {
   const winRate =
     totalProposals > 0 ? Math.round((wonProposals / totalProposals) * 100) : 0;
 
-  const proposalsRemaining = Math.max(0, 5 - totalProposals);
+  const proposalsGenerated = user?.proposalsGenerated ?? 0;
+  const proposalsRemaining = Math.max(0, 5 - proposalsGenerated);
   const analysesRemaining = Math.max(0, 5 - jobsAnalyzed);
 
   const isNewUser = jobsAnalyzed === 0 && totalProposals === 0;
@@ -181,7 +182,7 @@ export default async function DashboardPage() {
                 <div>
                   <div className="flex justify-between mb-1.5">
                     <span className="text-sm text-zinc-300">
-                      {totalProposals} of 5 free proposals used
+                      {proposalsGenerated} of 5 free proposals generated
                     </span>
                     <span
                       className={`text-xs font-medium ${
@@ -196,7 +197,7 @@ export default async function DashboardPage() {
                       className={`h-full rounded-full transition-all ${
                         proposalsRemaining <= 1 ? "bg-red-500" : "bg-violet-600"
                       }`}
-                      style={{ width: `${Math.min(100, (totalProposals / 5) * 100)}%` }}
+                      style={{ width: `${Math.min(100, (proposalsGenerated / 5) * 100)}%` }}
                     />
                   </div>
                 </div>

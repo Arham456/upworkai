@@ -43,8 +43,9 @@ model User {
   profile       Profile?
   proposals     Proposal[]
   jobs          Job[]
-  plan          String    @default("free")
-  createdAt     DateTime  @default(now())
+  plan                String   @default("free")
+  proposalsGenerated  Int      @default(0)
+  createdAt           DateTime @default(now())
 }
 
 model VerificationToken {

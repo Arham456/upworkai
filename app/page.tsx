@@ -9,7 +9,10 @@ import {
   BarChart2,
   Check,
   PenLine,
+  Search,
+  Settings,
   Trophy,
+  UserPlus,
   X,
   Zap,
 } from "lucide-react";
@@ -294,6 +297,100 @@ export default function Home() {
             </div>
           </div>
         </motion.section>
+
+        {/* -- How It Works ----------------------------------- */}
+        <section className="max-w-7xl mx-auto px-4 sm:px-10 py-20 space-y-12">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center space-y-3"
+          >
+            <span className="text-xs font-semibold text-violet-400 uppercase tracking-widest">
+              How It Works
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
+              Get Started in 2 Minutes
+            </h2>
+            <p className="text-zinc-400 max-w-sm mx-auto text-sm">
+              No setup. No complexity. Just results.
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-0 relative">
+            {/* Connector line on desktop */}
+            <div className="hidden md:block absolute top-10 left-[12.5%] right-[12.5%] h-px bg-gradient-to-r from-transparent via-violet-500/30 to-transparent pointer-events-none" />
+
+            {[
+              {
+                num: "01",
+                icon: UserPlus,
+                title: "Sign Up Free",
+                desc: "Create your account with one click. No credit card needed.",
+              },
+              {
+                num: "02",
+                icon: Settings,
+                title: "Build Your Profile",
+                desc: "Tell us your skills and paste sample proposals. AI learns your voice.",
+              },
+              {
+                num: "03",
+                icon: Search,
+                title: "Analyze Any Job",
+                desc: "Paste any job description. Get client psychology, match score, and red flags instantly.",
+              },
+              {
+                num: "04",
+                icon: Trophy,
+                title: "Win More Jobs",
+                desc: "Send proposals that address what clients actually fear. Watch your response rate climb.",
+              },
+            ].map(({ num, icon: Icon, title, desc }, i) => (
+              <motion.div
+                key={num}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.12, duration: 0.5 }}
+                className="relative flex flex-col items-center text-center px-4 md:px-6 space-y-4"
+              >
+                <div className="relative">
+                  <div className="w-20 h-20 rounded-2xl bg-[#111111] border border-zinc-800 flex items-center justify-center">
+                    <Icon className="w-7 h-7 text-violet-400" />
+                  </div>
+                  <span className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-violet-600 text-[10px] font-bold text-white leading-none">
+                    {num}
+                  </span>
+                </div>
+                <div className="space-y-1.5">
+                  <h3 className="text-sm font-semibold text-white">{title}</h3>
+                  <p className="text-xs text-zinc-500 leading-relaxed">{desc}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+            className="flex flex-col items-center gap-3"
+          >
+            <p className="text-zinc-400 text-sm font-medium">Ready to win your next job?</p>
+            <motion.button
+              whileTap={{ scale: 0.98 }}
+              onClick={() => signIn("google")}
+              disabled={status === "loading"}
+              className="inline-flex items-center gap-2 rounded-lg bg-violet-600 hover:bg-violet-700 px-7 py-3 text-sm font-semibold text-white shadow-lg shadow-violet-600/20 transition-all duration-200 disabled:opacity-60"
+            >
+              Start Free - No Credit Card
+              <ArrowRight className="w-4 h-4" />
+            </motion.button>
+          </motion.div>
+        </section>
 
         {/* -- Value Banner ----------------------------------- */}
         <section className="max-w-7xl mx-auto px-4 sm:px-10 py-20">

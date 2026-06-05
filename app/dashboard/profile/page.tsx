@@ -22,6 +22,7 @@ export default async function ProfilePage() {
         upworkUrl: true,
         sampleProposals: true,
         voiceDNA: true,
+        updatedAt: true,
       },
     }),
     prisma.user.findUnique({ where: { id: session.user.id }, select: { plan: true } }),
@@ -34,7 +35,11 @@ export default async function ProfilePage() {
       <Sidebar />
       <main className="flex-1 overflow-y-auto pt-14 md:pt-0">
         <div className="max-w-2xl mx-auto px-4 sm:px-6 py-10">
-          <ProfileForm initialData={profile} isPro={isPro} voiceDNA={profile?.voiceDNA ?? null} />
+          <ProfileForm
+            initialData={profile ? { ...profile, updatedAt: profile.updatedAt.toISOString() } : null}
+            isPro={isPro}
+            voiceDNA={profile?.voiceDNA ?? null}
+          />
         </div>
       </main>
     </div>

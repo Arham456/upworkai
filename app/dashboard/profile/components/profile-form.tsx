@@ -4,7 +4,7 @@ import { AnimatePresence, motion, type Variants } from "framer-motion";
 import { Check, ChevronLeft, ChevronRight, Loader2, X, Zap, Dna } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type InitialData = {
   skills: string[];
@@ -12,6 +12,7 @@ type InitialData = {
   experience: string | null;
   upworkUrl: string | null;
   sampleProposals: string[];
+  updatedAt?: string | null;
 } | null;
 
 type FormData = {
@@ -30,9 +31,35 @@ const STEPS = [
 ];
 
 const EXPERIENCE_OPTIONS = [
-  { value: "beginner", label: "Beginner", desc: "0–1 years on Upwork" },
-  { value: "intermediate", label: "Intermediate", desc: "1–3 years, steady clients" },
+  { value: "beginner", label: "Beginner", desc: "0-1 years on Upwork" },
+  { value: "intermediate", label: "Intermediate", desc: "1-3 years, steady clients" },
   { value: "expert", label: "Expert", desc: "3+ years, Top Rated or JSS 90%+" },
+];
+
+const SKILL_SUGGESTIONS = [
+  // Development
+  "React", "Next.js", "Node.js", "Python", "JavaScript",
+  "TypeScript", "Vue.js", "Angular", "Django", "FastAPI",
+  "PostgreSQL", "MongoDB", "MySQL", "Redis", "GraphQL",
+  "REST API", "Docker", "AWS", "Firebase", "Supabase",
+  // Design
+  "UI/UX Design", "Figma", "Adobe XD", "Photoshop",
+  "Illustrator", "Logo Design", "Brand Design", "Canva",
+  "Motion Graphics", "Video Editing", "3D Modeling",
+  // Writing
+  "Copywriting", "Content Writing", "Blog Writing",
+  "Technical Writing", "SEO Writing", "Ghostwriting",
+  "Proofreading", "Social Media",
+  // Marketing
+  "Digital Marketing", "SEO", "Google Ads", "Facebook Ads",
+  "Email Marketing", "Growth Hacking", "Analytics",
+  // Data
+  "Data Analysis", "Machine Learning", "Data Science",
+  "Pandas", "NumPy", "TensorFlow", "Power BI", "Tableau",
+  // Other
+  "Project Management", "Virtual Assistant", "Excel",
+  "Customer Support", "Accounting", "Bookkeeping",
+  "Translation", "Transcription", "Research",
 ];
 
 const slideVariants: Variants = {
@@ -62,9 +89,9 @@ type VoiceDNAData = {
 const MOCK_DNA: VoiceDNAData = {
   avgSentenceLength: "short",
   tone: "direct",
-  phrasesAlwaysUsed: ["Let's be direct about...", "Here's what matters:", "Skip the pitch —"],
+  phrasesAlwaysUsed: ["Let's be direct about...", "Here's what matters:", "Skip the pitch -"],
   phrasesNeverUsed: ["I am interested in", "I am confident that", "I have 5 years of"],
-  structurePattern: "Hook → Pain → Proof → Next step",
+  structurePattern: "Hook -> Pain -> Proof -> Next step",
   uniqueCharacteristics: [
     "Opens with client's problem, not freelancer's skills",
     "Uses very short paragraphs",
@@ -121,7 +148,7 @@ function VoiceDnaCard({
         </div>
         <div className="flex items-center gap-3 text-sm text-zinc-400">
           <Loader2 className="w-4 h-4 animate-spin text-violet-400" />
-          Analyzing your writing style…
+          Analyzing your writing style...
         </div>
       </div>
     );
@@ -192,7 +219,7 @@ function VoiceDnaCard({
               className="inline-flex items-center gap-2 rounded-lg bg-violet-600 hover:bg-violet-700 px-4 py-2 text-sm font-semibold text-white transition-colors"
             >
               <Check className="w-4 h-4" />
-              Profile saved — Go to Dashboard
+              Profile saved - Go to Dashboard
             </Link>
           </div>
         )}
@@ -215,11 +242,11 @@ export function ProfileForm({
   const [dir, setDir] = useState(1);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
-  const [skillInput, setSkillInput] = useState("");
-  const skillRef = useRef<HTMLInputElement>(null);
   const [dnaData, setDnaData] = useState<VoiceDNAData>(voiceDNA as VoiceDNAData ?? null);
   const [dnaLoading, setDnaLoading] = useState(false);
   const [saved, setSaved] = useState(false);
+
+  const isExistingProfile = !!initialData;
 
   const [form, setForm] = useState<FormData>({
     skills: initialData?.skills ?? [],
@@ -229,24 +256,21 @@ export function ProfileForm({
     sampleProposals: initialData?.sampleProposals?.[0] ?? "",
   });
 
+  useEffect(() => {
+    if (initialData) {
+      setForm({
+        skills: initialData.skills ?? [],
+        niche: initialData.niche ?? "",
+        experience: initialData.experience ?? "",
+        upworkUrl: initialData.upworkUrl ?? "",
+        sampleProposals: initialData.sampleProposals?.[0] ?? "",
+      });
+    }
+  }, []);
+
   function navigate(next: number) {
     setDir(next > step ? 1 : -1);
     setStep(next);
-  }
-
-  function addSkill() {
-    const val = skillInput.trim();
-    if (!val || form.skills.includes(val)) {
-      setSkillInput("");
-      return;
-    }
-    setForm((f) => ({ ...f, skills: [...f.skills, val] }));
-    setSkillInput("");
-    skillRef.current?.focus();
-  }
-
-  function removeSkill(skill: string) {
-    setForm((f) => ({ ...f, skills: f.skills.filter((s) => s !== skill) }));
   }
 
   async function handleSave() {
@@ -291,14 +315,40 @@ export function ProfileForm({
     }
   }
 
+  const formattedUpdatedAt = initialData?.updatedAt
+    ? new Date(initialData.updatedAt).toLocaleDateString("en-US", {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      })
+    : null;
+
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-white tracking-tight">Profile Setup</h1>
+        <h1 className="text-2xl font-bold text-white tracking-tight">
+          {isExistingProfile ? "Update Profile" : "Profile Setup"}
+        </h1>
         <p className="text-zinc-500 text-sm mt-1">
-          Help the AI write proposals that sound exactly like you.
+          {formattedUpdatedAt
+            ? `Last updated: ${formattedUpdatedAt}`
+            : "Help the AI write proposals that sound exactly like you."}
         </p>
       </div>
+
+      {/* Success toast */}
+      {saved && !isPro && (
+        <motion.div
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex items-center gap-3 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-3"
+        >
+          <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+          <p className="text-sm text-emerald-400">
+            Profile {isExistingProfile ? "updated" : "saved"} successfully!
+          </p>
+        </motion.div>
+      )}
 
       {/* Progress steps */}
       <div className="space-y-3">
@@ -354,11 +404,7 @@ export function ProfileForm({
             {step === 1 && (
               <StepSkills
                 skills={form.skills}
-                input={skillInput}
-                inputRef={skillRef}
-                onChange={setSkillInput}
-                onAdd={addSkill}
-                onRemove={removeSkill}
+                onSkillsChange={(skills) => setForm((f) => ({ ...f, skills }))}
               />
             )}
             {step === 2 && (
@@ -425,7 +471,7 @@ export function ProfileForm({
             {saving ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                Saving…
+                Saving...
               </>
             ) : saved && !isPro ? (
               <>
@@ -435,7 +481,7 @@ export function ProfileForm({
             ) : (
               <>
                 <Check className="w-4 h-4" />
-                Save profile
+                {isExistingProfile ? "Update Profile" : "Save Profile"}
               </>
             )}
           </button>
@@ -445,47 +491,131 @@ export function ProfileForm({
   );
 }
 
-// ─── Step components ──────────────────────────────────────────────────────────
+// ---- Step components -------------------------------------------------------
 
 function StepSkills({
   skills,
-  input,
-  inputRef,
-  onChange,
-  onAdd,
-  onRemove,
+  onSkillsChange,
 }: {
   skills: string[];
-  input: string;
-  inputRef: React.RefObject<HTMLInputElement | null>;
-  onChange: (v: string) => void;
-  onAdd: () => void;
-  onRemove: (s: string) => void;
+  onSkillsChange: (skills: string[]) => void;
 }) {
+  const [input, setInput] = useState("");
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node) &&
+        inputRef.current &&
+        !inputRef.current.contains(e.target as Node)
+      ) {
+        setShowDropdown(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  function handleInputChange(v: string) {
+    setInput(v);
+    if (v.trim().length > 0) {
+      const matches = SKILL_SUGGESTIONS.filter(
+        (s) =>
+          s.toLowerCase().includes(v.toLowerCase()) &&
+          !skills.includes(s)
+      ).slice(0, 8);
+      setSuggestions(matches);
+      setShowDropdown(matches.length > 0);
+    } else {
+      setShowDropdown(false);
+      setSuggestions([]);
+    }
+  }
+
+  function addSkill(skill?: string) {
+    const val = (skill ?? input).trim();
+    if (!val || skills.includes(val) || skills.length >= 10) return;
+    onSkillsChange([...skills, val]);
+    setInput("");
+    setShowDropdown(false);
+    setSuggestions([]);
+    inputRef.current?.focus();
+  }
+
+  function removeSkill(skill: string) {
+    onSkillsChange(skills.filter((s) => s !== skill));
+  }
+
+  function highlightMatch(text: string, query: string) {
+    if (!query.trim()) return <>{text}</>;
+    const idx = text.toLowerCase().indexOf(query.toLowerCase());
+    if (idx === -1) return <>{text}</>;
+    return (
+      <>
+        {text.slice(0, idx)}
+        <span className="text-violet-400 font-semibold">{text.slice(idx, idx + query.length)}</span>
+        {text.slice(idx + query.length)}
+      </>
+    );
+  }
+
   return (
     <div className="space-y-5">
       <div>
         <h2 className="text-lg font-semibold text-white">Your Skills</h2>
         <p className="text-zinc-400 text-sm mt-1">
-          Add the skills you offer on Upwork. Press Enter to add each one.
+          Add up to 10 skills. Type to search or press Enter to add a custom one.
         </p>
       </div>
 
-      <div className="flex gap-2">
-        <input
-          ref={inputRef}
-          value={input}
-          onChange={(e) => onChange(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), onAdd())}
-          placeholder="e.g. React, Copywriting, UI Design…"
-          className="flex-1 rounded-lg border border-zinc-800 bg-[#0a0a0a] px-4 py-2.5 text-sm text-white placeholder-zinc-500 focus:border-violet-500 focus:outline-none transition-colors"
-        />
-        <button
-          onClick={onAdd}
-          className="rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-2.5 text-sm font-medium text-zinc-300 hover:bg-zinc-700 hover:text-white transition-colors"
-        >
-          Add
-        </button>
+      <div className="relative">
+        <div className="flex gap-2">
+          <input
+            ref={inputRef}
+            value={input}
+            onChange={(e) => handleInputChange(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") { e.preventDefault(); addSkill(); }
+              if (e.key === "Escape") setShowDropdown(false);
+            }}
+            onFocus={() => input.trim() && setShowDropdown(suggestions.length > 0)}
+            placeholder="e.g. React, Copywriting, UI Design..."
+            disabled={skills.length >= 10}
+            className="flex-1 rounded-lg border border-zinc-800 bg-[#0a0a0a] px-4 py-2.5 text-sm text-white placeholder-zinc-500 focus:border-violet-500 focus:outline-none transition-colors disabled:opacity-50"
+          />
+          <button
+            onClick={() => addSkill()}
+            disabled={!input.trim() || skills.length >= 10}
+            className="rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-2.5 text-sm font-medium text-zinc-300 hover:bg-zinc-700 hover:text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            Add
+          </button>
+        </div>
+
+        {/* Dropdown */}
+        {showDropdown && (
+          <div
+            ref={dropdownRef}
+            className="absolute left-0 right-0 top-full mt-1 z-20 rounded-lg border border-zinc-700 bg-zinc-900 shadow-xl overflow-hidden"
+          >
+            <div className="max-h-48 overflow-y-auto">
+              {suggestions.map((s) => (
+                <button
+                  key={s}
+                  onMouseDown={(e) => { e.preventDefault(); addSkill(s); }}
+                  className="w-full text-left px-4 py-2.5 text-sm text-zinc-300 hover:bg-violet-600/10 hover:text-violet-400 transition-colors"
+                >
+                  {highlightMatch(s, input)}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {skills.length > 0 ? (
@@ -497,7 +627,7 @@ function StepSkills({
             >
               {skill}
               <button
-                onClick={() => onRemove(skill)}
+                onClick={() => removeSkill(skill)}
                 className="text-violet-500/60 hover:text-violet-300 transition-colors"
                 aria-label={`Remove ${skill}`}
               >
@@ -510,20 +640,18 @@ function StepSkills({
         <p className="text-xs text-zinc-600 italic">No skills added yet.</p>
       )}
 
+      {skills.length >= 10 && (
+        <p className="text-xs text-amber-500">Maximum 10 skills reached.</p>
+      )}
+
       <div className="space-y-1">
-        <p className="text-xs text-zinc-600">Examples:</p>
+        <p className="text-xs text-zinc-600">Popular:</p>
         <div className="flex flex-wrap gap-1.5">
           {["React", "Node.js", "Graphic Design", "Copywriting", "Python", "SEO"].map((ex) => (
             <button
               key={ex}
-              onClick={() => {
-                if (!skills.includes(ex)) {
-                  onRemove("");
-                  onChange(ex);
-                  setTimeout(() => onAdd(), 0);
-                }
-              }}
-              disabled={skills.includes(ex)}
+              onClick={() => !skills.includes(ex) && addSkill(ex)}
+              disabled={skills.includes(ex) || skills.length >= 10}
               className="rounded-full border border-zinc-700 px-2.5 py-0.5 text-xs text-zinc-500 hover:text-zinc-200 hover:border-zinc-500 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
             >
               {ex}
@@ -617,7 +745,7 @@ function StepStyle({ value, onChange }: { value: string; onChange: (v: string) =
       <div>
         <h2 className="text-lg font-semibold text-white">Your Writing Style</h2>
         <p className="text-zinc-400 text-sm mt-1">
-          Paste 1–2 of your best past proposals or cover letters.
+          Paste 1-2 of your best past proposals or cover letters.
         </p>
       </div>
 
@@ -625,7 +753,7 @@ function StepStyle({ value, onChange }: { value: string; onChange: (v: string) =
         <textarea
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          placeholder="Paste your best proposals here…"
+          placeholder="Paste your best proposals here..."
           rows={10}
           className="w-full rounded-lg border border-zinc-800 bg-[#0a0a0a] px-4 py-3 text-sm text-white placeholder-zinc-500 focus:border-violet-500 focus:outline-none transition-colors resize-none leading-relaxed"
         />
@@ -638,7 +766,7 @@ function StepStyle({ value, onChange }: { value: string; onChange: (v: string) =
         <p className="text-sm text-zinc-500">
           Don&apos;t have any yet?{" "}
           <span className="text-zinc-400">
-            That&apos;s fine — you can skip this step and add samples later.
+            That&apos;s fine - you can skip this step and add samples later.
           </span>
         </p>
       )}
