@@ -166,28 +166,43 @@ export default function Home() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [email, setEmail] = useState("");
-  const [waitlistState, setWaitlistState] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [waitlistLoading, setWaitlistLoading] = useState(false);
+  const [waitlistSuccess, setWaitlistSuccess] = useState(false);
+  const [waitlistError, setWaitlistError] = useState("");
 
   useEffect(() => {
     if (session) router.push("/dashboard");
   }, [session, router]);
 
-  async function handleWaitlist() {
+  const handleWaitlist = async () => {
     const emailValue = email.trim();
-    if (!emailValue || waitlistState === "loading") return;
-    setWaitlistState("loading");
+    if (!emailValue || !emailValue.includes("@")) {
+      setWaitlistError("Please enter a valid email");
+      return;
+    }
+    setWaitlistLoading(true);
+    setWaitlistError("");
     try {
       const res = await fetch("/api/waitlist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: emailValue }),
       });
-      if (!res.ok) throw new Error();
-      setWaitlistState("success");
-    } catch {
-      setWaitlistState("error");
+      console.log("[waitlist] status:", res.status);
+      const data = await res.json() as { error?: string };
+      console.log("[waitlist] response:", data);
+      if (res.ok) {
+        setWaitlistSuccess(true);
+      } else {
+        setWaitlistError(data.error ?? "Something went wrong");
+      }
+    } catch (err) {
+      console.error("[waitlist] fetch error:", err);
+      setWaitlistError("Network error. Please try again.");
+    } finally {
+      setWaitlistLoading(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white relative overflow-x-hidden">
@@ -322,7 +337,8 @@ export default function Home() {
 
                   {/* Google button */}
                   <button
-                    onClick={() => signIn("google")}
+                    type="button"
+                    onClick={(e) => { e.preventDefault(); signIn("google"); }}
                     disabled={status === "loading"}
                     className="w-full flex items-center justify-center gap-3 rounded-xl bg-white hover:bg-zinc-100 py-3.5 text-sm font-medium text-zinc-900 transition-colors disabled:opacity-60"
                   >
@@ -344,7 +360,7 @@ export default function Home() {
 
                   {/* Email / waitlist */}
                   <div className="space-y-3">
-                    {waitlistState === "success" ? (
+                    {waitlistSuccess ? (
                       <motion.div
                         initial={{ opacity: 0, scale: 0.96 }}
                         animate={{ opacity: 1, scale: 1 }}
@@ -360,7 +376,7 @@ export default function Home() {
                         <input
                           type="email"
                           value={email}
-                          onChange={(e) => setEmail(e.target.value)}
+                          onChange={(e) => { setEmail(e.target.value); setWaitlistError(""); }}
                           onKeyDown={(e) => { if (e.key === "Enter") handleWaitlist(); }}
                           placeholder="Enter your email"
                           className="w-full rounded-xl px-4 py-3 text-sm text-white placeholder-zinc-500 focus:outline-none transition-colors"
@@ -374,13 +390,13 @@ export default function Home() {
                         <button
                           type="button"
                           onClick={handleWaitlist}
-                          disabled={!email.trim() || waitlistState === "loading"}
+                          disabled={waitlistLoading}
                           className="w-full rounded-xl bg-violet-600 hover:bg-violet-700 py-3 text-sm font-semibold text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          {waitlistState === "loading" ? "Joining..." : "Get Early Access →"}
+                          {waitlistLoading ? "Joining..." : "Get Early Access →"}
                         </button>
-                        {waitlistState === "error" && (
-                          <p className="text-xs text-red-400 text-center">Something went wrong. Try again.</p>
+                        {waitlistError && (
+                          <p className="text-xs text-red-400 text-center">{waitlistError}</p>
                         )}
                       </>
                     )}
