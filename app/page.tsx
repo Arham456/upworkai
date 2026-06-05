@@ -162,9 +162,15 @@ function AnimatedCounter({
   );
 }
 
-function SignupSection({ status }: { status: string }) {
+export default function Home() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [waitlistState, setWaitlistState] = useState<"idle" | "loading" | "success" | "error">("idle");
+
+  useEffect(() => {
+    if (session) router.push("/dashboard");
+  }, [session, router]);
 
   async function handleWaitlist(e: React.FormEvent) {
     e.preventDefault();
@@ -182,147 +188,6 @@ function SignupSection({ status }: { status: string }) {
       setWaitlistState("error");
     }
   }
-
-  return (
-    <section className="border-y border-zinc-800 bg-zinc-900/50 py-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20 items-center">
-          {/* Left side */}
-          <motion.div
-            initial={{ opacity: 0, x: -24 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="space-y-6"
-          >
-            <span className="inline-flex items-center gap-2 rounded-full bg-violet-500/10 border border-violet-500/20 px-3 py-1 text-xs font-bold text-violet-400 uppercase tracking-widest">
-              Join 500+ Freelancers
-            </span>
-            <div className="space-y-3">
-              <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight leading-tight">
-                Start Winning Jobs Today
-              </h2>
-              <p className="text-zinc-400 text-base">
-                Free forever. No credit card. Cancel anytime.
-              </p>
-            </div>
-            <ul className="space-y-3">
-              {[
-                "5 free job analyses included",
-                "5 free proposals to get started",
-                "No credit card required",
-              ].map((point) => (
-                <li key={point} className="flex items-center gap-3 text-sm text-zinc-300">
-                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-violet-600/20 border border-violet-500/30">
-                    <Check className="w-3 h-3 text-violet-400" />
-                  </span>
-                  {point}
-                </li>
-              ))}
-            </ul>
-          </motion.div>
-
-          {/* Right side — signup card */}
-          <motion.div
-            initial={{ opacity: 0, x: 24 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-          >
-            <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-8 space-y-6">
-              <div className="space-y-1">
-                <h3 className="text-lg font-semibold text-white">Create your free account</h3>
-                <p className="text-sm text-zinc-500">Join in seconds with Google</p>
-              </div>
-
-              {/* Google button */}
-              <button
-                onClick={() => signIn("google")}
-                disabled={status === "loading"}
-                className="w-full flex items-center justify-center gap-3 rounded-xl bg-white hover:bg-zinc-100 py-4 text-sm font-semibold text-zinc-900 transition-colors disabled:opacity-60"
-              >
-                <svg className="w-5 h-5" viewBox="0 0 24 24">
-                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
-                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                </svg>
-                Continue with Google
-              </button>
-
-              {/* Divider */}
-              <div className="flex items-center gap-3">
-                <div className="flex-1 h-px bg-zinc-800" />
-                <span className="text-xs text-zinc-600">or continue with email</span>
-                <div className="flex-1 h-px bg-zinc-800" />
-              </div>
-
-              {/* Email form */}
-              <form onSubmit={handleWaitlist} className="space-y-3">
-                {waitlistState === "success" ? (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.96 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="flex items-center gap-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-4"
-                  >
-                    <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                    <p className="text-sm text-emerald-400">
-                      You&apos;re on the list! We&apos;ll be in touch.
-                    </p>
-                  </motion.div>
-                ) : (
-                  <>
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="Enter your work email"
-                      className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-3 text-sm text-white placeholder-zinc-500 focus:border-violet-500 focus:outline-none transition-colors"
-                    />
-                    <button
-                      type="submit"
-                      disabled={!email.trim() || waitlistState === "loading"}
-                      className="w-full rounded-xl bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 py-3 text-sm font-semibold text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {waitlistState === "loading" ? "Joining..." : "Get Early Access"}
-                    </button>
-                    {waitlistState === "error" && (
-                      <p className="text-xs text-red-400 text-center">Something went wrong. Try again.</p>
-                    )}
-                  </>
-                )}
-              </form>
-
-              {/* Footer links */}
-              <div className="space-y-2 text-center">
-                <p className="text-xs text-zinc-600">
-                  By signing up you agree to our Terms of Service
-                </p>
-                <p className="text-xs text-zinc-500">
-                  Already have an account?{" "}
-                  <button
-                    onClick={() => signIn("google")}
-                    className="text-violet-400 hover:text-violet-300 transition-colors"
-                  >
-                    Sign in &rarr;
-                  </button>
-                </p>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-export default function Home() {
-  const { data: session, status } = useSession();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (session) router.push("/dashboard");
-  }, [session, router]);
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white relative overflow-x-hidden">
@@ -353,104 +218,175 @@ export default function Home() {
         </header>
 
         {/* -- Hero ------------------------------------------- */}
-        <section className="min-h-[calc(100vh-57px)] flex items-center justify-center px-4 sm:px-10 py-20">
-          <div className="max-w-4xl mx-auto text-center space-y-8">
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, ease }}
-            >
-              <span className="text-xs font-semibold text-zinc-500 uppercase tracking-[0.2em]">
-                AI-Powered Proposal Intelligence
-              </span>
-            </motion.div>
+        <section className="min-h-[calc(100vh-57px)] flex items-center px-4 sm:px-10 py-16">
+          <div className="max-w-7xl mx-auto w-full">
+            <div className="grid grid-cols-1 lg:grid-cols-[55fr_45fr] gap-12 lg:gap-16 items-center">
 
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.1, ease }}
-              className="font-bold tracking-tight leading-[0.95]"
-              style={{ fontSize: "clamp(48px, 8vw, 96px)" }}
-            >
-              <span className="text-white block">Stop Losing Jobs</span>
-              <span className="block bg-gradient-to-r from-violet-400 to-purple-600 bg-clip-text text-transparent">
-                to Weaker Freelancers.
-              </span>
-            </motion.h1>
-
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.2, ease }}
-              className="text-zinc-400 max-w-lg mx-auto text-lg leading-relaxed"
-            >
-              UpworkAI reads every job post, finds what the client actually
-              fears, and writes a proposal that makes them choose you —
-              every single time.
-            </motion.p>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.3, ease }}
-              className="flex flex-col sm:flex-row items-center justify-center gap-4"
-            >
-              <motion.button
-                whileTap={{ scale: 0.98 }}
-                onClick={() => signIn("google")}
-                disabled={status === "loading"}
-                className="group inline-flex items-center justify-center gap-2 rounded-lg bg-violet-600 hover:bg-violet-700 px-8 py-4 text-base font-semibold text-white shadow-lg shadow-violet-600/25 transition-all duration-200 disabled:opacity-60"
-              >
-                Analyze Your First Job Free
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-              </motion.button>
-
-              <motion.button
-                whileTap={{ scale: 0.98 }}
-                onClick={() => {
-                  document.getElementById("features")?.scrollIntoView({ behavior: "smooth" });
-                }}
-                className="inline-flex items-center gap-2 rounded-lg border border-zinc-700 px-8 py-4 text-base font-medium text-zinc-300 hover:border-zinc-500 hover:text-white transition-all duration-200"
-              >
-                See How It Works
-              </motion.button>
-            </motion.div>
-
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5, duration: 0.5 }}
-              className="text-xs text-zinc-600"
-            >
-              Free forever · No credit card · 2 min setup
-            </motion.p>
-          </div>
-        </section>
-
-        {/* -- Social Proof Bar ------------------------------- */}
-        <motion.section
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.8, duration: 0.6 }}
-          className="border-y border-zinc-800/60 bg-transparent py-4"
-        >
-          <div className="max-w-7xl mx-auto px-4 sm:px-10 flex flex-col sm:flex-row items-center justify-center gap-3">
-            <span className="text-sm text-zinc-500">
-              Trusted by freelancers from 50+ countries
-            </span>
-            <div className="hidden sm:block w-px h-4 bg-zinc-700" />
-            <div className="flex items-center gap-1">
-              {["🇺🇸","🇬🇧","🇮🇳","🇵🇰","🇩🇪","🇫🇷","🇧🇷","🇨🇦","🇦🇺","🇳🇬"].map((flag) => (
-                <span
-                  key={flag}
-                  className="text-base hover:scale-125 transition-transform cursor-default"
+              {/* Left: copy */}
+              <div className="space-y-8">
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, ease }}
                 >
-                  {flag}
-                </span>
-              ))}
+                  <span className="text-xs font-semibold text-zinc-500 uppercase tracking-[0.2em]">
+                    AI-Powered Proposal Intelligence
+                  </span>
+                </motion.div>
+
+                <motion.h1
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.7, delay: 0.1, ease }}
+                  className="font-bold tracking-tight leading-[1.0]"
+                  style={{ fontSize: "clamp(36px, 5vw, 64px)" }}
+                >
+                  <span className="text-white block">Stop Losing Jobs to</span>
+                  <span className="block bg-gradient-to-r from-violet-400 to-purple-600 bg-clip-text text-transparent">
+                    Weaker Freelancers.
+                  </span>
+                </motion.h1>
+
+                <motion.p
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.7, delay: 0.2, ease }}
+                  className="text-zinc-400 text-lg leading-relaxed max-w-xl"
+                >
+                  UpworkAI reads every job post, finds what the client actually
+                  fears, and writes a proposal that makes them choose you.
+                </motion.p>
+
+                <motion.ul
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.3, ease }}
+                  className="space-y-3"
+                >
+                  {[
+                    "Analyzes client psychology in seconds",
+                    "Writes proposals in your exact voice",
+                    "Scores jobs before you waste connects",
+                  ].map((point) => (
+                    <li key={point} className="flex items-center gap-3 text-sm text-zinc-300">
+                      <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-violet-600/20 border border-violet-500/30">
+                        <Check className="w-3 h-3 text-violet-400" />
+                      </span>
+                      {point}
+                    </li>
+                  ))}
+                </motion.ul>
+
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.5, duration: 0.6 }}
+                  className="flex flex-col sm:flex-row sm:items-center gap-3"
+                >
+                  <span className="text-xs text-zinc-500">
+                    Trusted by 500+ freelancers from 50+ countries
+                  </span>
+                  <div className="flex items-center gap-1">
+                    {["🇺🇸","🇬🇧","🇮🇳","🇵🇰","🇩🇪","🇫🇷","🇧🇷","🇨🇦","🇦🇺","🇳🇬"].map((flag) => (
+                      <span key={flag} className="text-sm hover:scale-125 transition-transform cursor-default">
+                        {flag}
+                      </span>
+                    ))}
+                  </div>
+                </motion.div>
+              </div>
+
+              {/* Right: signup card */}
+              <motion.div
+                initial={{ opacity: 0, x: 32 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.7, delay: 0.2, ease }}
+              >
+                <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-8 space-y-6 shadow-2xl shadow-black/40">
+                  <div className="space-y-1">
+                    <h2 className="text-xl font-bold text-white">Start for Free</h2>
+                    <p className="text-sm text-zinc-500">Join 500+ freelancers winning more jobs</p>
+                  </div>
+
+                  {/* Google button */}
+                  <button
+                    onClick={() => signIn("google")}
+                    disabled={status === "loading"}
+                    className="w-full flex items-center justify-center gap-3 rounded-xl bg-white hover:bg-zinc-100 py-4 text-sm font-semibold text-zinc-900 transition-colors disabled:opacity-60"
+                  >
+                    <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24">
+                      <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                      <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                      <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
+                      <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    </svg>
+                    Continue with Google
+                  </button>
+
+                  {/* Divider */}
+                  <div className="flex items-center gap-3">
+                    <div className="flex-1 h-px bg-zinc-800" />
+                    <span className="text-xs text-zinc-600">or enter your email</span>
+                    <div className="flex-1 h-px bg-zinc-800" />
+                  </div>
+
+                  {/* Email / waitlist form */}
+                  <form onSubmit={handleWaitlist} className="space-y-3">
+                    {waitlistState === "success" ? (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.96 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="flex items-center gap-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-4"
+                      >
+                        <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                        <p className="text-sm text-emerald-400">
+                          You&apos;re on the list!
+                        </p>
+                      </motion.div>
+                    ) : (
+                      <>
+                        <input
+                          type="email"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          placeholder="your@email.com"
+                          className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-3 text-sm text-white placeholder-zinc-500 focus:border-violet-500 focus:outline-none transition-colors"
+                        />
+                        <button
+                          type="submit"
+                          disabled={!email.trim() || waitlistState === "loading"}
+                          className="w-full rounded-xl bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 py-3 text-sm font-semibold text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {waitlistState === "loading" ? "Joining..." : "Get Early Access"}
+                        </button>
+                        {waitlistState === "error" && (
+                          <p className="text-xs text-red-400 text-center">Something went wrong. Try again.</p>
+                        )}
+                      </>
+                    )}
+                  </form>
+
+                  {/* Footer */}
+                  <div className="space-y-2.5 text-center">
+                    <p className="text-xs text-zinc-600">
+                      Free forever · No credit card · 2 min setup
+                    </p>
+                    <p className="text-xs text-zinc-500">
+                      Already have an account?{" "}
+                      <button
+                        onClick={() => signIn("google")}
+                        className="text-violet-400 hover:text-violet-300 transition-colors"
+                      >
+                        Sign in &rarr;
+                      </button>
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+
             </div>
           </div>
-        </motion.section>
+        </section>
 
         {/* -- How It Works ----------------------------------- */}
         <section className="max-w-7xl mx-auto px-4 sm:px-10 py-20 space-y-12">
@@ -545,9 +481,6 @@ export default function Home() {
             </motion.button>
           </motion.div>
         </section>
-
-        {/* -- Signup Section --------------------------------- */}
-        <SignupSection status={status} />
 
         {/* -- Value Banner ----------------------------------- */}
         <section className="max-w-7xl mx-auto px-4 sm:px-10 py-20">
