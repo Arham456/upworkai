@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { motion, useInView } from "framer-motion";
 import { signIn, useSession } from "next-auth/react";
@@ -16,7 +16,7 @@ import {
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
-// â”€â”€ Particle Canvas â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -- Particle Canvas ----------------------------------------
 function ParticleCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -89,7 +89,7 @@ function ParticleCanvas() {
   );
 }
 
-// â”€â”€ Animated Grid Lines â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -- Animated Grid Lines -----------------------------------
 function GridLines() {
   return (
     <div aria-hidden className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
@@ -123,7 +123,7 @@ function GridLines() {
   );
 }
 
-// â”€â”€ Animated Counter â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -- Animated Counter --------------------------------------
 function AnimatedCounter({
   target,
   prefix = "",
@@ -180,7 +180,7 @@ export default function Home() {
       />
 
       <div className="relative z-10">
-        {/* â”€â”€ Navbar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+        {/* -- Navbar ----------------------------------------- */}
         <header className="sticky top-0 z-50 flex items-center justify-between px-4 sm:px-10 py-4 border-b border-zinc-800 bg-[#0a0a0a]/95 backdrop-blur-md">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-violet-500 shrink-0" />
@@ -195,7 +195,7 @@ export default function Home() {
           </button>
         </header>
 
-        {/* â”€â”€ Hero â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+        {/* -- Hero ------------------------------------------- */}
         <section className="min-h-[calc(100vh-57px)] flex items-center justify-center px-4 sm:px-10 py-20">
           <div className="max-w-4xl mx-auto text-center space-y-8">
             <motion.div
@@ -270,7 +270,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* â”€â”€ Social Proof Bar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+        {/* -- Social Proof Bar ------------------------------- */}
         <motion.section
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -295,7 +295,7 @@ export default function Home() {
           </div>
         </motion.section>
 
-        {/* â”€â”€ Value Banner â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+        {/* -- Value Banner ----------------------------------- */}
         <section className="max-w-7xl mx-auto px-4 sm:px-10 py-20">
           <motion.div
             initial={{ opacity: 0, y: 24 }}
@@ -340,7 +340,7 @@ export default function Home() {
           </motion.div>
         </section>
 
-        {/* â”€â”€ Features â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+        {/* -- Features --------------------------------------- */}
         <section id="features" className="max-w-7xl mx-auto px-4 sm:px-10 pb-24 space-y-14">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -407,7 +407,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* â”€â”€ Comparison Table â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+        {/* -- Comparison Table ------------------------------- */}
         <section className="max-w-7xl mx-auto px-4 sm:px-10 pb-28 space-y-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -427,8 +427,8 @@ export default function Home() {
             </p>
           </motion.div>
 
-          <div className=”overflow-x-auto -mx-1 px-1”>
-            <table className=”w-full min-w-[600px] border-collapse”>
+          <div className="overflow-x-auto -mx-1 px-1">
+            <table className="w-full min-w-[600px] border-collapse">
               <thead>
                 <tr>
                   <th className="text-left pb-4 pr-4 min-w-[160px]">
@@ -534,7 +534,7 @@ export default function Home() {
           </motion.div>
         </section>
 
-        {/* â”€â”€ Before / After â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+        {/* -- Before / After --------------------------------- */}
         <section className="max-w-7xl mx-auto px-4 sm:px-10 pb-28">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -638,7 +638,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* â”€â”€ Bottom CTA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+        {/* -- Bottom CTA ------------------------------------- */}
         <section className="max-w-7xl mx-auto px-4 sm:px-10 pb-24">
           <motion.div
             initial={{ opacity: 0, y: 24 }}
@@ -683,7 +683,7 @@ export default function Home() {
           </motion.div>
         </section>
 
-        {/* â”€â”€ Footer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+        {/* -- Footer ----------------------------------------- */}
         <footer className="border-t border-zinc-800/60 py-8 px-4 sm:px-10">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <div className="flex items-center gap-2">
