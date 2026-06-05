@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { motion, useInView } from "framer-motion";
 import { signIn, useSession } from "next-auth/react";
@@ -16,7 +16,7 @@ import {
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
-// ── Particle Canvas ────────────────────────────────────────
+// â”€â”€ Particle Canvas â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function ParticleCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -89,7 +89,7 @@ function ParticleCanvas() {
   );
 }
 
-// ── Animated Grid Lines ───────────────────────────────────
+// â”€â”€ Animated Grid Lines â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function GridLines() {
   return (
     <div aria-hidden className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
@@ -123,7 +123,7 @@ function GridLines() {
   );
 }
 
-// ── Animated Counter ──────────────────────────────────────
+// â”€â”€ Animated Counter â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function AnimatedCounter({
   target,
   prefix = "",
@@ -180,8 +180,8 @@ export default function Home() {
       />
 
       <div className="relative z-10">
-        {/* ── Navbar ───────────────────────────────────────── */}
-        <header className="sticky top-0 z-50 flex items-center justify-between px-6 sm:px-10 py-4 border-b border-zinc-800 bg-[#0a0a0a]/95 backdrop-blur-md">
+        {/* â”€â”€ Navbar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+        <header className="sticky top-0 z-50 flex items-center justify-between px-4 sm:px-10 py-4 border-b border-zinc-800 bg-[#0a0a0a]/95 backdrop-blur-md">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-violet-500 shrink-0" />
             <span className="font-bold text-white tracking-tight">UpworkAI</span>
@@ -195,8 +195,8 @@ export default function Home() {
           </button>
         </header>
 
-        {/* ── Hero ─────────────────────────────────────────── */}
-        <section className="min-h-[calc(100vh-57px)] flex items-center justify-center px-6 sm:px-10 py-20">
+        {/* â”€â”€ Hero â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+        <section className="min-h-[calc(100vh-57px)] flex items-center justify-center px-4 sm:px-10 py-20">
           <div className="max-w-4xl mx-auto text-center space-y-8">
             <motion.div
               initial={{ opacity: 0, y: -10 }}
@@ -228,7 +228,7 @@ export default function Home() {
               className="text-zinc-400 max-w-lg mx-auto text-lg leading-relaxed"
             >
               UpworkAI reads every job post, finds what the client actually
-              fears, and writes a proposal that makes them choose you —
+              fears, and writes a proposal that makes them choose you â€”
               every single time.
             </motion.p>
 
@@ -265,25 +265,25 @@ export default function Home() {
               transition={{ delay: 0.5, duration: 0.5 }}
               className="text-xs text-zinc-600"
             >
-              Free forever · No credit card · 2 min setup
+              Free forever Â· No credit card Â· 2 min setup
             </motion.p>
           </div>
         </section>
 
-        {/* ── Social Proof Bar ─────────────────────────────── */}
+        {/* â”€â”€ Social Proof Bar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <motion.section
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8, duration: 0.6 }}
           className="border-y border-zinc-800/60 bg-transparent py-4"
         >
-          <div className="max-w-7xl mx-auto px-6 sm:px-10 flex flex-col sm:flex-row items-center justify-center gap-3">
+          <div className="max-w-7xl mx-auto px-4 sm:px-10 flex flex-col sm:flex-row items-center justify-center gap-3">
             <span className="text-sm text-zinc-500">
               Trusted by freelancers from 50+ countries
             </span>
             <div className="hidden sm:block w-px h-4 bg-zinc-700" />
             <div className="flex items-center gap-1">
-              {["🇺🇸","🇬🇧","🇮🇳","🇵🇰","🇩🇪","🇫🇷","🇧🇷","🇨🇦","🇦🇺","🇳🇬"].map((flag) => (
+              {["ðŸ‡ºðŸ‡¸","ðŸ‡¬ðŸ‡§","ðŸ‡®ðŸ‡³","ðŸ‡µðŸ‡°","ðŸ‡©ðŸ‡ª","ðŸ‡«ðŸ‡·","ðŸ‡§ðŸ‡·","ðŸ‡¨ðŸ‡¦","ðŸ‡¦ðŸ‡º","ðŸ‡³ðŸ‡¬"].map((flag) => (
                 <span
                   key={flag}
                   className="text-base hover:scale-125 transition-transform cursor-default"
@@ -295,8 +295,8 @@ export default function Home() {
           </div>
         </motion.section>
 
-        {/* ── Value Banner ─────────────────────────────────── */}
-        <section className="max-w-7xl mx-auto px-6 sm:px-10 py-20">
+        {/* â”€â”€ Value Banner â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+        <section className="max-w-7xl mx-auto px-4 sm:px-10 py-20">
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -306,7 +306,7 @@ export default function Home() {
           >
             <div className="absolute inset-0 bg-gradient-to-br from-violet-500/5 via-transparent to-purple-500/5 pointer-events-none" />
 
-            <div className="relative px-6 sm:px-10 py-10 space-y-8">
+            <div className="relative px-4 sm:px-10 py-10 space-y-8">
               <p className="text-center text-lg sm:text-xl md:text-2xl font-semibold text-white leading-snug">
                 One extra job won ={" "}
                 <span className="text-violet-400">
@@ -314,7 +314,7 @@ export default function Home() {
                 </span>
               </p>
 
-              <div className="grid grid-cols-3 gap-3 sm:gap-5">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-5">
                 {[
                   { label: "Average Upwork job", prefix: "$", target: 300, suffix: "", note: "typical contract" },
                   { label: "UpworkAI cost", prefix: "$", target: 14, suffix: "/mo", note: "all features included" },
@@ -326,13 +326,13 @@ export default function Home() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: i * 0.12, duration: 0.5 }}
-                    className="rounded-xl border border-zinc-800 bg-[#0a0a0a]/60 px-4 py-5 sm:px-6 sm:py-6 text-center space-y-1.5"
+                    className="flex-1 rounded-xl border border-zinc-800 bg-[#0a0a0a]/60 px-6 py-6 text-center space-y-2"
                   >
-                    <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-violet-400 tabular-nums">
+                    <p className="text-4xl sm:text-3xl md:text-4xl font-bold text-violet-400 tabular-nums">
                       <AnimatedCounter target={target} prefix={prefix} suffix={suffix} />
                     </p>
-                    <p className="text-xs sm:text-sm font-medium text-zinc-200">{label}</p>
-                    <p className="text-[10px] sm:text-xs text-zinc-600">{note}</p>
+                    <p className="text-sm font-medium text-zinc-200">{label}</p>
+                    <p className="text-xs text-zinc-600">{note}</p>
                   </motion.div>
                 ))}
               </div>
@@ -340,8 +340,8 @@ export default function Home() {
           </motion.div>
         </section>
 
-        {/* ── Features ─────────────────────────────────────── */}
-        <section id="features" className="max-w-7xl mx-auto px-6 sm:px-10 pb-24 space-y-14">
+        {/* â”€â”€ Features â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+        <section id="features" className="max-w-7xl mx-auto px-4 sm:px-10 pb-24 space-y-14">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -370,7 +370,7 @@ export default function Home() {
               {
                 icon: PenLine,
                 title: "Proposal Writer",
-                desc: "AI writes in your voice — not generic templates. Every proposal sounds like you read their post twice.",
+                desc: "AI writes in your voice â€” not generic templates. Every proposal sounds like you read their post twice.",
                 badge: "Most popular",
               },
               {
@@ -407,8 +407,8 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ── Comparison Table ─────────────────────────────── */}
-        <section className="max-w-7xl mx-auto px-6 sm:px-10 pb-28 space-y-10">
+        {/* â”€â”€ Comparison Table â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+        <section className="max-w-7xl mx-auto px-4 sm:px-10 pb-28 space-y-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -427,12 +427,67 @@ export default function Home() {
             </p>
           </motion.div>
 
+          {/* â”€â”€ Mobile: card list (hidden on md+) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="overflow-x-auto"
+            className="block md:hidden space-y-3"
+          >
+            {[
+              "Remembers your writing voice",
+              "Analyzes client psychology",
+              "Scores jobs before you apply",
+              "Learns from your wins over time",
+              "Predicts client fear with confidence %",
+              "Built specifically for Upwork",
+            ].map((feature) => (
+              <div key={feature} className="rounded-xl border border-zinc-800 bg-[#111111] overflow-hidden">
+                <div className="px-4 py-3 text-sm font-medium text-zinc-200 border-b border-zinc-800">
+                  {feature}
+                </div>
+                <div className="divide-y divide-zinc-800">
+                  <div className="flex items-center justify-between px-4 py-3">
+                    <span className="text-xs text-zinc-500">Others</span>
+                    <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-red-500/10">
+                      <X className="w-3 h-3 text-red-400" />
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between px-4 py-3 bg-violet-500/[0.04] border-l-[3px] border-l-violet-500">
+                    <span className="text-xs font-semibold text-violet-400">UpworkAI</span>
+                    <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-violet-500/15">
+                      <Check className="w-3 h-3 text-violet-400" />
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+            {/* Price row */}
+            <div className="rounded-xl border border-zinc-800 bg-[#111111] overflow-hidden">
+              <div className="px-4 py-3 text-sm font-medium text-zinc-200 border-b border-zinc-800">
+                Price per month
+              </div>
+              <div className="divide-y divide-zinc-800">
+                <div className="flex items-center justify-between px-4 py-3">
+                  <span className="text-xs text-zinc-500">ChatGPT / Grammarly / Jasper</span>
+                  <span className="text-sm text-zinc-500 font-medium">$20â€“$49</span>
+                </div>
+                <div className="flex items-center justify-between px-4 py-3 bg-violet-500/[0.04] border-l-[3px] border-l-violet-500">
+                  <span className="text-xs font-semibold text-violet-400">UpworkAI</span>
+                  <span className="text-sm font-bold text-violet-400">$14/mo</span>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* â”€â”€ Desktop: full table (hidden below md) â”€â”€â”€â”€â”€â”€â”€â”€ */}
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="hidden md:block overflow-x-auto"
           >
             <table className="w-full min-w-[640px] border-collapse">
               <thead>
@@ -539,8 +594,8 @@ export default function Home() {
           </motion.div>
         </section>
 
-        {/* ── Before / After ───────────────────────────────── */}
-        <section className="max-w-7xl mx-auto px-6 sm:px-10 pb-28">
+        {/* â”€â”€ Before / After â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+        <section className="max-w-7xl mx-auto px-4 sm:px-10 pb-28">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -615,7 +670,7 @@ export default function Home() {
               </div>
               <div className="space-y-2 text-sm text-zinc-300 leading-relaxed">
                 <p>
-                  I read your post twice — sounds like you&apos;ve been through the
+                  I read your post twice â€” sounds like you&apos;ve been through the
                   hired-and-ghosted cycle before, and you&apos;re done with it.
                 </p>
                 <p>
@@ -626,7 +681,7 @@ export default function Home() {
                 <p>
                   Your project needs a Shopify integration with custom inventory
                   sync. I built this exact system for a fashion retailer last
-                  quarter — here&apos;s what week one looks like if we work together...
+                  quarter â€” here&apos;s what week one looks like if we work together...
                 </p>
               </div>
               <div className="flex flex-wrap gap-2 pt-1 border-t border-violet-500/15">
@@ -643,8 +698,8 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ── Bottom CTA ───────────────────────────────────── */}
-        <section className="max-w-7xl mx-auto px-6 sm:px-10 pb-24">
+        {/* â”€â”€ Bottom CTA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+        <section className="max-w-7xl mx-auto px-4 sm:px-10 pb-24">
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -688,14 +743,14 @@ export default function Home() {
           </motion.div>
         </section>
 
-        {/* ── Footer ───────────────────────────────────────── */}
-        <footer className="border-t border-zinc-800/60 py-8 px-6 sm:px-10">
+        {/* â”€â”€ Footer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+        <footer className="border-t border-zinc-800/60 py-8 px-4 sm:px-10">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-violet-500" />
               <span className="text-sm font-medium text-zinc-500">UpworkAI</span>
             </div>
-            <p className="text-xs text-zinc-600">© 2026 UpworkAI. Built for freelancers.</p>
+            <p className="text-xs text-zinc-600">Â© 2026 UpworkAI. Built for freelancers.</p>
           </div>
         </footer>
       </div>
