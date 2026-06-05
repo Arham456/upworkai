@@ -1,15 +1,12 @@
-import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export async function POST(request: NextRequest) {
+export async function POST(req: Request) {
   try {
-    const body = await request.json() as { email?: string };
+    const body = await req.json() as { email?: string };
     const email = body.email?.trim().toLowerCase();
 
-    console.log("[waitlist] received email:", email);
-
-    if (!email || !email.includes("@") || email.length < 5) {
-      return NextResponse.json({ error: "Valid email required" }, { status: 400 });
+    if (!email || !email.includes("@")) {
+      return Response.json({ error: "Invalid email" }, { status: 400 });
     }
 
     await prisma.waitlist.upsert({
@@ -18,10 +15,9 @@ export async function POST(request: NextRequest) {
       create: { email },
     });
 
-    console.log("[waitlist] upserted:", email);
-    return NextResponse.json({ success: true });
+    return Response.json({ success: true });
   } catch (err) {
     console.error("[waitlist] error:", err);
-    return NextResponse.json({ error: "Something went wrong" }, { status: 500 });
+    return Response.json({ error: "Server error" }, { status: 500 });
   }
 }
