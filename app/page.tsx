@@ -183,7 +183,8 @@ export default function Home() {
     setWaitlistLoading(true);
     setWaitlistError("");
     try {
-      const res = await fetch("/api/waitlist", {
+      const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
+      const res = await fetch(`${baseUrl}/api/waitlist`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: emailValue }),
