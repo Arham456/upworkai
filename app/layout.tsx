@@ -9,9 +9,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "UpworkAI — Write Winning Proposals",
-  description:
-    "AI-powered Upwork proposal writer. Stop getting ignored. Start winning clients.",
+  title: "RefinedHawk — Win More Jobs on Upwork",
+  description: "AI-powered proposal intelligence for Upwork freelancers",
+  icons: { icon: "/logo.png" },
 };
 
 export default function RootLayout({

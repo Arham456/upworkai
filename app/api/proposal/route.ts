@@ -160,7 +160,7 @@ Write a compelling, personalized proposal. Address the client's core concern dir
           if (isFreePlan) {
             controller.enqueue(
               encoder.encode(
-                "\n\n---\nWritten with UpworkAI Free — upgrade to Pro for unlimited proposals with no watermark.",
+                "\n\n---\nWritten with RefinedHawk Free — upgrade to Pro for unlimited proposals with no watermark.",
               ),
             );
             // Increment generated count AFTER successful stream (not on error)

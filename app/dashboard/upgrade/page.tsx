@@ -56,7 +56,7 @@ export default async function UpgradePage() {
             <p className="text-zinc-500 text-sm">
               {isPro
                 ? "You have unlimited access to all features."
-                : "Unlock the full power of UpworkAI."}
+                : "Unlock the full power of RefinedHawk."}
             </p>
           </div>
 

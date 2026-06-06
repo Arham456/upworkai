@@ -221,8 +221,9 @@ export default function Home() {
         {/* -- Navbar ----------------------------------------- */}
         <header className="sticky top-0 z-50 flex items-center justify-between px-4 sm:px-10 py-4 border-b border-zinc-800 bg-[#0a0a0a]/95 backdrop-blur-md">
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-violet-500 shrink-0" />
-            <span className="font-bold text-white tracking-tight">UpworkAI</span>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo.png" width={36} height={36} alt="RefinedHawk logo" className="shrink-0" />
+            <span className="font-bold text-white tracking-tight">RefinedHawk</span>
           </div>
           <button
             onClick={() => signIn("google")}
@@ -522,14 +523,14 @@ export default function Home() {
               <p className="text-center text-lg sm:text-xl md:text-2xl font-semibold text-white leading-snug">
                 One extra job won ={" "}
                 <span className="text-violet-400">
-                  21 months of UpworkAI paid for
+                  21 months of RefinedHawk paid for
                 </span>
               </p>
 
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-5">
                 {[
                   { label: "Average Upwork job", prefix: "$", target: 300, suffix: "", note: "typical contract" },
-                  { label: "UpworkAI cost", prefix: "$", target: 14, suffix: "/mo", note: "all features included" },
+                  { label: "RefinedHawk cost", prefix: "$", target: 14, suffix: "/mo", note: "all features included" },
                   { label: "Your ROI", prefix: "", target: 21, suffix: "x", note: "return on investment" },
                 ].map(({ label, prefix, target, suffix, note }, i) => (
                   <motion.div
@@ -632,7 +633,7 @@ export default function Home() {
               Comparison
             </span>
             <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
-              Why UpworkAI Beats Everything Else
+              Why RefinedHawk Beats Everything Else
             </h2>
             <p className="text-zinc-400 max-w-md mx-auto text-sm">
               More powerful. More personal. Less expensive.
@@ -666,7 +667,7 @@ export default function Home() {
                       <span className="text-[9px] bg-violet-600 text-white font-bold px-2 py-0.5 rounded-full leading-[18px]">
                         Best Value
                       </span>
-                      <span className="text-sm font-bold text-violet-400">UpworkAI</span>
+                      <span className="text-sm font-bold text-violet-400">RefinedHawk</span>
                       <span className="text-xs text-violet-500/70">$14/mo</span>
                     </div>
                   </th>
@@ -814,7 +815,7 @@ export default function Home() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="w-2.5 h-2.5 rounded-full bg-violet-500" />
-                  <span className="text-sm font-semibold text-violet-400">UpworkAI Proposal</span>
+                  <span className="text-sm font-semibold text-violet-400">RefinedHawk Proposal</span>
                 </div>
                 <span className="text-xs bg-violet-600 text-white font-bold px-2.5 py-0.5 rounded-full">
                   Hired
@@ -899,10 +900,11 @@ export default function Home() {
         <footer className="border-t border-zinc-800/60 py-8 px-4 sm:px-10">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-violet-500" />
-              <span className="text-sm font-medium text-zinc-500">UpworkAI</span>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/logo.png" width={20} height={20} alt="RefinedHawk logo" className="opacity-60" />
+              <span className="text-sm font-medium text-zinc-500">RefinedHawk</span>
             </div>
-            <p className="text-xs text-zinc-600">© 2026 UpworkAI. Built for freelancers.</p>
+            <p className="text-xs text-zinc-600">© 2026 RefinedHawk. Built for freelancers.</p>
           </div>
         </footer>
       </div>

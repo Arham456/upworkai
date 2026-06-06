@@ -318,7 +318,7 @@ export default async function DashboardPage() {
                         ? "See your match score, the client's core concern, and whether a job is worth your connects — before you spend them."
                         : !step2Done
                         ? "Tell the AI your skills and niche so it tailors every proposal to your voice and strengths."
-                        : "You've scored a job and set up your profile. Now let UpworkAI write a proposal in your voice."}
+                        : "You've scored a job and set up your profile. Now let RefinedHawk write a proposal in your voice."}
                     </p>
                     <div className="mt-4 flex flex-wrap gap-3">
                       {!step1Done && (

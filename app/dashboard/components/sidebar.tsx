@@ -134,8 +134,9 @@ export function Sidebar() {
       {/* ── Mobile top bar ───────────────────────────────── */}
       <div className="md:hidden fixed top-0 inset-x-0 z-40 flex items-center justify-between h-14 px-4 bg-[#111111]/95 backdrop-blur-md border-b border-zinc-800">
         <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-violet-500 shrink-0" />
-          <span className="font-bold text-white text-sm tracking-tight">UpworkAI</span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.png" width={28} height={28} alt="RefinedHawk logo" className="shrink-0" />
+          <span className="font-bold text-white text-sm tracking-tight">RefinedHawk</span>
         </div>
         <button
           onClick={() => setMobileOpen(true)}
@@ -174,8 +175,9 @@ export function Sidebar() {
           >
             <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-800 shrink-0">
               <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-violet-500 shrink-0" />
-                <span className="font-bold text-white tracking-tight">UpworkAI</span>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/logo.png" width={28} height={28} alt="RefinedHawk logo" className="shrink-0" />
+                <span className="font-bold text-white tracking-tight">RefinedHawk</span>
               </div>
               <button
                 onClick={() => setMobileOpen(false)}
@@ -195,8 +197,9 @@ export function Sidebar() {
       {/* ── Desktop sidebar ──────────────────────────────── */}
       <aside className="hidden md:flex flex-col w-60 border-r border-zinc-800 bg-[#111111] shrink-0">
         <div className="flex items-center gap-2 px-5 py-5 border-b border-zinc-800">
-          <span className="w-2 h-2 rounded-full bg-violet-500 shrink-0" />
-          <span className="font-bold text-white tracking-tight">UpworkAI</span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.png" width={28} height={28} alt="RefinedHawk logo" className="shrink-0" />
+          <span className="font-bold text-white tracking-tight">RefinedHawk</span>
         </div>
         <NavContent />
       </aside>
