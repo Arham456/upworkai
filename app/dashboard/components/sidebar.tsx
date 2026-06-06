@@ -25,15 +25,6 @@ const navItems = [
   { label: "Profile Setup", href: "/dashboard/profile", icon: UserCircle },
 ];
 
-function HawkLogo({ size = 28 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="shrink-0">
-      <path d="M10 55 L35 10 L50 35 L75 5 L65 45 L90 40 L70 60 L80 90 L50 70 L35 85 L40 60 L10 55Z" fill="#7C3AED"/>
-      <path d="M50 35 L65 45 L50 55Z" fill="#A78BFA"/>
-    </svg>
-  );
-}
-
 function UserInitials({ name }: { name?: string | null }) {
   const initials = name
     ? name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase()
@@ -143,7 +134,8 @@ export function Sidebar() {
       {/* ── Mobile top bar ───────────────────────────────── */}
       <div className="md:hidden fixed top-0 inset-x-0 z-40 flex items-center justify-between h-14 px-4 bg-[#111111]/95 backdrop-blur-md border-b border-zinc-800">
         <div className="flex items-center gap-2">
-          <HawkLogo size={28} />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/hawk.png" width={32} height={32} alt="RefinedHawk" style={{objectFit: 'contain'}} />
           <span className="font-bold text-white text-sm tracking-tight">RefinedHawk</span>
         </div>
         <button
@@ -183,7 +175,8 @@ export function Sidebar() {
           >
             <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-800 shrink-0">
               <div className="flex items-center gap-2">
-                <HawkLogo size={28} />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/hawk.png" width={32} height={32} alt="RefinedHawk" style={{objectFit: 'contain'}} />
                 <span className="font-bold text-white tracking-tight">RefinedHawk</span>
               </div>
               <button
@@ -204,7 +197,8 @@ export function Sidebar() {
       {/* ── Desktop sidebar ──────────────────────────────── */}
       <aside className="hidden md:flex flex-col w-60 border-r border-zinc-800 bg-[#111111] shrink-0">
         <div className="flex items-center gap-2 px-5 py-5 border-b border-zinc-800">
-          <HawkLogo size={28} />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/hawk.png" width={32} height={32} alt="RefinedHawk" style={{objectFit: 'contain'}} />
           <span className="font-bold text-white tracking-tight">RefinedHawk</span>
         </div>
         <NavContent />

@@ -221,7 +221,8 @@ export default function Home() {
         {/* -- Navbar ----------------------------------------- */}
         <header className="sticky top-0 z-50 flex items-center justify-between px-4 sm:px-10 py-4 border-b border-zinc-800 bg-[#0a0a0a]/95 backdrop-blur-md">
           <div className="flex items-center gap-2">
-            <HawkLogo size={32} />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/hawk.png" width={40} height={40} alt="RefinedHawk" style={{objectFit: 'contain'}} />
             <span className="font-bold text-white tracking-tight">RefinedHawk</span>
           </div>
           <button
@@ -899,7 +900,8 @@ export default function Home() {
         <footer className="border-t border-zinc-800/60 py-8 px-4 sm:px-10">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <HawkLogo size={20} className="opacity-60" />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/hawk.png" width={20} height={20} alt="RefinedHawk" style={{objectFit: 'contain', opacity: 0.6}} />
               <span className="text-sm font-medium text-zinc-500">RefinedHawk</span>
             </div>
             <p className="text-xs text-zinc-600">© 2026 RefinedHawk. Built for freelancers.</p>
@@ -907,15 +909,6 @@ export default function Home() {
         </footer>
       </div>
     </div>
-  );
-}
-
-function HawkLogo({ size = 32, className }: { size?: number; className?: string }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-      <path d="M10 55 L35 10 L50 35 L75 5 L65 45 L90 40 L70 60 L80 90 L50 70 L35 85 L40 60 L10 55Z" fill="#7C3AED"/>
-      <path d="M50 35 L65 45 L50 55Z" fill="#A78BFA"/>
-    </svg>
   );
 }
 
