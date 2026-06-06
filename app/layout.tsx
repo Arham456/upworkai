@@ -11,7 +11,11 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "RefinedHawk — Win More Jobs on Upwork",
   description: "AI-powered proposal intelligence for Upwork freelancers",
-  icons: { icon: "/logo.png" },
+  icons: {
+    icon: "/favicon.svg",
+    shortcut: "/favicon.svg",
+    apple: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({
