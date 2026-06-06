@@ -26,15 +26,8 @@ const navItems = [
 ];
 
 function HawkLogo({ size = 36 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M5 45 L30 15 L45 30 L60 10 L55 35 L80 20 L70 45" fill="#7C3AED" opacity="0.9"/>
-      <path d="M25 45 L55 35 L70 45 L60 65 L40 70 L25 45Z" fill="#7C3AED"/>
-      <path d="M55 35 L75 30 L80 45 L65 50 L55 35Z" fill="#A78BFA"/>
-      <path d="M78 38 L88 42 L78 46Z" fill="#7C3AED"/>
-      <path d="M30 62 L40 70 L35 85 L25 75 L20 85 L18 68Z" fill="#7C3AED" opacity="0.8"/>
-    </svg>
-  );
+  // eslint-disable-next-line @next/next/no-img-element
+  return <img src="/hawk.png" width={size} height={size} alt="RefinedHawk" style={{ objectFit: 'contain' }} />;
 }
 
 function UserInitials({ name }: { name?: string | null }) {
