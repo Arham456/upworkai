@@ -28,13 +28,8 @@ const navItems = [
 function HawkLogo({ size = 36 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M8 50 L20 20 L35 35 L50 15 L45 40" fill="#7C3AED"/>
-      <path d="M8 50 L15 65 L30 55 L25 70 L40 60" fill="#6D28D9"/>
-      <path d="M35 35 L65 38 L70 55 L45 60 L35 35Z" fill="#7C3AED"/>
-      <path d="M60 30 L80 35 L82 48 L65 50 L60 30Z" fill="#A78BFA"/>
-      <path d="M80 38 L95 43 L80 48Z" fill="#7C3AED"/>
-      <path d="M38 60 L30 80 L22 90 L28 72 L20 85 L30 65Z" fill="#7C3AED"/>
-      <path d="M35 35 L50 15 L52 25 L38 38Z" fill="#A78BFA"/>
+      <path d="M10,70 Q30,20 50,40 Q60,10 90,30 Q70,45 75,60 Q60,50 50,65 Q40,80 25,85 Q30,70 10,70Z" fill="#7C3AED"/>
+      <path d="M75,60 Q85,65 95,55 Q88,70 75,60Z" fill="#A78BFA"/>
     </svg>
   );
 }
