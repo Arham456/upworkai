@@ -221,8 +221,7 @@ export default function Home() {
         {/* -- Navbar ----------------------------------------- */}
         <header className="sticky top-0 z-50 flex items-center justify-between px-4 sm:px-10 py-4 border-b border-zinc-800 bg-[#0a0a0a]/95 backdrop-blur-md">
           <div className="flex items-center gap-2">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/hawk.png" width={40} height={40} alt="RefinedHawk" style={{objectFit: 'contain'}} />
+            <HawkLogo size={36} />
             <span className="font-bold text-white tracking-tight">RefinedHawk</span>
           </div>
           <button
@@ -900,8 +899,7 @@ export default function Home() {
         <footer className="border-t border-zinc-800/60 py-8 px-4 sm:px-10">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <div className="flex items-center gap-2">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/hawk.png" width={20} height={20} alt="RefinedHawk" style={{objectFit: 'contain', opacity: 0.6}} />
+              <HawkLogo size={20} />
               <span className="text-sm font-medium text-zinc-500">RefinedHawk</span>
             </div>
             <p className="text-xs text-zinc-600">© 2026 RefinedHawk. Built for freelancers.</p>
@@ -909,6 +907,18 @@ export default function Home() {
         </footer>
       </div>
     </div>
+  );
+}
+
+function HawkLogo({ size = 36 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M5 45 L30 15 L45 30 L60 10 L55 35 L80 20 L70 45" fill="#7C3AED" opacity="0.9"/>
+      <path d="M25 45 L55 35 L70 45 L60 65 L40 70 L25 45Z" fill="#7C3AED"/>
+      <path d="M55 35 L75 30 L80 45 L65 50 L55 35Z" fill="#A78BFA"/>
+      <path d="M78 38 L88 42 L78 46Z" fill="#7C3AED"/>
+      <path d="M30 62 L40 70 L35 85 L25 75 L20 85 L18 68Z" fill="#7C3AED" opacity="0.8"/>
+    </svg>
   );
 }
 

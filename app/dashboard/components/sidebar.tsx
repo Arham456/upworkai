@@ -25,6 +25,18 @@ const navItems = [
   { label: "Profile Setup", href: "/dashboard/profile", icon: UserCircle },
 ];
 
+function HawkLogo({ size = 36 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M5 45 L30 15 L45 30 L60 10 L55 35 L80 20 L70 45" fill="#7C3AED" opacity="0.9"/>
+      <path d="M25 45 L55 35 L70 45 L60 65 L40 70 L25 45Z" fill="#7C3AED"/>
+      <path d="M55 35 L75 30 L80 45 L65 50 L55 35Z" fill="#A78BFA"/>
+      <path d="M78 38 L88 42 L78 46Z" fill="#7C3AED"/>
+      <path d="M30 62 L40 70 L35 85 L25 75 L20 85 L18 68Z" fill="#7C3AED" opacity="0.8"/>
+    </svg>
+  );
+}
+
 function UserInitials({ name }: { name?: string | null }) {
   const initials = name
     ? name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase()
@@ -134,8 +146,7 @@ export function Sidebar() {
       {/* ── Mobile top bar ───────────────────────────────── */}
       <div className="md:hidden fixed top-0 inset-x-0 z-40 flex items-center justify-between h-14 px-4 bg-[#111111]/95 backdrop-blur-md border-b border-zinc-800">
         <div className="flex items-center gap-2">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/hawk.png" width={32} height={32} alt="RefinedHawk" style={{objectFit: 'contain'}} />
+          <HawkLogo size={28} />
           <span className="font-bold text-white text-sm tracking-tight">RefinedHawk</span>
         </div>
         <button
@@ -175,8 +186,7 @@ export function Sidebar() {
           >
             <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-800 shrink-0">
               <div className="flex items-center gap-2">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/hawk.png" width={32} height={32} alt="RefinedHawk" style={{objectFit: 'contain'}} />
+                <HawkLogo size={28} />
                 <span className="font-bold text-white tracking-tight">RefinedHawk</span>
               </div>
               <button
@@ -197,8 +207,7 @@ export function Sidebar() {
       {/* ── Desktop sidebar ──────────────────────────────── */}
       <aside className="hidden md:flex flex-col w-60 border-r border-zinc-800 bg-[#111111] shrink-0">
         <div className="flex items-center gap-2 px-5 py-5 border-b border-zinc-800">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/hawk.png" width={32} height={32} alt="RefinedHawk" style={{objectFit: 'contain'}} />
+          <HawkLogo size={28} />
           <span className="font-bold text-white tracking-tight">RefinedHawk</span>
         </div>
         <NavContent />
