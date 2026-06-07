@@ -914,10 +914,9 @@ function HawkLogo({ size = 36 }: { size?: number }) {
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      src="/hawk-logo.svg"
-      alt="RefinedHawk"
-      width={size}
-      height={size}
+      src="/hawk.png"
+      alt="RefinedHawk Logo"
+      style={{ width: size, height: size, objectFit: 'contain' }}
     />
   );
 }
