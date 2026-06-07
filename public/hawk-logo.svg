@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Wing top -->
+  <path d="M15 55 L25 25 L40 42 L55 18 L50 45" fill="#7C3AED"/>
+  <!-- Wing bottom -->
+  <path d="M15 55 L20 68 L35 58" fill="#6D28D9"/>
+  <!-- Body -->
+  <path d="M38 42 L62 38 L68 55 L48 62 L38 42Z" fill="#7C3AED"/>
+  <!-- Head -->
+  <path d="M58 30 L76 34 L78 48 L62 50 L58 30Z" fill="#8B5CF6"/>
+  <!-- Beak -->
+  <path d="M76 38 L90 43 L76 47Z" fill="#7C3AED"/>
+  <!-- Tail -->
+  <path d="M36 60 L28 78 L22 88 L32 68Z" fill="#7C3AED"/>
+  <path d="M44 62 L40 80 L48 70Z" fill="#6D28D9"/>
+</svg>

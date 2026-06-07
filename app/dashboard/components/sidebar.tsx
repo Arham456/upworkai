@@ -27,10 +27,13 @@ const navItems = [
 
 function HawkLogo({ size = 36 }: { size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M10,70 Q30,20 50,40 Q60,10 90,30 Q70,45 75,60 Q60,50 50,65 Q40,80 25,85 Q30,70 10,70Z" fill="#7C3AED"/>
-      <path d="M75,60 Q85,65 95,55 Q88,70 75,60Z" fill="#A78BFA"/>
-    </svg>
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src="/hawk-logo.svg"
+      alt="RefinedHawk"
+      width={size}
+      height={size}
+    />
   );
 }
 
