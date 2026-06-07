@@ -4,7 +4,7 @@ export function HawkLogo({ size = 36 }: { size?: number }) {
     <img
       src="/hawk.png"
       alt="RefinedHawk Logo"
-      style={{ width: size, height: size, objectFit: "contain" }}
+      style={{ width: size, height: size, objectFit: "contain", mixBlendMode: "screen" }}
     />
   );
 }
