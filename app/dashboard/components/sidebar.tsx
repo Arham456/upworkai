@@ -16,6 +16,7 @@ import {
   Menu,
   X,
 } from "lucide-react";
+import { HawkLogo } from "@/components/hawk-logo";
 
 const navItems = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -24,17 +25,6 @@ const navItems = [
   { label: "My Proposals", href: "/dashboard/proposals", icon: FolderOpen },
   { label: "Profile Setup", href: "/dashboard/profile", icon: UserCircle },
 ];
-
-function HawkLogo({ size = 36 }: { size?: number }) {
-  return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      src="/hawk.png"
-      alt="RefinedHawk Logo"
-      style={{ width: size, height: size, objectFit: 'contain' }}
-    />
-  );
-}
 
 function UserInitials({ name }: { name?: string | null }) {
   const initials = name

@@ -16,6 +16,7 @@ import {
   X,
   Zap,
 } from "lucide-react";
+import { HawkLogo } from "@/components/hawk-logo";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
@@ -221,7 +222,7 @@ export default function Home() {
         {/* -- Navbar ----------------------------------------- */}
         <header className="sticky top-0 z-50 flex items-center justify-between px-4 sm:px-10 py-4 border-b border-zinc-800 bg-[#0a0a0a]/95 backdrop-blur-md">
           <div className="flex items-center gap-2">
-            <HawkLogo size={36} />
+            <HawkLogo size={28} />
             <span className="font-bold text-white tracking-tight">RefinedHawk</span>
           </div>
           <button
@@ -907,17 +908,6 @@ export default function Home() {
         </footer>
       </div>
     </div>
-  );
-}
-
-function HawkLogo({ size = 36 }: { size?: number }) {
-  return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      src="/hawk.png"
-      alt="RefinedHawk Logo"
-      style={{ width: size, height: size, objectFit: 'contain' }}
-    />
   );
 }
 
