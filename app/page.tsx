@@ -222,7 +222,7 @@ export default function Home() {
         {/* -- Navbar ----------------------------------------- */}
         <header className="sticky top-0 z-50 flex items-center justify-between px-4 sm:px-10 py-4 border-b border-zinc-800 bg-[#0a0a0a]/95 backdrop-blur-md">
           <div className="flex items-center gap-2">
-            <HawkLogo size={28} />
+            <HawkLogo size={36} />
             <span className="font-bold text-white tracking-tight">RefinedHawk</span>
           </div>
           <button

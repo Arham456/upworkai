@@ -12,9 +12,9 @@ export const metadata: Metadata = {
   title: "RefinedHawk — Win More Jobs on Upwork",
   description: "AI-powered proposal intelligence for Upwork freelancers",
   icons: {
-    icon: "/favicon.svg",
-    shortcut: "/favicon.svg",
-    apple: "/favicon.svg",
+    icon: "/hawk.png",
+    shortcut: "/hawk.png",
+    apple: "/hawk.png",
   },
 };
 
