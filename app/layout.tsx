@@ -9,8 +9,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "RefinedHawk — Win More Jobs on Upwork",
-  description: "AI-powered proposal intelligence for Upwork freelancers",
+  title: "RefinedHawk — Win More Jobs",
+  description: "RefinedHawk branding application",
   icons: {
     icon: "/hawk.png",
     shortcut: "/hawk.png",
@@ -25,6 +25,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${inter.variable} h-full`}>
+      <head>
+        <link rel="icon" href="/hawk.png" type="image/png" />
+        <link rel="shortcut icon" href="/hawk.png" type="image/png" />
+        <link rel="apple-touch-icon" href="/hawk.png" />
+      </head>
       <body className="h-full antialiased">
         <Providers>{children}</Providers>
       </body>
