@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard,
   Search,
+  ClipboardCheck,
   PenLine,
   FolderOpen,
   UserCircle,
@@ -21,6 +22,7 @@ import { HawkLogo } from "@/components/hawk-logo";
 const navItems = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { label: "Analyze Job", href: "/dashboard/analyze", icon: Search },
+  { label: "Success Audit", href: "/dashboard/audit", icon: ClipboardCheck },
   { label: "Write Proposal", href: "/dashboard/write", icon: PenLine },
   { label: "My Proposals", href: "/dashboard/proposals", icon: FolderOpen },
   { label: "Profile Setup", href: "/dashboard/profile", icon: UserCircle },

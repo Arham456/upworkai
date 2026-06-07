@@ -43,6 +43,8 @@ model User {
   profile       Profile?
   proposals     Proposal[]
   jobs          Job[]
+  rejections    Rejection[]
+  audits        Audit[]
   plan                String   @default("free")
   proposalsGenerated  Int      @default(0)
   createdAt           DateTime @default(now())
@@ -122,4 +124,24 @@ model Waitlist {
   id        String   @id @default(cuid())
   email     String   @unique
   createdAt DateTime @default(now())
+}
+
+model Rejection {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  companyName String
+  roleTitle   String
+  stage       String
+  rawFeedback String
+  createdAt   DateTime @default(now())
+}
+
+model Audit {
+  id               String @id @default(cuid())
+  userId           String
+  user             User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jobUrl           String
+  hireabilityScore Int
+  auditFeedback    String
 }
