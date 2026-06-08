@@ -415,6 +415,158 @@ export default function Home() {
           </div>
         </section>
 
+        {/* -- Personalization Engine ------------------------- */}
+        <section className="max-w-7xl mx-auto px-4 sm:px-10 py-24 space-y-14">
+          {/* Badge + headline + subheadline */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center space-y-6 max-w-3xl mx-auto"
+          >
+            <div className="inline-flex items-center gap-2 rounded-full border border-violet-500/30 bg-violet-500/10 px-4 py-1.5 text-xs font-semibold text-violet-400">
+              <Sparkles className="w-3.5 h-3.5" />
+              New — Pro Feature
+            </div>
+
+            <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight leading-tight">
+              Your next proposal knows the client before you do
+            </h2>
+
+            <p className="text-zinc-400 text-base leading-relaxed">
+              While other freelancers send the same template to everyone, RefinedHawk
+              researches your client first — their hiring history, what they complained
+              about in past contractors, their budget behavior — then writes a proposal
+              that speaks directly to their psychology.
+            </p>
+          </motion.div>
+
+          {/* Mock product UI */}
+          <motion.div
+            initial={{ opacity: 0, y: 32 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7, delay: 0.1 }}
+            className="relative rounded-2xl border border-zinc-800 bg-[#111111] overflow-hidden shadow-[0_0_60px_rgba(124,58,237,0.07)]"
+          >
+            {/* Subtle violet glow */}
+            <div
+              aria-hidden
+              className="absolute inset-0 bg-gradient-to-br from-violet-500/5 via-transparent to-transparent pointer-events-none"
+            />
+
+            {/* Column header bar */}
+            <div className="relative grid grid-cols-1 md:grid-cols-2 border-b border-zinc-800">
+              <div className="flex items-center gap-2 px-6 py-3 border-b md:border-b-0 md:border-r border-zinc-800">
+                <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
+                  Client Intelligence
+                </span>
+                <span className="flex items-center gap-1 text-[10px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/25 px-2 py-0.5 rounded-full ml-auto">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+                  Live
+                </span>
+              </div>
+              <div className="flex items-center justify-between px-6 py-3">
+                <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
+                  Personalized Proposal
+                </span>
+                <span className="text-[10px] font-medium text-zinc-600 border border-zinc-700 rounded-md px-2 py-0.5 cursor-default">
+                  Copy
+                </span>
+              </div>
+            </div>
+
+            {/* Two-column body */}
+            <div className="relative grid grid-cols-1 md:grid-cols-2">
+
+              {/* LEFT — Client Intelligence */}
+              <div className="md:border-r border-zinc-800 p-6 space-y-5">
+                {/* Stat grid */}
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { label: "Location",     value: "New York, United States" },
+                    { label: "Total Spent",  value: "$47,200" },
+                    { label: "Hire Rate",    value: "84%" },
+                    { label: "Total Hires",  value: "23" },
+                    { label: "Member Since", value: "2019" },
+                  ].map(({ label, value }) => (
+                    <div
+                      key={label}
+                      className={`rounded-lg bg-zinc-800/60 px-3 py-2.5 ${label === "Location" ? "col-span-2" : ""}`}
+                    >
+                      <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wide mb-0.5">
+                        {label}
+                      </p>
+                      <p className="text-sm font-semibold text-zinc-200 leading-tight">{value}</p>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Reviews */}
+                <div className="space-y-2.5">
+                  <p className="text-[10px] font-semibold text-zinc-500 uppercase tracking-widest">
+                    Recent Reviews
+                  </p>
+                  <blockquote className="rounded-lg bg-zinc-800/40 border-l-2 border-violet-500/40 px-3 py-2.5 text-xs text-zinc-300 italic leading-relaxed">
+                    &ldquo;Delivered exactly what was scoped. No surprises, no excuses. Will hire again.&rdquo;
+                  </blockquote>
+                  <blockquote className="rounded-lg bg-zinc-800/40 border-l-2 border-violet-500/40 px-3 py-2.5 text-xs text-zinc-300 italic leading-relaxed">
+                    &ldquo;Fast communicator. Pushed back when my brief was unclear — that was actually helpful.&rdquo;
+                  </blockquote>
+                </div>
+              </div>
+
+              {/* RIGHT — Personalized Proposal */}
+              <div className="p-6 bg-[#0d0d0d]">
+                <div className="rounded-xl border border-zinc-800 bg-[#111111] p-5 space-y-3 text-sm text-zinc-300 leading-relaxed min-h-[300px]">
+                  <p>Hi Sarah,</p>
+                  <p>
+                    Your reviews tell me something most clients never say out loud: you value
+                    freelancers who push back when the brief is unclear. That&apos;s rare to find —
+                    and it&apos;s exactly how I work.
+                  </p>
+                  <p>
+                    I noticed you&apos;ve hired 23 times with an 84% hire rate, which tells me you
+                    know what good looks like and move fast when you find it. I&apos;d like to be
+                    that hire.
+                  </p>
+                  <p>
+                    For this project, I&apos;d start with a 30-minute scope call to align on
+                    deliverables and success criteria in writing — so we both know exactly what
+                    done looks like before I touch anything.
+                  </p>
+                  <p>Ready when you are.</p>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Stat pills */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="flex flex-wrap items-center justify-center gap-3"
+          >
+            {[
+              { value: "2 min",           label: "Time to generate" },
+              { value: "Client-specific", label: "Every proposal unique" },
+              { value: "Pro feature",     label: "Available on Pro plan" },
+            ].map(({ value, label }) => (
+              <div
+                key={label}
+                className="flex items-center gap-2.5 rounded-full border border-zinc-800 bg-[#111111] px-5 py-2.5"
+              >
+                <span className="text-sm font-bold text-violet-400">{value}</span>
+                <span className="text-zinc-700">·</span>
+                <span className="text-xs text-zinc-500">{label}</span>
+              </div>
+            ))}
+          </motion.div>
+        </section>
+
         {/* -- How It Works ----------------------------------- */}
         <section className="max-w-7xl mx-auto px-4 sm:px-10 py-20 space-y-12">
           <motion.div
@@ -524,15 +676,15 @@ export default function Home() {
               <p className="text-center text-lg sm:text-xl md:text-2xl font-semibold text-white leading-snug">
                 One extra job won ={" "}
                 <span className="text-violet-400">
-                  21 months of RefinedHawk paid for
+                  15 months of RefinedHawk paid for
                 </span>
               </p>
 
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-5">
                 {[
                   { label: "Average Upwork job", prefix: "$", target: 300, suffix: "", note: "typical contract" },
-                  { label: "RefinedHawk cost", prefix: "$", target: 14, suffix: "/mo", note: "all features included" },
-                  { label: "Your ROI", prefix: "", target: 21, suffix: "x", note: "return on investment" },
+                  { label: "RefinedHawk cost", prefix: "$", target: 20, suffix: "/mo", note: "all features included" },
+                  { label: "Your ROI", prefix: "", target: 15, suffix: "x", note: "return on investment" },
                 ].map(({ label, prefix, target, suffix, note }, i) => (
                   <motion.div
                     key={label}
