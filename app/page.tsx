@@ -396,7 +396,7 @@ export default function Home() {
                           disabled={waitlistLoading}
                           className="w-full rounded-xl bg-violet-600 hover:bg-violet-700 py-3 text-sm font-semibold text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          {waitlistLoading ? "Joining..." : "Get Early Access →"}
+                          {waitlistLoading ? "Joining..." : "Start for Free →"}
                         </button>
                         {waitlistError && (
                           <p className="text-xs text-red-400 text-center">{waitlistError}</p>
@@ -406,7 +406,7 @@ export default function Home() {
                   </div>
 
                   <p className="text-xs text-zinc-600 text-center">
-                    Free forever &middot; No credit card required
+                    Free to start &middot; No credit card required
                   </p>
                 </div>
               </motion.div>
@@ -481,7 +481,7 @@ export default function Home() {
             <div className="relative grid grid-cols-1 md:grid-cols-2">
 
               {/* LEFT — Client Intelligence */}
-              <div className="md:border-r border-zinc-800 p-6 space-y-5">
+              <div className="border-b border-zinc-800 md:border-b-0 md:border-r p-6 space-y-5">
                 {/* Stat grid */}
                 <div className="grid grid-cols-2 gap-2">
                   {[
@@ -518,8 +518,8 @@ export default function Home() {
               </div>
 
               {/* RIGHT — Personalized Proposal */}
-              <div className="p-6 bg-[#0d0d0d]">
-                <div className="rounded-xl border border-zinc-800 bg-[#111111] p-5 space-y-3 text-sm text-zinc-300 leading-relaxed min-h-[300px]">
+              <div className="p-6 bg-[#0a0a0a]">
+                <div className="rounded-xl border border-zinc-800 bg-[#111111] p-5 space-y-3 text-sm text-zinc-300 leading-relaxed min-h-[200px] md:min-h-[300px]">
                   <p>Hi Sarah,</p>
                   <p>
                     Your reviews tell me something most clients never say out loud: you value
@@ -564,6 +564,22 @@ export default function Home() {
                 <span className="text-xs text-zinc-500">{label}</span>
               </div>
             ))}
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="flex justify-center"
+          >
+            <a
+              href="/dashboard/personalize"
+              className="inline-flex items-center gap-2 rounded-lg bg-violet-600 hover:bg-violet-500 px-6 py-3 text-sm font-medium text-white transition-colors"
+            >
+              Try Personalization Engine
+              <ArrowRight className="w-4 h-4" />
+            </a>
           </motion.div>
         </section>
 
@@ -702,12 +718,24 @@ export default function Home() {
                   </motion.div>
                 ))}
               </div>
+
+              <div className="flex justify-center pt-4">
+                <motion.button
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => signIn("google")}
+                  disabled={status === "loading"}
+                  className="inline-flex items-center gap-2 rounded-lg bg-violet-600 hover:bg-violet-700 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-violet-600/20 transition-all duration-200 disabled:opacity-60"
+                >
+                  Start winning more jobs
+                  <ArrowRight className="w-4 h-4" />
+                </motion.button>
+              </div>
             </div>
           </motion.div>
         </section>
 
         {/* -- Features --------------------------------------- */}
-        <section id="features" className="max-w-7xl mx-auto px-4 sm:px-10 pb-24 space-y-14">
+        <section id="features" className="max-w-7xl mx-auto px-4 sm:px-10 pt-20 pb-24 space-y-14">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -724,115 +752,6 @@ export default function Home() {
             <p className="text-zinc-400 max-w-md mx-auto text-sm">
               Three tools built for one outcome: clients choosing you over everyone else.
             </p>
-          </motion.div>
-
-          {/* Personalization Engine — full-width hero feature */}
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="relative rounded-xl border border-violet-500/30 bg-[#111111] p-8 overflow-hidden"
-          >
-            <div
-              aria-hidden
-              className="absolute inset-0 bg-gradient-to-br from-violet-500/8 via-transparent to-transparent pointer-events-none"
-            />
-
-            <div className="relative grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
-              {/* Left: copy */}
-              <div className="space-y-5">
-                <div className="flex items-start gap-3 flex-wrap">
-                  <div className="w-10 h-10 rounded-xl bg-violet-500/15 flex items-center justify-center shrink-0">
-                    <Sparkles className="w-5 h-5 text-violet-400" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2.5 flex-wrap">
-                      <h3 className="text-xl font-bold text-white leading-snug">
-                        We research your client before writing your proposal
-                      </h3>
-                      <span className="shrink-0 text-[10px] font-bold bg-violet-600 text-white px-2.5 py-1 rounded-full uppercase tracking-wide">
-                        Pro Feature
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                <p className="text-sm text-zinc-400 leading-relaxed">
-                  Most freelancers send the same generic proposal to every client.
-                  RefinedHawk reads the client&apos;s hiring history, reviews they left
-                  for past contractors, budget behavior, and communication style —
-                  then writes a proposal tailored to their psychology.
-                </p>
-
-                <ul className="space-y-3">
-                  {[
-                    "Client Intelligence — hire rate, total spent, past contractor reviews",
-                    "Psychology-matched tone — we write how this client wants to be spoken to",
-                    "Addresses unstated fears — scope creep, ghosting, wasted budget",
-                  ].map((point) => (
-                    <li key={point} className="flex items-start gap-2.5 text-sm text-zinc-300">
-                      <span className="mt-0.5 shrink-0 w-4 h-4 rounded-full bg-violet-500/20 border border-violet-500/40 flex items-center justify-center">
-                        <Check className="w-2.5 h-2.5 text-violet-400" />
-                      </span>
-                      {point}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* Right: client intelligence mockup */}
-              <div className="relative">
-                <div
-                  aria-hidden
-                  className="absolute -inset-3 rounded-2xl pointer-events-none"
-                  style={{ background: "radial-gradient(ellipse, rgba(124,58,237,0.12) 0%, transparent 70%)" }}
-                />
-                <div className="relative rounded-xl border border-zinc-700/60 bg-[#0a0a0a] p-5 space-y-4">
-                  <div className="flex items-center gap-2 text-xs font-semibold text-blue-400 uppercase tracking-wide">
-                    <Zap className="w-3.5 h-3.5" />
-                    Client Intelligence
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-2">
-                    {[
-                      { label: "Hire Rate", value: "87%" },
-                      { label: "Total Spent", value: "$42K+" },
-                      { label: "Total Hires", value: "31" },
-                      { label: "Member Since", value: "2019" },
-                    ].map(({ label, value }) => (
-                      <div key={label} className="rounded-lg bg-zinc-800/60 px-3 py-2.5">
-                        <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wide">
-                          {label}
-                        </p>
-                        <p className="text-sm font-semibold text-zinc-200">{value}</p>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <p className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wide">
-                      Review this client left for a past contractor
-                    </p>
-                    <blockquote className="rounded-lg bg-zinc-800/50 border-l-2 border-violet-500/40 px-3 py-2.5 text-xs text-zinc-300 italic leading-relaxed">
-                      &ldquo;Fast delivery, great communication, exactly what we needed. Will hire
-                      again without hesitation.&rdquo;
-                    </blockquote>
-                  </div>
-
-                  <div className="rounded-lg bg-violet-500/8 border border-violet-500/20 px-3 py-2.5 space-y-1">
-                    <p className="text-[10px] font-semibold text-violet-400 uppercase tracking-wide">
-                      Personalized proposal written
-                    </p>
-                    <p className="text-xs text-zinc-400 leading-relaxed line-clamp-2">
-                      Based on your 87% hire rate and 31 successful projects, I know you move
-                      fast when you find the right fit — so let me get straight to how I&apos;d
-                      solve this&hellip;
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -898,7 +817,7 @@ export default function Home() {
               Why RefinedHawk Beats Everything Else
             </h2>
             <p className="text-zinc-400 max-w-md mx-auto text-sm">
-              More powerful. More personal. Less expensive.
+              More powerful. More personal. Purpose-built for Upwork freelancers.
             </p>
           </motion.div>
 
