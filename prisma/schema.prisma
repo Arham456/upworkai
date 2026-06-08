@@ -44,7 +44,6 @@ model User {
   proposals     Proposal[]
   jobs          Job[]
   rejections    Rejection[]
-  audits        Audit[]
   plan                String   @default("free")
   proposalsGenerated  Int      @default(0)
   createdAt           DateTime @default(now())
@@ -135,13 +134,4 @@ model Rejection {
   stage       String
   rawFeedback String
   createdAt   DateTime @default(now())
-}
-
-model Audit {
-  id               String @id @default(cuid())
-  userId           String
-  user             User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  jobUrl           String
-  hireabilityScore Int
-  auditFeedback    String
 }
