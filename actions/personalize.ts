@@ -6,6 +6,8 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import {
   scrapeClientIntelligence,
+  scrapeClientProfile,
+  extractJobFields,
   type ClientIntelligence,
 } from "@/lib/client-scraper";
 
@@ -17,11 +19,15 @@ export type PersonalizeResult =
       proposal: string;
       clientIntelligence: ClientIntelligence;
       scrape_failed: boolean;
+      input_mode: "url" | "paste";
     }
   | { error: string };
 
 export async function personalizeProposal(input: {
-  jobUrl: string;
+  mode: "url" | "paste";
+  jobUrl?: string;
+  jobDescription?: string;
+  clientProfileUrl?: string;
   userProfile: string;
   voiceDna: string;
 }): Promise<PersonalizeResult> {
@@ -36,8 +42,45 @@ export async function personalizeProposal(input: {
 
   if (!process.env.ANTHROPIC_API_KEY) return { error: "server_misconfigured" };
 
-  // ── Scrape client intelligence ────────────────────────────────────────────
-  const intel = await scrapeClientIntelligence(input.jobUrl);
+  // ── Input validation ──────────────────────────────────────────────────────
+  if (input.mode === "url") {
+    if (!input.jobUrl) return { error: "job_url_required" };
+  } else {
+    if (!input.jobDescription || input.jobDescription.trim().length < 50) {
+      return { error: "description_too_short" };
+    }
+  }
+
+  // ── Intelligence gathering ────────────────────────────────────────────────
+  let intel: ClientIntelligence;
+
+  if (input.mode === "url") {
+    intel = await scrapeClientIntelligence(input.jobUrl!, input.clientProfileUrl);
+  } else {
+    const jobFields = extractJobFields(input.jobDescription!);
+
+    let clientFields: Partial<ClientIntelligence> & { scrape_failed: boolean } = {
+      scrape_failed: !input.clientProfileUrl,
+    };
+    if (input.clientProfileUrl) {
+      clientFields = await scrapeClientProfile(input.clientProfileUrl);
+    }
+
+    intel = {
+      job_title: jobFields.job_title,
+      job_description: jobFields.job_description,
+      required_skills: jobFields.required_skills,
+      budget: null,
+      client_location: clientFields.client_location ?? null,
+      total_spent: clientFields.total_spent ?? null,
+      hire_rate: clientFields.hire_rate ?? null,
+      total_hires: clientFields.total_hires ?? null,
+      member_since: clientFields.member_since ?? null,
+      recent_reviews: clientFields.recent_reviews ?? null,
+      // paste mode always has the description — never a full failure
+      scrape_failed: false,
+    };
+  }
 
   // ── Build prompt sections ─────────────────────────────────────────────────
   const intelLines: string[] = [];
@@ -60,7 +103,7 @@ export async function personalizeProposal(input: {
 
   const jobSection = intel.job_description
     ? `\n\nJOB DESCRIPTION:\n${intel.job_description}`
-    : `\n\nJOB URL (description unavailable — work from context): ${input.jobUrl}`;
+    : `\n\nJOB URL (description unavailable — work from context): ${input.jobUrl ?? ""}`;
 
   const skillsSection =
     intel.required_skills && intel.required_skills.length > 0
@@ -115,6 +158,7 @@ Write the proposal now. Open with something that proves you studied this specifi
       proposal: proposalText,
       clientIntelligence: intel,
       scrape_failed: intel.scrape_failed,
+      input_mode: input.mode,
     };
   } catch (err) {
     console.error("[personalize] Claude error:", err);

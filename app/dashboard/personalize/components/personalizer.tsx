@@ -16,6 +16,7 @@ import {
   Calendar,
   MapPin,
   Brain,
+  FileText,
 } from "lucide-react";
 import { personalizeProposal } from "@/actions/personalize";
 import type { ClientIntelligence } from "@/lib/client-scraper";
@@ -43,9 +44,14 @@ type Result = {
   proposal: string;
   clientIntelligence: ClientIntelligence;
   scrape_failed: boolean;
+  input_mode: "url" | "paste";
 };
 
 type Toast = { id: number; message: string };
+
+// ── Constants ─────────────────────────────────────────────────────────────────
+
+const DESC_MAX = 8_000;
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -122,10 +128,42 @@ function ToastItem({ message }: { message: string }) {
   );
 }
 
+// ── Shared client profile URL input ──────────────────────────────────────────
+
+function ClientProfileInput({
+  value,
+  onChange,
+  disabled,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  disabled: boolean;
+}) {
+  return (
+    <div>
+      <label className="block text-xs font-medium text-zinc-400 mb-1.5">
+        Client Profile URL{" "}
+        <span className="font-normal text-zinc-600">(optional)</span>
+      </label>
+      <input
+        type="url"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder="https://www.upwork.com/companies/~..."
+        disabled={disabled}
+        className="w-full rounded-lg border border-zinc-800 bg-[#0a0a0a] px-4 py-2.5 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-violet-500 transition-colors disabled:opacity-50"
+      />
+    </div>
+  );
+}
+
 // ── Main component ────────────────────────────────────────────────────────────
 
 export function Personalizer({ profile }: { profile: Profile }) {
+  const [mode, setMode] = useState<"url" | "paste">("paste");
   const [jobUrl, setJobUrl] = useState("");
+  const [jobDescription, setJobDescription] = useState("");
+  const [clientProfileUrl, setClientProfileUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [loadingPhase, setLoadingPhase] = useState<"researching" | "writing">("researching");
   const [result, setResult] = useState<Result | null>(null);
@@ -148,19 +186,35 @@ export function Personalizer({ profile }: { profile: Profile }) {
     return () => clearTimeout(t);
   }, [loading]);
 
-  async function handlePersonalize() {
-    const url = jobUrl.trim();
-    if (!url) return;
+  function handleModeSwitch(next: "url" | "paste") {
+    if (next === mode) return;
+    setMode(next);
+    setResult(null);
+  }
 
+  const canSubmit =
+    mode === "url" ? !!jobUrl.trim() : jobDescription.trim().length > 0;
+
+  async function handlePersonalize() {
+    if (loading || !canSubmit) return;
     setLoading(true);
     setResult(null);
 
     try {
-      const response = await personalizeProposal({
-        jobUrl: url,
+      const shared = {
+        clientProfileUrl: clientProfileUrl.trim() || undefined,
         userProfile: buildProfileString(profile),
         voiceDna: buildVoiceDnaString(profile?.voiceDNA),
-      });
+      };
+
+      const response =
+        mode === "url"
+          ? await personalizeProposal({ mode: "url", jobUrl: jobUrl.trim(), ...shared })
+          : await personalizeProposal({
+              mode: "paste",
+              jobDescription: jobDescription.trim(),
+              ...shared,
+            });
 
       if ("error" in response) {
         const messages: Record<string, string> = {
@@ -168,6 +222,8 @@ export function Personalizer({ profile }: { profile: Profile }) {
           unauthorized: "Please sign in to continue.",
           server_misconfigured: "Server configuration error. Please try again later.",
           ai_no_response: "The AI did not return a response. Please try again.",
+          description_too_short: "Please paste at least 50 characters of the job description.",
+          job_url_required: "Please enter a valid Upwork job URL.",
         };
         addToast(messages[response.error] ?? response.error);
         return;
@@ -202,51 +258,147 @@ export function Personalizer({ profile }: { profile: Profile }) {
 
   return (
     <div className="space-y-6">
+
       {/* ── Input card ─────────────────────────────────────────────────────── */}
-      <div className="rounded-xl border border-zinc-800 bg-[#111111] p-6 space-y-4">
-        <label className="block text-sm font-medium text-zinc-300">Job URL</label>
+      <div className="rounded-xl border border-zinc-800 bg-[#111111] p-6 space-y-5">
 
-        <div className="flex flex-col sm:flex-row gap-3">
-          <div className="relative flex-1">
-            <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 pointer-events-none" />
-            <input
-              type="url"
-              value={jobUrl}
-              onChange={(e) => setJobUrl(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handlePersonalize()}
-              placeholder="Paste Upwork job URL..."
-              disabled={loading}
-              className="w-full rounded-lg border border-zinc-800 bg-[#0a0a0a] pl-10 pr-4 py-2.5 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-violet-500 transition-colors disabled:opacity-50"
-            />
-          </div>
-
+        {/* Mode toggle tabs */}
+        <div className="flex rounded-lg border border-zinc-800 bg-[#0a0a0a] p-0.5 gap-0.5">
           <button
-            onClick={handlePersonalize}
-            disabled={loading || !jobUrl.trim()}
-            className="flex items-center justify-center gap-2 rounded-lg bg-violet-600 hover:bg-violet-700 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors shrink-0"
+            type="button"
+            onClick={() => handleModeSwitch("url")}
+            className={`flex flex-1 items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+              mode === "url"
+                ? "bg-[#111111] text-white shadow-sm"
+                : "text-zinc-500 hover:text-zinc-300"
+            }`}
           >
-            {loading ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin shrink-0" />
-                <span>
-                  {loadingPhase === "researching"
-                    ? "Researching client…"
-                    : "Writing personalized proposal…"}
-                </span>
-              </>
-            ) : (
-              <>
-                <Sparkles className="w-4 h-4 shrink-0" />
-                Personalize Proposal
-              </>
-            )}
+            <Globe className="w-4 h-4 shrink-0" />
+            Job URL
+          </button>
+          <button
+            type="button"
+            onClick={() => handleModeSwitch("paste")}
+            className={`flex flex-1 items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+              mode === "paste"
+                ? "bg-[#111111] text-white shadow-sm"
+                : "text-zinc-500 hover:text-zinc-300"
+            }`}
+          >
+            <FileText className="w-4 h-4 shrink-0" />
+            Paste Description
+            <span className="inline-flex items-center text-[10px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/25 px-1.5 py-0.5 rounded-full leading-none">
+              Recommended
+            </span>
           </button>
         </div>
 
+        {/* ── URL mode ─────────────────────────────────────────────────────── */}
+        {mode === "url" && (
+          <div className="space-y-3">
+            <div>
+              <label className="block text-xs font-medium text-zinc-400 mb-1.5">Job URL</label>
+              <div className="relative">
+                <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 pointer-events-none" />
+                <input
+                  type="url"
+                  value={jobUrl}
+                  onChange={(e) => setJobUrl(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handlePersonalize()}
+                  placeholder="https://www.upwork.com/jobs/~..."
+                  disabled={loading}
+                  className="w-full rounded-lg border border-zinc-800 bg-[#0a0a0a] pl-10 pr-4 py-2.5 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-violet-500 transition-colors disabled:opacity-50"
+                />
+              </div>
+            </div>
+
+            <ClientProfileInput
+              value={clientProfileUrl}
+              onChange={setClientProfileUrl}
+              disabled={loading}
+            />
+
+            <p className="flex items-start gap-1.5 text-xs text-amber-400/80 leading-relaxed">
+              <AlertTriangle className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+              Note: Upwork job pages require login — URL mode works best when combined with a client profile URL
+            </p>
+          </div>
+        )}
+
+        {/* ── Paste mode ───────────────────────────────────────────────────── */}
+        {mode === "paste" && (
+          <div className="space-y-3">
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="text-xs font-medium text-zinc-400">Job Description</label>
+                <span
+                  className={`text-xs tabular-nums ${
+                    jobDescription.length > DESC_MAX * 0.9
+                      ? "text-amber-400"
+                      : "text-zinc-600"
+                  }`}
+                >
+                  {jobDescription.length.toLocaleString()} / {DESC_MAX.toLocaleString()}
+                </span>
+              </div>
+              <textarea
+                value={jobDescription}
+                onChange={(e) => setJobDescription(e.target.value.slice(0, DESC_MAX))}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) handlePersonalize();
+                }}
+                placeholder="Paste the full job description here — title, requirements, budget, everything the client wrote..."
+                disabled={loading}
+                rows={8}
+                className="w-full rounded-lg border border-zinc-800 bg-[#0a0a0a] px-4 py-3 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-violet-500 transition-colors disabled:opacity-50 resize-y leading-relaxed"
+                style={{ minHeight: "200px" }}
+              />
+            </div>
+
+            <ClientProfileInput
+              value={clientProfileUrl}
+              onChange={setClientProfileUrl}
+              disabled={loading}
+            />
+
+            <p className="flex items-center gap-1.5 text-xs text-emerald-400/80">
+              <Check className="w-3.5 h-3.5 shrink-0" />
+              Works reliably — paste the job description directly for best results
+            </p>
+          </div>
+        )}
+
+        {/* Submit */}
+        <button
+          onClick={handlePersonalize}
+          disabled={loading || !canSubmit}
+          className="flex w-full items-center justify-center gap-2 rounded-lg bg-violet-600 hover:bg-violet-700 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        >
+          {loading ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin shrink-0" />
+              <span>
+                {loadingPhase === "researching"
+                  ? "Researching client…"
+                  : "Writing personalized proposal…"}
+              </span>
+            </>
+          ) : (
+            <>
+              <Sparkles className="w-4 h-4 shrink-0" />
+              Personalize Proposal
+            </>
+          )}
+        </button>
+
+        {/* Profile nudge */}
         {!profile?.skills?.length && (
           <p className="text-xs text-amber-400/80">
             Your profile isn&apos;t set up yet.{" "}
-            <Link href="/dashboard/profile" className="underline hover:text-amber-300 transition-colors">
+            <Link
+              href="/dashboard/profile"
+              className="underline hover:text-amber-300 transition-colors"
+            >
               Add your skills
             </Link>{" "}
             for a stronger proposal.
@@ -320,7 +472,9 @@ export function Personalizer({ profile }: { profile: Profile }) {
                 <div className="flex items-start gap-2.5 rounded-lg border border-amber-500/20 bg-amber-500/5 px-3 py-2.5">
                   <AlertTriangle className="w-3.5 h-3.5 text-amber-400 mt-0.5 shrink-0" />
                   <p className="text-xs text-amber-300 leading-relaxed">
-                    Client data unavailable — proposal written from job description only
+                    {result.input_mode === "paste"
+                      ? "No client profile URL provided — proposal written from job description"
+                      : "Job page requires login — try adding a client profile URL or switch to Paste mode"}
                   </p>
                 </div>
               )}
@@ -433,7 +587,10 @@ export function Personalizer({ profile }: { profile: Profile }) {
 
               <p className="text-[11px] text-zinc-600">
                 Saved to{" "}
-                <Link href="/dashboard/proposals" className="underline hover:text-zinc-400 transition-colors">
+                <Link
+                  href="/dashboard/proposals"
+                  className="underline hover:text-zinc-400 transition-colors"
+                >
                   My Proposals
                 </Link>
               </p>

@@ -343,9 +343,9 @@ function extractReviews(html: string, json: unknown): string[] | null {
   return fromHtml.length > 0 ? fromHtml : null;
 }
 
-// ── Public API ────────────────────────────────────────────────────────────────
+// ── Internal job-page scraper ────────────────────────────────────────────────
 
-export async function scrapeClientIntelligence(jobUrl: string): Promise<ClientIntelligence> {
+async function scrapeJobPage(jobUrl: string): Promise<ClientIntelligence> {
   if (!isUpworkJobUrl(jobUrl)) return failed();
 
   let html: string;
@@ -382,5 +382,109 @@ export async function scrapeClientIntelligence(jobUrl: string): Promise<ClientIn
     member_since: extractMemberSince(html, json),
     recent_reviews: extractReviews(html, json),
     scrape_failed: false,
+  };
+}
+
+// ── Client profile URL validator ──────────────────────────────────────────────
+
+function isClientProfileUrl(url: string): boolean {
+  try {
+    const { hostname, pathname } = new URL(url);
+    const host = hostname.replace(/^www\./, "");
+    if (host !== "upwork.com") return false;
+    return (
+      pathname.startsWith("/companies/") ||
+      pathname.startsWith("/ag/") ||
+      pathname.startsWith("/freelancers/")
+    );
+  } catch {
+    return false;
+  }
+}
+
+// ── Scrape client profile for client-specific fields only ─────────────────────
+
+export async function scrapeClientProfile(
+  clientProfileUrl: string,
+): Promise<Partial<ClientIntelligence> & { scrape_failed: boolean }> {
+  if (!isClientProfileUrl(clientProfileUrl)) return { scrape_failed: true };
+
+  let html: string;
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+    const res = await fetch(clientProfileUrl, {
+      headers: {
+        "User-Agent": USER_AGENT,
+        Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Cache-Control": "no-cache",
+      },
+      signal: controller.signal,
+    });
+    clearTimeout(timeout);
+    if (!res.ok) return { scrape_failed: true };
+    html = await res.text();
+  } catch {
+    return { scrape_failed: true };
+  }
+
+  const json = parseNextData(html);
+
+  return {
+    client_location: extractLocation(html, json),
+    total_spent: extractTotalSpent(html, json),
+    hire_rate: extractHireRate(html, json),
+    total_hires: extractTotalHires(html, json),
+    member_since: extractMemberSince(html, json),
+    recent_reviews: extractReviews(html, json),
+    scrape_failed: false,
+  };
+}
+
+// ── Public API — orchestrates job page + optional client profile ──────────────
+
+export async function scrapeClientIntelligence(
+  jobUrl: string,
+  clientProfileUrl?: string,
+): Promise<ClientIntelligence> {
+  const jobResult = await scrapeJobPage(jobUrl);
+
+  if (!clientProfileUrl) return jobResult;
+
+  const profileResult = await scrapeClientProfile(clientProfileUrl);
+
+  return {
+    // Job-specific fields always come from the job page
+    job_title: jobResult.job_title,
+    job_description: jobResult.job_description,
+    budget: jobResult.budget,
+    required_skills: jobResult.required_skills,
+    // Client fields: prefer profile page result, fall back to whatever the job page found
+    client_location: profileResult.client_location ?? jobResult.client_location,
+    total_spent: profileResult.total_spent ?? jobResult.total_spent,
+    hire_rate: profileResult.hire_rate ?? jobResult.hire_rate,
+    total_hires: profileResult.total_hires ?? jobResult.total_hires,
+    member_since: profileResult.member_since ?? jobResult.member_since,
+    recent_reviews: profileResult.recent_reviews ?? jobResult.recent_reviews,
+    // false if at least one source returned data; true only when both fully failed
+    scrape_failed: jobResult.scrape_failed && profileResult.scrape_failed,
+  };
+}
+
+// ── Paste-text fallback — extracts fields from raw pasted job text ────────────
+
+export function extractJobFields(
+  pastedText: string,
+): Pick<ClientIntelligence, "job_title" | "job_description" | "required_skills"> {
+  const trimmed = pastedText.trim().slice(0, 8_000);
+  const firstLine = trimmed.split("\n")[0].trim();
+  const looksLikeTitle =
+    firstLine.length > 0 && firstLine.length < 100 && !firstLine.includes(".");
+
+  return {
+    job_title: looksLikeTitle ? firstLine : null,
+    job_description: trimmed,
+    required_skills: [],
   };
 }

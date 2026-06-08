@@ -456,6 +456,26 @@ export default function Home() {
               className="absolute inset-0 bg-gradient-to-br from-violet-500/5 via-transparent to-transparent pointer-events-none"
             />
 
+            {/* Mock input area */}
+            <div className="relative border-b border-zinc-800 px-6 py-4 space-y-3">
+              {/* Mode toggle */}
+              <div className="flex rounded-lg border border-zinc-800 bg-[#0a0a0a] p-0.5 gap-0.5">
+                <div className="flex flex-1 items-center justify-center rounded-md px-3 py-1.5 text-[11px] font-medium text-zinc-500 cursor-default select-none">
+                  Job URL
+                </div>
+                <div className="flex flex-1 items-center justify-center gap-1.5 rounded-md px-3 py-1.5 bg-[#111111] text-[11px] font-medium text-white shadow-sm cursor-default select-none">
+                  Paste Description
+                  <span className="inline-flex items-center text-[9px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/25 px-1.5 py-0.5 rounded-full leading-none">
+                    Recommended
+                  </span>
+                </div>
+              </div>
+              {/* Pasted job description */}
+              <div className="rounded-lg border border-zinc-700 bg-[#0a0a0a] px-3 py-2.5 text-xs text-zinc-400 leading-relaxed">
+                Looking for an experienced React developer to build a customer dashboard. Must have TypeScript experience, strong communication, and ability to work independently. Fixed price $500–$800. Previous contractor ghosted mid-project...
+              </div>
+            </div>
+
             {/* Column header bar */}
             <div className="relative grid grid-cols-1 md:grid-cols-2 border-b border-zinc-800">
               <div className="flex items-center gap-2 px-6 py-3 border-b md:border-b-0 md:border-r border-zinc-800">
@@ -482,6 +502,11 @@ export default function Home() {
 
               {/* LEFT — Client Intelligence */}
               <div className="border-b border-zinc-800 md:border-b-0 md:border-r p-6 space-y-5">
+                {/* Client profile scraped confirmation */}
+                <div className="inline-flex items-center gap-1.5 text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/25 px-2.5 py-1 rounded-full">
+                  ✓ Client profile scraped
+                </div>
+
                 {/* Stat grid */}
                 <div className="grid grid-cols-2 gap-2">
                   {[
