@@ -278,7 +278,7 @@ export function ProposalWriter({ job }: Props) {
         <div className="rounded-xl border border-zinc-800 bg-[#111111] p-6 space-y-4">
           <p className="text-zinc-200 leading-relaxed">
             You&apos;ve used all 5 free proposals. Free plan was designed to get you your first win.
-            If it worked — Pro is how you keep winning. $14/month — less than what you earn in one hour.
+            If it worked — Pro is how you keep winning. $20/month — less than what you earn in one hour.
           </p>
           <Link
             href="/dashboard/upgrade"

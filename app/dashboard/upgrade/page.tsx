@@ -25,6 +25,7 @@ const PRO_FEATURES = [
   { text: "No watermark on proposals", included: true },
   { text: "Voice DNA — AI learns your exact writing style", included: true },
   { text: "Client Intelligence (hire rate, spend, rating)", included: true },
+  { text: "Proposal Personalization Engine — AI researches the client before writing your proposal", included: true },
   { text: "Client Fear Database — predicts fear with confidence %", included: true },
   { text: "Connect ROI Score with weekly report", included: true },
   { text: "Win pattern learning over time", included: true },
@@ -129,7 +130,7 @@ export default async function UpgradePage() {
                   )}
                 </div>
                 <p className="mt-2 text-3xl font-bold text-white">
-                  $14
+                  $20
                   <span className="text-base font-normal text-zinc-500"> / month</span>
                 </p>
               </div>

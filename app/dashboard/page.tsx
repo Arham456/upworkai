@@ -174,7 +174,7 @@ export default async function DashboardPage() {
                   className="flex items-center gap-1.5 rounded-lg bg-violet-500/10 border border-violet-500/20 px-3 py-1.5 text-xs font-semibold text-violet-400 hover:bg-violet-500/20 transition-colors"
                 >
                   <Zap className="w-3 h-3" />
-                  Upgrade — $14/mo
+                  Upgrade — $20/mo
                 </Link>
               </div>
 

@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
       return Response.json(
         {
           error:
-            "You've used all 5 free proposals. Free plan was designed to get you your first win. If it worked — Pro is how you keep winning. $14/month — less than what you earn in one hour.",
+            "You've used all 5 free proposals. Free plan was designed to get you your first win. If it worked — Pro is how you keep winning. $20/month — less than what you earn in one hour.",
           upgradeRequired: true,
         },
         { status: 403 },
