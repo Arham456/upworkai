@@ -9,7 +9,7 @@ import {
   LayoutDashboard,
   Search,
   Sparkles,
-  PenLine,
+  ShieldAlert,
   FolderOpen,
   UserCircle,
   LogOut,
@@ -22,7 +22,7 @@ import { HawkLogo } from "@/components/hawk-logo";
 const navItems = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { label: "Analyze Job", href: "/dashboard/analyze", icon: Search },
-  { label: "Write Proposal", href: "/dashboard/write", icon: PenLine },
+  { label: "Red Flag Detector", href: "/dashboard/red-flags", icon: ShieldAlert },
   { label: "Personalize Proposal", href: "/dashboard/personalize", icon: Sparkles },
   { label: "My Proposals", href: "/dashboard/proposals", icon: FolderOpen },
   { label: "Profile Setup", href: "/dashboard/profile", icon: UserCircle },

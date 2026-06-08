@@ -112,7 +112,7 @@ export default async function DashboardPage() {
   const steps = [
     { step: "1", label: "Analyze a job", done: step1Done },
     { step: "2", label: "Set up your profile", done: step2Done },
-    { step: "3", label: "Write your first proposal", done: step3Done },
+    { step: "3", label: "Check a job for red flags", done: step3Done },
   ];
 
   return (
@@ -311,14 +311,14 @@ export default async function DashboardPage() {
                         ? "Analyze your first job — instant results"
                         : !step2Done
                         ? "Set up your profile for better results"
-                        : "Write your first proposal"}
+                        : "Analyze your first job"}
                     </h2>
                     <p className="text-zinc-400 text-sm mt-1 leading-relaxed">
                       {!step1Done
                         ? "See your match score, the client's core concern, and whether a job is worth your connects — before you spend them."
                         : !step2Done
                         ? "Tell the AI your skills and niche so it tailors every proposal to your voice and strengths."
-                        : "You've scored a job and set up your profile. Now let RefinedHawk write a proposal in your voice."}
+                        : "Paste any Upwork job and RefinedHawk will score the client risk before you apply."}
                     </p>
                     <div className="mt-4 flex flex-wrap gap-3">
                       {!step1Done && (
@@ -341,10 +341,10 @@ export default async function DashboardPage() {
                       )}
                       {step1Done && step2Done && !step3Done && (
                         <Link
-                          href="/dashboard/write"
+                          href="/dashboard/red-flags"
                           className="inline-flex items-center gap-2 rounded-lg bg-violet-600 hover:bg-violet-700 px-4 py-2 text-sm font-semibold text-white transition-colors"
                         >
-                          Write your first proposal
+                          Analyze your first job
                           <ArrowRight className="w-4 h-4" />
                         </Link>
                       )}

@@ -14,6 +14,7 @@ import {
   Lightbulb,
   FileText,
   ArrowRight,
+  Sparkles,
   CheckCircle,
   Globe,
   Brain,
@@ -335,9 +336,9 @@ export default function AnalyzePage() {
     }
   }
 
-  function handleWriteProposal() {
+  function handlePersonalizeProposal() {
     if (!result) return;
-    router.push(`/dashboard/write?jobId=${result.jobId}`);
+    router.push(`/dashboard/personalize`);
   }
 
   const inputValue = inputMode === "fullPage" ? fullPageText : description;
@@ -613,11 +614,11 @@ export default function AnalyzePage() {
                 {/* CTA */}
                 <motion.div variants={fadeUp}>
                   <button
-                    onClick={handleWriteProposal}
+                    onClick={handlePersonalizeProposal}
                     className="flex w-full items-center justify-center gap-2 rounded-xl bg-violet-600 hover:bg-violet-700 py-3 text-sm font-semibold text-white transition-colors"
                   >
-                    Write Proposal for this Job
-                    <ArrowRight className="w-4 h-4" />
+                    <Sparkles className="w-4 h-4" />
+                    Personalize a Proposal
                   </button>
                 </motion.div>
               </motion.div>

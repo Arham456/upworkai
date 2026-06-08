@@ -11,7 +11,7 @@ const FREE_FEATURES = [
   { text: "5 proposals lifetime", included: true },
   { text: "Job scoring with match score", included: true },
   { text: "Connect ROI score (basic)", included: true },
-  { text: "Basic proposal generation", included: true },
+  { text: "Red Flag Detector — instant client risk score before you apply", included: true },
   { text: "Win/loss tracking", included: true },
   { text: "Mobile friendly", included: true },
   { text: "Voice DNA & tone matching", included: false },
@@ -22,6 +22,7 @@ const FREE_FEATURES = [
 const PRO_FEATURES = [
   { text: "Unlimited job analyses", included: true },
   { text: "Unlimited proposals", included: true },
+  { text: "Red Flag Detector — instant client risk score before you apply", included: true },
   { text: "No watermark on proposals", included: true },
   { text: "Voice DNA — AI learns your exact writing style", included: true },
   { text: "Client Intelligence (hire rate, spend, rating)", included: true },

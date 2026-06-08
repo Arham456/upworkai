@@ -8,7 +8,7 @@ import {
   ArrowRight,
   BarChart2,
   Check,
-  PenLine,
+  ShieldAlert,
   Search,
   Settings,
   Sparkles,
@@ -653,9 +653,9 @@ export default function Home() {
               },
               {
                 num: "04",
-                icon: Trophy,
-                title: "Win More Jobs",
-                desc: "Send proposals that address what clients actually fear. Watch your response rate climb.",
+                icon: ShieldAlert,
+                title: "Vet the client",
+                desc: "Paste the job post and get an instant risk score. Know if it's worth applying before spending a single Connect.",
               },
             ].map(({ num, icon: Icon, title, desc }, i) => (
               <motion.div
@@ -787,10 +787,10 @@ export default function Home() {
                 desc: "Find the client's real fear before applying. Know if a job is worth your connects before you spend them.",
               },
               {
-                icon: PenLine,
-                title: "Proposal Writer",
-                desc: "AI writes in your voice — not generic templates. Every proposal sounds like you read their post twice.",
-                badge: "Most popular",
+                icon: ShieldAlert,
+                title: "Client Red Flag Detector",
+                desc: "Before you write a single word, know if the client is worth your time. Instant risk score with specific warnings — budget traps, scope creep signals, payment risks.",
+                badge: "Free for all users",
               },
               {
                 icon: Trophy,
@@ -967,12 +967,28 @@ export default function Home() {
               Before vs After
             </span>
             <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
-              The difference is obvious
+              From red flag check to winning proposal — in minutes
             </h2>
             <p className="text-zinc-400 max-w-md mx-auto text-sm">
               See what clients actually read vs. what makes them click hire.
             </p>
           </motion.div>
+
+          {/* Step indicators */}
+          <div className="flex flex-wrap items-center justify-center gap-3 mb-10">
+            <div className="flex items-center gap-2 rounded-full border border-zinc-700 bg-[#111111] px-4 py-2">
+              <ShieldAlert className="w-4 h-4 text-green-400 shrink-0" />
+              <span className="text-sm font-medium text-zinc-300">Step 1: Red Flag Check</span>
+              <span className="text-[10px] font-bold text-green-400 bg-green-500/10 border border-green-500/25 px-2 py-0.5 rounded-full leading-none">
+                Safe to apply
+              </span>
+            </div>
+            <ArrowRight className="w-4 h-4 text-zinc-600 shrink-0" />
+            <div className="flex items-center gap-2 rounded-full border border-zinc-700 bg-[#111111] px-4 py-2">
+              <Sparkles className="w-4 h-4 text-violet-400 shrink-0" />
+              <span className="text-sm font-medium text-zinc-300">Step 2: Personalized Proposal</span>
+            </div>
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <motion.div
@@ -1080,10 +1096,10 @@ export default function Home() {
                 Free to start
               </div>
               <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
-                Start Writing Winning Proposals Today
+                Start winning more jobs on Upwork
               </h2>
               <p className="text-zinc-400 max-w-sm mx-auto text-sm">
-                Join 500+ freelancers who stopped losing to weaker candidates.
+                Analyze jobs, detect red flags, and write personalized proposals — all in one place.
               </p>
             </div>
 
