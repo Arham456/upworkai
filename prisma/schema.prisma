@@ -114,9 +114,10 @@ model Proposal {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   jobId     String?
   job       Job?     @relation(fields: [jobId], references: [id])
-  content   String
-  status    String   @default("pending")
-  createdAt DateTime @default(now())
+  content       String
+  status        String   @default("pending")
+  sourceFeature String   @default("personalize")
+  createdAt     DateTime @default(now())
 }
 
 model Waitlist {

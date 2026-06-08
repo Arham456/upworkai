@@ -10,6 +10,7 @@ import {
   Search,
   Sparkles,
   ShieldAlert,
+  Trophy,
   FolderOpen,
   UserCircle,
   LogOut,
@@ -25,6 +26,7 @@ const navItems = [
   { label: "Red Flag Detector", href: "/dashboard/red-flags", icon: ShieldAlert },
   { label: "Personalize Proposal", href: "/dashboard/personalize", icon: Sparkles },
   { label: "My Proposals", href: "/dashboard/proposals", icon: FolderOpen },
+  { label: "Win Tracker", href: "/dashboard/win-tracker", icon: Trophy },
   { label: "Profile Setup", href: "/dashboard/profile", icon: UserCircle },
 ];
 

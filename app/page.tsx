@@ -779,7 +779,7 @@ export default function Home() {
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
             {[
               {
                 icon: BarChart2,
@@ -789,15 +789,23 @@ export default function Home() {
               {
                 icon: ShieldAlert,
                 title: "Client Red Flag Detector",
-                desc: "Before you write a single word, know if the client is worth your time. Instant risk score with specific warnings — budget traps, scope creep signals, payment risks.",
+                desc: "Before you write a single word, know if the client is worth your time. Instant risk score with specific warnings.",
                 badge: "Free for all users",
+                badgeClass: "bg-green-500/10 text-green-400 border border-green-500/30",
+              },
+              {
+                icon: Sparkles,
+                title: "Personalize Proposal",
+                desc: "AI researches the client before writing your proposal. Every proposal speaks directly to their psychology.",
+                badge: "Pro",
+                badgeClass: "bg-violet-500/10 text-violet-400 border border-violet-500/30",
               },
               {
                 icon: Trophy,
                 title: "Win Tracker",
                 desc: "Track won and lost proposals. Learn exactly what works so you stop repeating what doesn't.",
               },
-            ].map(({ icon: Icon, title, desc, badge }, i) => (
+            ].map(({ icon: Icon, title, desc, badge, badgeClass }, i) => (
               <motion.div
                 key={title}
                 initial={{ opacity: 0, y: 24 }}
@@ -809,7 +817,7 @@ export default function Home() {
               >
                 {badge && (
                   <div className="absolute -top-3 left-6">
-                    <span className="text-xs bg-violet-600 text-white font-semibold px-3 py-0.5 rounded-full">
+                    <span className={`text-xs font-semibold px-3 py-0.5 rounded-full ${badgeClass}`}>
                       {badge}
                     </span>
                   </div>
