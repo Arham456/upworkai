@@ -1,4 +1,4 @@
-import OpenAI from "openai";
+import Anthropic from "@anthropic-ai/sdk";
 import { prisma } from "./prisma";
 
 export type AuditResult = {
@@ -32,12 +32,12 @@ Return JSON only with:
 - issues: string[] (empty if feedback passes)
 - improved_feedback: rewritten feedback that is specific and actionable; if the original already passes, return it unchanged`;
 
-function getOpenAIClient() {
-  const apiKey = process.env.OPENAI_API_KEY;
+function getAnthropicClient() {
+  const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
-    throw new Error("OPENAI_API_KEY is not set");
+    throw new Error("ANTHROPIC_API_KEY is not set");
   }
-  return new OpenAI({ apiKey });
+  return new Anthropic({ apiKey });
 }
 
 function parseJsonFromResponse<T>(rawText: string): T {
@@ -48,31 +48,61 @@ function parseJsonFromResponse<T>(rawText: string): T {
   return JSON.parse(jsonMatch[0]) as T;
 }
 
+const SCRAPE_FALLBACK_NOTICE = `Job description could not be scraped from the provided URL.
+The page may require login, block bots, or render content with JavaScript.
+Audit will use the URL context and rejection history only.`;
+
+function getMockJobDescription(jobUrl: string): string {
+  return `MOCK JOB POSTING (AUDIT_MOCK_MODE=true)
+URL: ${jobUrl}
+Role: Senior Full-Stack Developer
+Requirements: React, TypeScript, Node.js, PostgreSQL, 5+ years experience, strong communication.
+Client notes: Need someone who can deliver quickly and communicate proactively.`;
+}
+
+function getMockAuditResult(): AuditResult {
+  return {
+    hireability_score: 62,
+    audit_feedback:
+      "Mock audit (AUDIT_MOCK_MODE=true): Your rejection history suggests gaps in senior-level system design storytelling. For this role, add 2–3 portfolio bullets showing end-to-end delivery with React + Node, and tailor your opener to the client's speed/communication requirements.",
+  };
+}
+
 async function fetchJobDescription(jobUrl: string): Promise<string> {
-  const response = await fetch(jobUrl, {
-    headers: {
-      "User-Agent": "Mozilla/5.0 (compatible; RefinedHawk-Auditor/1.0)",
-      Accept: "text/html,application/xhtml+xml",
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error(`Failed to fetch job description (${response.status})`);
+  if (process.env.AUDIT_MOCK_MODE === "true") {
+    return getMockJobDescription(jobUrl);
   }
 
-  const html = await response.text();
-  const text = html
-    .replace(/<script[\s\S]*?<\/script>/gi, " ")
-    .replace(/<style[\s\S]*?<\/style>/gi, " ")
-    .replace(/<[^>]+>/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
+  try {
+    const response = await fetch(jobUrl, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (compatible; RefinedHawk-Auditor/1.0)",
+        Accept: "text/html,application/xhtml+xml",
+      },
+      signal: AbortSignal.timeout(15000),
+    });
 
-  if (!text) {
-    throw new Error("Job page returned no readable content");
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const html = await response.text();
+    const text = html
+      .replace(/<script[\s\S]*?<\/script>/gi, " ")
+      .replace(/<style[\s\S]*?<\/style>/gi, " ")
+      .replace(/<[^>]+>/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+
+    if (!text) {
+      throw new Error("empty page content");
+    }
+
+    return text.slice(0, 15000);
+  } catch (err) {
+    console.warn("[audit] Job scrape failed, using fallback description:", err);
+    return `${SCRAPE_FALLBACK_NOTICE}\n\nTarget URL: ${jobUrl}`;
   }
-
-  return text.slice(0, 15000);
 }
 
 function formatRejections(
@@ -100,17 +130,17 @@ Feedback: ${rejection.rawFeedback}`,
 }
 
 async function runInitialAudit(
-  openai: OpenAI,
+  anthropic: Anthropic,
   rejectionsText: string,
   jobDescription: string,
   jobUrl: string,
 ): Promise<DraftAudit> {
-  const completion = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
+  const message = await anthropic.messages.create({
+    model: "claude-haiku-4-5-20251001",
+    max_tokens: 1024,
     temperature: 0.3,
-    response_format: { type: "json_object" },
+    system: AUDIT_SYSTEM_PROMPT,
     messages: [
-      { role: "system", content: AUDIT_SYSTEM_PROMPT },
       {
         role: "user",
         content: `Target job URL: ${jobUrl}
@@ -126,7 +156,8 @@ Produce hireability_score and audit_feedback based on pattern overlap between re
     ],
   });
 
-  const rawText = completion.choices[0]?.message?.content?.trim();
+  const rawText =
+    message.content[0]?.type === "text" ? message.content[0].text.trim() : "";
   if (!rawText) {
     throw new Error("Empty response from audit model");
   }
@@ -144,17 +175,17 @@ Produce hireability_score and audit_feedback based on pattern overlap between re
 }
 
 async function critiqueAuditFeedback(
-  openai: OpenAI,
+  anthropic: Anthropic,
   draftFeedback: string,
   rejectionsText: string,
   jobDescription: string,
 ): Promise<string> {
-  const completion = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
+  const message = await anthropic.messages.create({
+    model: "claude-haiku-4-5-20251001",
+    max_tokens: 1024,
     temperature: 0.2,
-    response_format: { type: "json_object" },
+    system: CRITIQUE_SYSTEM_PROMPT,
     messages: [
-      { role: "system", content: CRITIQUE_SYSTEM_PROMPT },
       {
         role: "user",
         content: `Review this draft audit feedback for specificity and actionability.
@@ -174,7 +205,8 @@ rewrite it to cite exact gaps and concrete actions tied to this job and rejectio
     ],
   });
 
-  const rawText = completion.choices[0]?.message?.content?.trim();
+  const rawText =
+    message.content[0]?.type === "text" ? message.content[0].text.trim() : "";
   if (!rawText) {
     throw new Error("Empty response from feedback critique model");
   }
@@ -205,35 +237,64 @@ export async function auditJobApplication(
     throw new Error("job_url is required");
   }
 
-  const rejections = await prisma.rejection.findMany({
-    where: { userId: user_id },
-    orderBy: { createdAt: "desc" },
-    take: 5,
-    select: {
-      companyName: true,
-      roleTitle: true,
-      stage: true,
-      rawFeedback: true,
-      createdAt: true,
-    },
-  });
+  if (process.env.AUDIT_MOCK_MODE === "true") {
+    return getMockAuditResult();
+  }
 
-  const [jobDescription, openai] = await Promise.all([
-    fetchJobDescription(jobUrl),
-    Promise.resolve(getOpenAIClient()),
-  ]);
+  let rejections: Array<{
+    companyName: string;
+    roleTitle: string;
+    stage: string;
+    rawFeedback: string;
+    createdAt: Date;
+  }> = [];
 
+  try {
+    rejections = await prisma.rejection.findMany({
+      where: { userId: user_id },
+      orderBy: { createdAt: "desc" },
+      take: 5,
+      select: {
+        companyName: true,
+        roleTitle: true,
+        stage: true,
+        rawFeedback: true,
+        createdAt: true,
+      },
+    });
+  } catch (err) {
+    console.error("[audit] Failed to load rejections:", err);
+    throw new Error(
+      "Could not load rejection history. Run database migrations on production (prisma migrate deploy).",
+    );
+  }
+
+  const jobDescription = await fetchJobDescription(jobUrl);
+  const anthropic = getAnthropicClient();
   const rejectionsText = formatRejections(rejections);
-  const draft = await runInitialAudit(openai, rejectionsText, jobDescription, jobUrl);
-  const audit_feedback = await critiqueAuditFeedback(
-    openai,
-    draft.audit_feedback,
-    rejectionsText,
-    jobDescription,
-  );
 
-  return {
-    hireability_score: draft.hireability_score,
-    audit_feedback,
-  };
+  try {
+    const draft = await runInitialAudit(anthropic, rejectionsText, jobDescription, jobUrl);
+    const audit_feedback = await critiqueAuditFeedback(
+      anthropic,
+      draft.audit_feedback,
+      rejectionsText,
+      jobDescription,
+    );
+
+    return {
+      hireability_score: draft.hireability_score,
+      audit_feedback,
+    };
+  } catch (err) {
+    console.error("[audit] AI audit failed:", err);
+    if (err instanceof Error && err.message.includes("ANTHROPIC_API_KEY")) {
+      throw err;
+    }
+    throw new Error(
+      err instanceof Error
+        ? `Audit analysis failed: ${err.message}`
+        : "Audit analysis failed. Please try again.",
+    );
+  }
 }
