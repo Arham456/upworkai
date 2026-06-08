@@ -8,6 +8,7 @@ import {
   scrapeClientIntelligence,
   scrapeClientProfile,
   extractJobFields,
+  isUpworkUrl,
   type ClientIntelligence,
 } from "@/lib/client-scraper";
 
@@ -45,6 +46,7 @@ export async function personalizeProposal(input: {
   // ── Input validation ──────────────────────────────────────────────────────
   if (input.mode === "url") {
     if (!input.jobUrl) return { error: "job_url_required" };
+    if (!isUpworkUrl(input.jobUrl)) return { error: "invalid_job_url" };
   } else {
     if (!input.jobDescription || input.jobDescription.trim().length < 50) {
       return { error: "description_too_short" };
@@ -77,8 +79,8 @@ export async function personalizeProposal(input: {
       total_hires: clientFields.total_hires ?? null,
       member_since: clientFields.member_since ?? null,
       recent_reviews: clientFields.recent_reviews ?? null,
-      // paste mode always has the description — never a full failure
-      scrape_failed: false,
+      // failed only if a client profile was requested but couldn't be scraped
+      scrape_failed: !!(input.clientProfileUrl && clientFields.scrape_failed),
     };
   }
 
@@ -121,11 +123,12 @@ ${input.voiceDna.trim()}
 Write the proposal now. Open with something that proves you studied this specific client — not generic praise. Let the review history inform your tone. Speak to their psychology, not just their job post.`;
 
   // ── Call Claude ───────────────────────────────────────────────────────────
+  let proposalText = "";
   try {
     const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
     const stream = anthropic.messages.stream({
-      model: "claude-opus-4-7",
+      model: "claude-opus-4-8",
       max_tokens: 2048,
       thinking: { type: "adaptive" },
       system: [
@@ -140,12 +143,16 @@ Write the proposal now. Open with something that proves you studied this specifi
 
     const message = await stream.finalMessage();
     const textBlock = message.content.find((b) => b.type === "text");
-    const proposalText =
-      textBlock?.type === "text" ? textBlock.text.trim() : "";
+    proposalText = textBlock?.type === "text" ? textBlock.text.trim() : "";
 
     if (!proposalText) return { error: "ai_no_response" };
+  } catch (err) {
+    console.error("[personalize] Claude error:", err);
+    return { error: "ai_request_failed" };
+  }
 
-    // ── Persist to Proposal table ─────────────────────────────────────────
+  // ── Persist to Proposal table (best-effort) ───────────────────────────────
+  try {
     await prisma.proposal.create({
       data: {
         userId: session.user.id,
@@ -153,17 +160,18 @@ Write the proposal now. Open with something that proves you studied this specifi
         status: "pending",
       },
     });
-
-    return {
-      proposal: proposalText,
-      clientIntelligence: intel,
-      scrape_failed: intel.scrape_failed,
-      input_mode: input.mode,
-    };
-  } catch (err) {
-    console.error("[personalize] Claude error:", err);
-    return {
-      error: err instanceof Error ? err.message : "ai_request_failed",
-    };
+    await prisma.user.update({
+      where: { id: session.user.id },
+      data: { proposalsGenerated: { increment: 1 } },
+    });
+  } catch (dbErr) {
+    console.error("[personalize] DB save failed (non-fatal):", dbErr);
   }
+
+  return {
+    proposal: proposalText,
+    clientIntelligence: intel,
+    scrape_failed: intel.scrape_failed,
+    input_mode: input.mode,
+  };
 }

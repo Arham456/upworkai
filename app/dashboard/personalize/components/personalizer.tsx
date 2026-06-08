@@ -193,7 +193,7 @@ export function Personalizer({ profile }: { profile: Profile }) {
   }
 
   const canSubmit =
-    mode === "url" ? !!jobUrl.trim() : jobDescription.trim().length > 0;
+    mode === "url" ? !!jobUrl.trim() : jobDescription.trim().length >= 50;
 
   async function handlePersonalize() {
     if (loading || !canSubmit) return;
@@ -222,8 +222,10 @@ export function Personalizer({ profile }: { profile: Profile }) {
           unauthorized: "Please sign in to continue.",
           server_misconfigured: "Server configuration error. Please try again later.",
           ai_no_response: "The AI did not return a response. Please try again.",
+          ai_request_failed: "The AI request failed. Please try again.",
           description_too_short: "Please paste at least 50 characters of the job description.",
           job_url_required: "Please enter a valid Upwork job URL.",
+          invalid_job_url: "Please enter a valid Upwork job URL (upwork.com/jobs/...)",
         };
         addToast(messages[response.error] ?? response.error);
         return;
@@ -353,6 +355,11 @@ export function Personalizer({ profile }: { profile: Profile }) {
                 className="w-full rounded-lg border border-zinc-800 bg-[#0a0a0a] px-4 py-3 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-violet-500 transition-colors disabled:opacity-50 resize-y leading-relaxed"
                 style={{ minHeight: "200px" }}
               />
+              {jobDescription.length > 0 && jobDescription.trim().length < 50 && (
+                <p className="text-xs text-amber-400/80 mt-1">
+                  Add at least {50 - jobDescription.trim().length} more characters for a meaningful proposal.
+                </p>
+              )}
             </div>
 
             <ClientProfileInput
@@ -402,6 +409,17 @@ export function Personalizer({ profile }: { profile: Profile }) {
               Add your skills
             </Link>{" "}
             for a stronger proposal.
+          </p>
+        )}
+        {profile && !profile.voiceDNA && (
+          <p className="text-xs text-amber-400/80 mt-1">
+            <Link
+              href="/dashboard/profile"
+              className="underline underline-offset-2 hover:text-amber-300 transition-colors"
+            >
+              Set up Voice DNA
+            </Link>
+            {" "}so proposals match your writing style.
           </p>
         )}
       </div>

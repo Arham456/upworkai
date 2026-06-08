@@ -42,6 +42,15 @@ function isUpworkJobUrl(url: string): boolean {
   }
 }
 
+export function isUpworkUrl(url: string): boolean {
+  try {
+    const { hostname } = new URL(url);
+    return hostname.replace(/^www\./, "") === "upwork.com";
+  } catch {
+    return false;
+  }
+}
+
 function stripHtml(raw: string): string {
   return raw
     .replace(/<br\s*\/?>/gi, "\n")
@@ -370,18 +379,34 @@ async function scrapeJobPage(jobUrl: string): Promise<ClientIntelligence> {
 
   const json = parseNextData(html);
 
+  const job_title = extractTitle(html, json);
+  const job_description = extractDescription(html, json);
+  const budget = extractBudget(html, json);
+  const required_skills = extractSkills(html, json);
+  const client_location = extractLocation(html, json);
+  const total_spent = extractTotalSpent(html, json);
+  const hire_rate = extractHireRate(html, json);
+  const total_hires = extractTotalHires(html, json);
+  const member_since = extractMemberSince(html, json);
+  const recent_reviews = extractReviews(html, json);
+
+  const allFieldsNull =
+    !job_title && !job_description && !budget &&
+    !required_skills?.length && !client_location && !total_spent &&
+    !hire_rate && total_hires === null && !member_since && !recent_reviews?.length;
+
   return {
-    job_title: extractTitle(html, json),
-    job_description: extractDescription(html, json),
-    budget: extractBudget(html, json),
-    required_skills: extractSkills(html, json),
-    client_location: extractLocation(html, json),
-    total_spent: extractTotalSpent(html, json),
-    hire_rate: extractHireRate(html, json),
-    total_hires: extractTotalHires(html, json),
-    member_since: extractMemberSince(html, json),
-    recent_reviews: extractReviews(html, json),
-    scrape_failed: false,
+    job_title,
+    job_description,
+    budget,
+    required_skills,
+    client_location,
+    total_spent,
+    hire_rate,
+    total_hires,
+    member_since,
+    recent_reviews,
+    scrape_failed: allFieldsNull,
   };
 }
 
@@ -448,11 +473,12 @@ export async function scrapeClientIntelligence(
   jobUrl: string,
   clientProfileUrl?: string,
 ): Promise<ClientIntelligence> {
-  const jobResult = await scrapeJobPage(jobUrl);
+  const [jobResult, profileResult] = await Promise.all([
+    scrapeJobPage(jobUrl),
+    clientProfileUrl ? scrapeClientProfile(clientProfileUrl) : Promise.resolve(null),
+  ]);
 
-  if (!clientProfileUrl) return jobResult;
-
-  const profileResult = await scrapeClientProfile(clientProfileUrl);
+  if (!clientProfileUrl || profileResult === null) return jobResult;
 
   return {
     // Job-specific fields always come from the job page
