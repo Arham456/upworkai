@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { ElementType } from "react";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import {
   TrendingUp,
   TrendingDown,
@@ -63,23 +64,36 @@ function StatCard({
   icon: Icon,
   iconClass,
   iconBg,
+  highlight,
 }: {
   label: string;
   value: string;
   icon: ElementType;
   iconClass: string;
   iconBg: string;
+  highlight?: boolean;
 }) {
   return (
-    <div className="rounded-xl border border-zinc-800 bg-[#111111] p-5 flex flex-col gap-3 hover:border-violet-500/30 transition-colors">
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      className={`rounded-xl border bg-[#111111] p-5 flex flex-col gap-3 transition-colors ${
+        highlight
+          ? "border-violet-500/25 hover:border-violet-500/40"
+          : "border-zinc-800 hover:border-zinc-700"
+      }`}
+    >
       <div className="flex items-center justify-between">
-        <span className="text-sm text-zinc-400">{label}</span>
+        <span className="text-sm text-zinc-500">{label}</span>
         <span className={`p-2 rounded-lg ${iconBg}`}>
           <Icon className={`w-4 h-4 ${iconClass}`} />
         </span>
       </div>
-      <p className="text-3xl font-bold text-white">{value}</p>
-    </div>
+      <p className={`text-3xl font-bold ${highlight ? "text-violet-300" : "text-white"}`}>
+        {value}
+      </p>
+    </motion.div>
   );
 }
 
@@ -119,6 +133,9 @@ function ActionButton({
     </button>
   );
 }
+
+const CHART_HEIGHT = 140;
+const GRID_LINES = 4;
 
 export function WinTrackerDashboard({ proposals: initialProposals }: Props) {
   const [proposals, setProposals] = useState<Proposal[]>(initialProposals);
@@ -186,16 +203,16 @@ export function WinTrackerDashboard({ proposals: initialProposals }: Props) {
           </p>
         </div>
         <div className="flex flex-col items-center justify-center rounded-xl border border-zinc-800 bg-[#111111] py-24 text-center">
-          <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-zinc-800 mb-5">
-            <Trophy className="w-7 h-7 text-zinc-500" />
+          <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-violet-500/10 border border-violet-500/20 mb-5">
+            <Trophy className="w-6 h-6 text-violet-400" />
           </div>
-          <p className="text-base font-semibold text-zinc-300">No proposals yet</p>
-          <p className="text-sm text-zinc-500 mt-2 mb-6 max-w-xs">
-            Start by personalizing a proposal for a job you want
+          <p className="text-base font-semibold text-zinc-200">No proposals yet</p>
+          <p className="text-sm text-zinc-500 mt-2 mb-6 max-w-xs leading-relaxed">
+            Start by personalizing a proposal for a job you want — then track if you won it here.
           </p>
           <Link
             href="/dashboard/personalize"
-            className="inline-flex items-center gap-2 rounded-lg bg-violet-600 hover:bg-violet-700 px-4 py-2 text-sm font-semibold text-white transition-colors"
+            className="inline-flex items-center gap-2 rounded-lg bg-violet-600 hover:bg-violet-500 px-4 py-2.5 text-sm font-semibold text-white transition-colors"
           >
             <Sparkles className="w-4 h-4" />
             Personalize a Proposal
@@ -243,43 +260,91 @@ export function WinTrackerDashboard({ proposals: initialProposals }: Props) {
           icon={Trophy}
           iconClass="text-violet-400"
           iconBg="bg-violet-500/10"
+          highlight
         />
       </div>
 
       {/* Monthly performance chart */}
       <div className="rounded-xl border border-zinc-800 bg-[#111111] p-6">
-        <h2 className="text-sm font-semibold text-white mb-0.5">Monthly Performance</h2>
-        <p className="text-xs text-zinc-500 mb-6">Last 6 months</p>
+        <div className="flex items-center justify-between mb-5">
+          <div>
+            <h2 className="text-sm font-semibold text-white">Monthly Performance</h2>
+            <p className="text-xs text-zinc-500 mt-0.5">Last 6 months</p>
+          </div>
+          <div className="flex items-center gap-4">
+            <LegendDot color="bg-emerald-500/80" label="Won" />
+            <LegendDot color="bg-red-500/60" label="Lost" />
+            <LegendDot color="bg-zinc-600/60" label="Pending" />
+          </div>
+        </div>
 
         {!hasChartData ? (
           <p className="text-sm text-zinc-500 text-center py-10">
             No proposals yet — start applying to see your win rate here
           </p>
         ) : (
-          <>
+          <div className="relative">
+            {/* Grid lines */}
+            <div
+              className="absolute inset-x-0 top-0 flex flex-col justify-between pointer-events-none"
+              style={{ height: `${CHART_HEIGHT}px` }}
+            >
+              {Array.from({ length: GRID_LINES + 1 }).map((_, i) => (
+                <div key={i} className="w-full border-t border-zinc-800/60" />
+              ))}
+            </div>
+
+            {/* Y-axis labels */}
+            <div
+              className="absolute -left-6 top-0 flex flex-col justify-between pointer-events-none"
+              style={{ height: `${CHART_HEIGHT}px` }}
+            >
+              {Array.from({ length: GRID_LINES + 1 })
+                .map((_, i) => Math.round((maxTotal * (GRID_LINES - i)) / GRID_LINES))
+                .map((val, i) => (
+                  <span key={i} className="text-[9px] text-zinc-700 tabular-nums">
+                    {val}
+                  </span>
+                ))}
+            </div>
+
             {/* Bars */}
-            <div className="flex items-end gap-2 sm:gap-4" style={{ height: "120px" }}>
-              {monthData.map(({ label, won, lost, pending, total }) => (
+            <div
+              className="relative flex items-end gap-2 sm:gap-3 pl-2"
+              style={{ height: `${CHART_HEIGHT}px` }}
+            >
+              {monthData.map(({ label, won, lost, pending, total }, idx) => (
                 <div
                   key={label}
                   className="flex-1 flex flex-col justify-end"
-                  style={{ height: "120px" }}
+                  style={{ height: `${CHART_HEIGHT}px` }}
                 >
                   {total > 0 ? (
-                    <div
-                      className="w-full flex flex-col overflow-hidden rounded-t"
-                      style={{ height: `${(total / maxTotal) * 120}px` }}
+                    <motion.div
+                      className="w-full flex flex-col overflow-hidden rounded-t-md"
+                      initial={{ height: 0 }}
+                      animate={{ height: `${(total / maxTotal) * CHART_HEIGHT}px` }}
+                      transition={{ duration: 0.6, ease: "easeOut", delay: idx * 0.06 }}
                     >
                       {won > 0 && (
-                        <div style={{ flex: won }} className="bg-emerald-500/70" />
+                        <div
+                          className="w-full bg-emerald-500/80 hover:bg-emerald-500/95 transition-colors"
+                          style={{ flex: won }}
+                        />
                       )}
                       {lost > 0 && (
-                        <div style={{ flex: lost }} className="bg-red-500/60" />
+                        <div
+                          className="w-full bg-red-500/60 hover:bg-red-500/75 transition-colors"
+                          style={{ flex: lost }}
+                        />
                       )}
                       {pending > 0 && (
-                        <div style={{ flex: pending }} className="bg-zinc-600/50" />
+                        <div
+                          className="w-full bg-zinc-600/60 hover:bg-zinc-600/80 transition-colors"
+                          style={{ flex: pending }}
+                        />
                       )}
-                    </div>
+                    </motion.div>
                   ) : (
                     <div className="w-full h-px bg-zinc-800" />
                   )}
@@ -288,46 +353,53 @@ export function WinTrackerDashboard({ proposals: initialProposals }: Props) {
             </div>
 
             {/* Month labels */}
-            <div className="flex gap-2 sm:gap-4 mt-2">
+            <div className="flex gap-2 sm:gap-3 mt-2 pl-2">
               {monthData.map(({ label }) => (
                 <div key={label} className="flex-1 text-center">
                   <span className="text-xs text-zinc-500">{label}</span>
                 </div>
               ))}
             </div>
-
-            {/* Legend */}
-            <div className="flex items-center gap-5 mt-5">
-              <LegendDot color="bg-emerald-500/70" label="Won" />
-              <LegendDot color="bg-red-500/60" label="Lost" />
-              <LegendDot color="bg-zinc-600/50" label="Pending" />
-            </div>
-          </>
+          </div>
         )}
       </div>
 
       {/* Proposal history table */}
       <div className="rounded-xl border border-zinc-800 bg-[#111111] overflow-hidden">
-        <div className="px-6 py-4 border-b border-zinc-800">
-          <h2 className="text-sm font-semibold text-white">Proposal History</h2>
-          <p className="text-xs text-zinc-500 mt-0.5">
-            {Math.min(totalCount, 20)} of {totalCount} proposals, newest first
-          </p>
+        <div className="px-6 py-4 border-b border-zinc-800/80 flex items-center justify-between">
+          <div>
+            <h2 className="text-sm font-semibold text-white">Proposal History</h2>
+            <p className="text-xs text-zinc-500 mt-0.5">
+              {Math.min(totalCount, 20)} of {totalCount} proposals, newest first
+            </p>
+          </div>
+          <div className="flex items-center gap-3 text-xs text-zinc-600">
+            <span className="flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500/80 inline-block" />
+              {wonCount} won
+            </span>
+            <span className="flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-yellow-500/60 inline-block" />
+              {pendingCount} pending
+            </span>
+          </div>
         </div>
 
         <div className="divide-y divide-zinc-800/60">
           {proposals.slice(0, 20).map((proposal) => {
             const isUpdating = updatingId === proposal.id;
             const badgeClass = STATUS_BADGE[proposal.status] ?? STATUS_BADGE.pending;
-            const preview = proposal.content.slice(0, 80) + (proposal.content.length > 80 ? "…" : "");
+            const preview =
+              proposal.content.slice(0, 80) +
+              (proposal.content.length > 80 ? "…" : "");
 
             return (
               <div
                 key={proposal.id}
-                className="px-6 py-4 flex flex-col sm:flex-row sm:items-center gap-3"
+                className="px-6 py-4 flex flex-col sm:flex-row sm:items-center gap-3 hover:bg-white/[0.015] transition-colors"
               >
                 {/* Date */}
-                <span className="text-xs text-zinc-500 shrink-0 w-24">
+                <span className="text-xs text-zinc-600 shrink-0 w-24 tabular-nums">
                   {formatDate(proposal.createdAt)}
                 </span>
 

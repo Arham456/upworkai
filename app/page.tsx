@@ -398,7 +398,7 @@ export default function Home() {
                           type="button"
                           onClick={handleWaitlist}
                           disabled={waitlistLoading}
-                          className="w-full rounded-xl bg-violet-600 hover:bg-violet-700 py-3 text-sm font-semibold text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="w-full rounded-xl bg-violet-600 hover:bg-violet-500 py-3 text-sm font-semibold text-white shadow-[0_0_20px_rgba(124,58,237,0.3)] hover:shadow-[0_0_30px_rgba(124,58,237,0.45)] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           {waitlistLoading ? "Joining..." : "Start for Free →"}
                         </button>
@@ -817,7 +817,7 @@ export default function Home() {
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1, duration: 0.6 }}
                 whileHover={{ scale: 1.02 }}
-                className="relative rounded-xl border border-zinc-800 bg-[#111111] p-6 space-y-4 hover:border-violet-500/40 transition-colors duration-300 cursor-default"
+                className="relative rounded-xl border border-zinc-800 bg-[#111111] p-6 space-y-4 hover:border-violet-500/40 hover:-translate-y-0.5 transition-all duration-300 cursor-default"
               >
                 {badge && (
                   <div className="absolute -top-3 left-6">
@@ -826,7 +826,7 @@ export default function Home() {
                     </span>
                   </div>
                 )}
-                <div className="w-10 h-10 rounded-xl bg-violet-500/15 flex items-center justify-center">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-violet-500/20 to-violet-600/[0.08] border border-violet-500/20 flex items-center justify-center">
                   <Icon className="w-5 h-5 text-violet-400" />
                 </div>
                 <div>
@@ -882,7 +882,7 @@ export default function Home() {
                   ))}
                   <th className="pb-4 px-2 text-center w-[16%]">
                     <div className="flex flex-col items-center gap-0.5">
-                      <span className="text-[9px] bg-violet-600 text-white font-bold px-2 py-0.5 rounded-full leading-[18px]">
+                      <span className="text-[9px] bg-violet-600 text-white font-bold px-2.5 py-0.5 rounded-full leading-[18px] tracking-wide uppercase">
                         Best Value
                       </span>
                       <span className="text-sm font-bold text-violet-400">RefinedHawk</span>
