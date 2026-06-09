@@ -2,7 +2,6 @@
 
 import { motion, useInView } from "framer-motion";
 import { signIn, useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import {
@@ -167,15 +166,10 @@ function AnimatedCounter({
 
 export default function Home() {
   const { data: session, status } = useSession();
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [waitlistLoading, setWaitlistLoading] = useState(false);
   const [waitlistSuccess, setWaitlistSuccess] = useState(false);
   const [waitlistError, setWaitlistError] = useState("");
-
-  useEffect(() => {
-    if (session) router.push("/dashboard");
-  }, [session, router]);
 
   const handleWaitlist = async () => {
     const emailValue = email.trim();
@@ -227,13 +221,22 @@ export default function Home() {
             <HawkLogo size={36} />
             <span className="font-bold text-white tracking-tight">RefinedHawk</span>
           </div>
-          <button
-            onClick={() => signIn("google")}
-            disabled={status === "loading"}
-            className="flex items-center gap-2 rounded-lg border border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/5 transition-all duration-200 disabled:opacity-60"
-          >
-            Sign in
-          </button>
+          {session ? (
+            <Link
+              href="/dashboard"
+              className="flex items-center gap-2 rounded-lg border border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/5 transition-all duration-200"
+            >
+              Go to Dashboard
+            </Link>
+          ) : (
+            <button
+              onClick={() => signIn("google")}
+              disabled={status === "loading"}
+              className="flex items-center gap-2 rounded-lg border border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-300 hover:text-white hover:bg-white/5 transition-all duration-200 disabled:opacity-60"
+            >
+              Sign in
+            </button>
+          )}
         </header>
 
         {/* -- Hero ------------------------------------------- */}
