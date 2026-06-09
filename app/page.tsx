@@ -4,6 +4,7 @@ import { motion, useInView } from "framer-motion";
 import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import {
   ArrowRight,
   BarChart2,
@@ -1129,10 +1130,16 @@ export default function Home() {
 
         {/* -- Footer ----------------------------------------- */}
         <footer className="border-t border-zinc-800/60 py-8 px-4 sm:px-10">
-          <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-2">
               <HawkLogo size={20} />
               <span className="text-sm font-medium text-zinc-500">RefinedHawk</span>
+            </div>
+            <div className="flex flex-wrap gap-x-6 gap-y-2 text-xs text-zinc-600">
+              <Link href="/privacy" className="hover:text-zinc-400 transition-colors">Privacy Policy</Link>
+              <Link href="/terms" className="hover:text-zinc-400 transition-colors">Terms of Service</Link>
+              <Link href="/contact" className="hover:text-zinc-400 transition-colors">Contact</Link>
+              <Link href="/about" className="hover:text-zinc-400 transition-colors">About</Link>
             </div>
             <p className="text-xs text-zinc-600">© 2026 RefinedHawk. Built for freelancers.</p>
           </div>
