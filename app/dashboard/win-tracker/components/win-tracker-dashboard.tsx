@@ -33,9 +33,9 @@ interface Props {
 }
 
 const STATUS_BADGE: Record<string, string> = {
-  won: "bg-green-500/10 text-green-400 border border-green-500/30",
-  lost: "bg-red-500/10 text-red-400 border border-red-500/30",
-  pending: "bg-yellow-500/10 text-yellow-400 border border-yellow-500/30",
+  won: "bg-green-950 text-green-400 border border-green-500/25",
+  lost: "bg-red-950 text-red-400 border border-red-500/25",
+  pending: "bg-zinc-800/60 text-zinc-400 border border-zinc-700/50",
 };
 
 function getLast6Months(): { key: string; label: string }[] {
@@ -64,6 +64,8 @@ function StatCard({
   icon: Icon,
   iconClass,
   iconBg,
+  cardGradient,
+  cardBorder,
   highlight,
 }: {
   label: string;
@@ -71,6 +73,8 @@ function StatCard({
   icon: ElementType;
   iconClass: string;
   iconBg: string;
+  cardGradient?: string;
+  cardBorder?: string;
   highlight?: boolean;
 }) {
   return (
@@ -78,19 +82,26 @@ function StatCard({
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className={`rounded-xl border bg-[#111111] p-5 flex flex-col gap-3 transition-colors ${
-        highlight
+      className={`rounded-2xl border p-6 flex flex-col gap-4 transition-all ${
+        cardGradient ?? "bg-[#111111]"
+      } ${
+        cardBorder ??
+        (highlight
           ? "border-violet-500/25 hover:border-violet-500/40"
-          : "border-zinc-800 hover:border-zinc-700"
+          : "border-zinc-800 hover:border-zinc-700")
       }`}
     >
       <div className="flex items-center justify-between">
-        <span className="text-sm text-zinc-500">{label}</span>
-        <span className={`p-2 rounded-lg ${iconBg}`}>
-          <Icon className={`w-4 h-4 ${iconClass}`} />
+        <span className="text-sm font-medium text-zinc-500">{label}</span>
+        <span className={`p-2.5 rounded-xl ${iconBg}`}>
+          <Icon className={`w-5 h-5 ${iconClass}`} />
         </span>
       </div>
-      <p className={`text-3xl font-bold ${highlight ? "text-violet-300" : "text-white"}`}>
+      <p
+        className={`text-5xl font-black tabular-nums tracking-tight ${
+          highlight ? "text-violet-300" : "text-white"
+        }`}
+      >
         {value}
       </p>
     </motion.div>
@@ -125,7 +136,7 @@ function ActionButton({
     <button
       onClick={onClick}
       disabled={active || disabled}
-      className={`rounded border px-2.5 py-1 text-xs font-medium transition-colors disabled:cursor-not-allowed ${
+      className={`rounded-md border px-3 py-1.5 text-xs font-semibold transition-all disabled:cursor-not-allowed ${
         active ? activeClass : inactiveClass
       }`}
     >
@@ -197,22 +208,22 @@ export function WinTrackerDashboard({ proposals: initialProposals }: Props) {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">Win Tracker</h1>
+          <h1 className="text-2xl font-black text-white tracking-tight">Win Tracker</h1>
           <p className="text-zinc-500 mt-1 text-sm">
             Track your proposal outcomes and win rate.
           </p>
         </div>
-        <div className="flex flex-col items-center justify-center rounded-xl border border-zinc-800 bg-[#111111] py-24 text-center">
-          <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-violet-500/10 border border-violet-500/20 mb-5">
-            <Trophy className="w-6 h-6 text-violet-400" />
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-zinc-800 bg-[#111111] py-24 text-center">
+          <div className="flex items-center justify-center w-16 h-16 rounded-2xl bg-violet-500/10 border border-violet-500/20 mb-5 shadow-[0_0_30px_rgba(124,58,237,0.12)]">
+            <Trophy className="w-7 h-7 text-violet-400" />
           </div>
-          <p className="text-base font-semibold text-zinc-200">No proposals yet</p>
+          <p className="text-lg font-semibold text-zinc-200">No proposals yet</p>
           <p className="text-sm text-zinc-500 mt-2 mb-6 max-w-xs leading-relaxed">
             Start by personalizing a proposal for a job you want — then track if you won it here.
           </p>
           <Link
             href="/dashboard/personalize"
-            className="inline-flex items-center gap-2 rounded-lg bg-violet-600 hover:bg-violet-500 px-4 py-2.5 text-sm font-semibold text-white transition-colors"
+            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-violet-500 hover:from-violet-500 hover:to-violet-400 px-5 py-2.5 text-sm font-semibold text-white transition-all shadow-[0_0_20px_rgba(124,58,237,0.3)] hover:shadow-[0_0_30px_rgba(124,58,237,0.4)]"
           >
             <Sparkles className="w-4 h-4" />
             Personalize a Proposal
@@ -225,7 +236,7 @@ export function WinTrackerDashboard({ proposals: initialProposals }: Props) {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-white tracking-tight">Win Tracker</h1>
+        <h1 className="text-2xl font-black text-white tracking-tight">Win Tracker</h1>
         <p className="text-zinc-500 mt-1 text-sm">
           Track your proposal outcomes and win rate.
         </p>
@@ -239,6 +250,8 @@ export function WinTrackerDashboard({ proposals: initialProposals }: Props) {
           icon={FileText}
           iconClass="text-zinc-400"
           iconBg="bg-zinc-800/60"
+          cardGradient="bg-gradient-to-br from-zinc-900 to-[#0a0a0a]"
+          cardBorder="border-zinc-800 hover:border-zinc-700"
         />
         <StatCard
           label="Won"
@@ -246,6 +259,8 @@ export function WinTrackerDashboard({ proposals: initialProposals }: Props) {
           icon={TrendingUp}
           iconClass="text-emerald-400"
           iconBg="bg-emerald-500/10"
+          cardGradient="bg-gradient-to-br from-green-950 to-[#0a0a0a]"
+          cardBorder="border-green-900/50 hover:border-green-700/40"
         />
         <StatCard
           label="Lost"
@@ -253,6 +268,8 @@ export function WinTrackerDashboard({ proposals: initialProposals }: Props) {
           icon={TrendingDown}
           iconClass="text-red-400"
           iconBg="bg-red-500/10"
+          cardGradient="bg-gradient-to-br from-red-950 to-[#0a0a0a]"
+          cardBorder="border-red-900/50 hover:border-red-700/40"
         />
         <StatCard
           label="Win Rate"
@@ -260,21 +277,23 @@ export function WinTrackerDashboard({ proposals: initialProposals }: Props) {
           icon={Trophy}
           iconClass="text-violet-400"
           iconBg="bg-violet-500/10"
+          cardGradient="bg-gradient-to-br from-violet-950 to-[#0a0a0a]"
+          cardBorder="border-violet-500/25 hover:border-violet-500/40"
           highlight
         />
       </div>
 
       {/* Monthly performance chart */}
-      <div className="rounded-xl border border-zinc-800 bg-[#111111] p-6">
+      <div className="rounded-2xl border border-zinc-800 bg-[#111111] p-6">
         <div className="flex items-center justify-between mb-5">
           <div>
             <h2 className="text-sm font-semibold text-white">Monthly Performance</h2>
             <p className="text-xs text-zinc-500 mt-0.5">Last 6 months</p>
           </div>
           <div className="flex items-center gap-4">
-            <LegendDot color="bg-emerald-500/80" label="Won" />
-            <LegendDot color="bg-red-500/60" label="Lost" />
-            <LegendDot color="bg-zinc-600/60" label="Pending" />
+            <LegendDot color="bg-emerald-500" label="Won" />
+            <LegendDot color="bg-red-500" label="Lost" />
+            <LegendDot color="bg-zinc-500" label="Pending" />
           </div>
         </div>
 
@@ -321,26 +340,26 @@ export function WinTrackerDashboard({ proposals: initialProposals }: Props) {
                 >
                   {total > 0 ? (
                     <motion.div
-                      className="w-full flex flex-col overflow-hidden rounded-t-md"
+                      className="w-full flex flex-col overflow-hidden rounded-t-lg"
                       initial={{ height: 0 }}
                       animate={{ height: `${(total / maxTotal) * CHART_HEIGHT}px` }}
                       transition={{ duration: 0.6, ease: "easeOut", delay: idx * 0.06 }}
                     >
                       {won > 0 && (
                         <div
-                          className="w-full bg-emerald-500/80 hover:bg-emerald-500/95 transition-colors"
+                          className="w-full bg-gradient-to-t from-green-700 to-green-500 transition-colors"
                           style={{ flex: won }}
                         />
                       )}
                       {lost > 0 && (
                         <div
-                          className="w-full bg-red-500/60 hover:bg-red-500/75 transition-colors"
+                          className="w-full bg-gradient-to-t from-red-700 to-red-500 transition-colors"
                           style={{ flex: lost }}
                         />
                       )}
                       {pending > 0 && (
                         <div
-                          className="w-full bg-zinc-600/60 hover:bg-zinc-600/80 transition-colors"
+                          className="w-full bg-gradient-to-t from-zinc-700 to-zinc-500 transition-colors"
                           style={{ flex: pending }}
                         />
                       )}
@@ -365,7 +384,7 @@ export function WinTrackerDashboard({ proposals: initialProposals }: Props) {
       </div>
 
       {/* Proposal history table */}
-      <div className="rounded-xl border border-zinc-800 bg-[#111111] overflow-hidden">
+      <div className="rounded-2xl border border-zinc-800 bg-[#111111] overflow-hidden">
         <div className="px-6 py-4 border-b border-zinc-800/80 flex items-center justify-between">
           <div>
             <h2 className="text-sm font-semibold text-white">Proposal History</h2>
@@ -375,18 +394,18 @@ export function WinTrackerDashboard({ proposals: initialProposals }: Props) {
           </div>
           <div className="flex items-center gap-3 text-xs text-zinc-600">
             <span className="flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500/80 inline-block" />
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
               {wonCount} won
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-yellow-500/60 inline-block" />
+              <span className="w-1.5 h-1.5 rounded-full bg-zinc-500 inline-block" />
               {pendingCount} pending
             </span>
           </div>
         </div>
 
         <div className="divide-y divide-zinc-800/60">
-          {proposals.slice(0, 20).map((proposal) => {
+          {proposals.slice(0, 20).map((proposal, idx) => {
             const isUpdating = updatingId === proposal.id;
             const badgeClass = STATUS_BADGE[proposal.status] ?? STATUS_BADGE.pending;
             const preview =
@@ -396,7 +415,9 @@ export function WinTrackerDashboard({ proposals: initialProposals }: Props) {
             return (
               <div
                 key={proposal.id}
-                className="px-6 py-4 flex flex-col sm:flex-row sm:items-center gap-3 hover:bg-white/[0.015] transition-colors"
+                className={`px-6 py-4 flex flex-col sm:flex-row sm:items-center gap-3 transition-colors hover:bg-white/[0.025] ${
+                  idx % 2 === 1 ? "bg-white/[0.012]" : ""
+                }`}
               >
                 {/* Date */}
                 <span className="text-xs text-zinc-600 shrink-0 w-24 tabular-nums">
@@ -410,7 +431,7 @@ export function WinTrackerDashboard({ proposals: initialProposals }: Props) {
 
                 {/* Status badge */}
                 <span
-                  className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium shrink-0 ${badgeClass}`}
+                  className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold shrink-0 ${badgeClass}`}
                 >
                   {proposal.status.charAt(0).toUpperCase() + proposal.status.slice(1)}
                 </span>
@@ -421,24 +442,24 @@ export function WinTrackerDashboard({ proposals: initialProposals }: Props) {
                     label="Won"
                     active={proposal.status === "won"}
                     disabled={isUpdating}
-                    activeClass="bg-emerald-500/20 text-emerald-400 border-emerald-500/30"
-                    inactiveClass="text-zinc-500 border-zinc-700 hover:text-emerald-400 hover:border-emerald-500/40 hover:bg-emerald-500/5"
+                    activeClass="bg-emerald-950 text-emerald-400 border-emerald-500/30"
+                    inactiveClass="text-zinc-500 border-zinc-700/50 hover:text-emerald-400 hover:border-emerald-500/40 hover:bg-emerald-500/5"
                     onClick={() => updateStatus(proposal.id, "won")}
                   />
                   <ActionButton
                     label="Lost"
                     active={proposal.status === "lost"}
                     disabled={isUpdating}
-                    activeClass="bg-red-500/20 text-red-400 border-red-500/30"
-                    inactiveClass="text-zinc-500 border-zinc-700 hover:text-red-400 hover:border-red-500/40 hover:bg-red-500/5"
+                    activeClass="bg-red-950 text-red-400 border-red-500/30"
+                    inactiveClass="text-zinc-500 border-zinc-700/50 hover:text-red-400 hover:border-red-500/40 hover:bg-red-500/5"
                     onClick={() => updateStatus(proposal.id, "lost")}
                   />
                   <ActionButton
                     label="Reset"
                     active={proposal.status === "pending"}
                     disabled={isUpdating}
-                    activeClass="bg-zinc-700/60 text-zinc-300 border-zinc-600"
-                    inactiveClass="text-zinc-600 border-zinc-800 hover:text-zinc-400 hover:border-zinc-700 hover:bg-zinc-800/50"
+                    activeClass="bg-zinc-800 text-zinc-300 border-zinc-600"
+                    inactiveClass="text-zinc-600 border-zinc-800/80 hover:text-zinc-400 hover:border-zinc-700 hover:bg-zinc-800/50"
                     onClick={() => updateStatus(proposal.id, "pending")}
                   />
                 </div>

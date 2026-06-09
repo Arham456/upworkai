@@ -119,10 +119,13 @@ export default async function DashboardPage() {
     <div className="flex h-screen bg-[#0a0a0a] overflow-hidden">
       <Sidebar />
 
-      <main className="flex-1 overflow-y-auto pt-14 md:pt-0">
+      <main
+        className="flex-1 overflow-y-auto pt-14 md:pt-0"
+        style={{ backgroundImage: "radial-gradient(circle at 1px 1px, rgba(139,92,246,0.05) 1px, transparent 0)", backgroundSize: "28px 28px" }}
+      >
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-8">
           <div>
-            <h1 className="text-2xl font-bold text-white tracking-tight">
+            <h1 className="text-3xl font-black text-white tracking-tight">
               {greeting}, {firstName}
             </h1>
             <p className="text-zinc-500 mt-1 text-sm">
@@ -131,7 +134,7 @@ export default async function DashboardPage() {
           </div>
 
           {isNewUser ? (
-            <div className="rounded-xl border border-zinc-800 bg-[#111111] p-10 flex flex-col items-center text-center space-y-5">
+            <div className="rounded-2xl border border-zinc-800 bg-gradient-to-br from-violet-950/10 to-[#111111] p-10 flex flex-col items-center text-center space-y-5">
               <div className="w-14 h-14 rounded-2xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center">
                 <BarChart2 className="w-7 h-7 text-violet-400" />
               </div>
@@ -269,7 +272,7 @@ export default async function DashboardPage() {
           )}
 
           {/* Get started / You're all set */}
-          <div className="rounded-xl border border-zinc-800 bg-[#111111] p-6 border-l-[3px] border-l-violet-500">
+          <div className="rounded-2xl border border-violet-500/20 bg-gradient-to-br from-violet-950/15 to-[#111111] p-6 shadow-[0_0_40px_rgba(124,58,237,0.05)]">
             <div className="flex items-start gap-4">
               <div className="p-3 rounded-xl bg-violet-500/10 shrink-0">
                 {allDone ? (
@@ -366,18 +369,16 @@ export default async function DashboardPage() {
               {steps.map(({ step, label, done }) => (
                 <div
                   key={step}
-                  className="flex items-center gap-3 rounded-lg border border-zinc-800 bg-[#0a0a0a]/50 px-4 py-3"
+                  className="flex items-center gap-3 rounded-xl border border-zinc-800/80 bg-[#0a0a0a]/60 px-4 py-3"
                 >
-                  <span
-                    className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
-                      done
-                        ? "bg-violet-600 text-white"
-                        : "border border-zinc-700 text-zinc-500"
-                    }`}
-                  >
-                    {done ? "✓" : step}
-                  </span>
-                  <span className={`text-sm ${done ? "text-white" : "text-zinc-400"}`}>
+                  {done ? (
+                    <CheckCircle2 className="w-6 h-6 text-violet-500 shrink-0" />
+                  ) : (
+                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-zinc-700 text-xs font-bold text-zinc-500">
+                      {step}
+                    </span>
+                  )}
+                  <span className={`text-sm font-medium ${done ? "text-white" : "text-zinc-500"}`}>
                     {label}
                   </span>
                 </div>

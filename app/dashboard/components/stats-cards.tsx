@@ -28,7 +28,8 @@ export function StatsCards({ totalProposals, winRate, jobsAnalyzed, connectsSave
       icon: FileText,
       iconClass: "text-violet-400",
       iconBg: "bg-violet-500/10",
-      borderHover: "hover:border-violet-500/25",
+      cardGradient: "bg-gradient-to-br from-violet-950/30 to-[#111111]",
+      cardBorder: "border-violet-500/20 hover:border-violet-500/30",
     },
     {
       label: "Win Rate",
@@ -36,7 +37,8 @@ export function StatsCards({ totalProposals, winRate, jobsAnalyzed, connectsSave
       icon: Target,
       iconClass: "text-emerald-400",
       iconBg: "bg-emerald-500/10",
-      borderHover: "hover:border-emerald-500/25",
+      cardGradient: "bg-gradient-to-br from-green-950/40 to-[#111111]",
+      cardBorder: "border-green-900/50 hover:border-green-700/40",
     },
     {
       label: "Connects Saved",
@@ -44,7 +46,8 @@ export function StatsCards({ totalProposals, winRate, jobsAnalyzed, connectsSave
       icon: Zap,
       iconClass: "text-amber-400",
       iconBg: "bg-amber-500/10",
-      borderHover: "hover:border-amber-500/25",
+      cardGradient: "bg-gradient-to-br from-amber-950/30 to-[#111111]",
+      cardBorder: "border-amber-900/50 hover:border-amber-700/40",
     },
     {
       label: "Jobs Analyzed",
@@ -52,7 +55,8 @@ export function StatsCards({ totalProposals, winRate, jobsAnalyzed, connectsSave
       icon: Search,
       iconClass: "text-blue-400",
       iconBg: "bg-blue-500/10",
-      borderHover: "hover:border-blue-500/25",
+      cardGradient: "bg-gradient-to-br from-blue-950/30 to-[#111111]",
+      cardBorder: "border-blue-900/50 hover:border-blue-700/40",
     },
   ];
 
@@ -63,19 +67,19 @@ export function StatsCards({ totalProposals, winRate, jobsAnalyzed, connectsSave
       animate="visible"
       className="grid grid-cols-2 xl:grid-cols-4 gap-4"
     >
-      {cards.map(({ label, value, icon: Icon, iconClass, iconBg, borderHover }) => (
+      {cards.map(({ label, value, icon: Icon, iconClass, iconBg, cardGradient, cardBorder }) => (
         <motion.div
           key={label}
           variants={item}
-          className={`rounded-xl border border-zinc-800 bg-[#111111] p-5 flex flex-col gap-3 transition-colors ${borderHover}`}
+          className={`rounded-2xl border p-6 flex flex-col gap-4 transition-all ${cardGradient} ${cardBorder}`}
         >
           <div className="flex items-center justify-between">
-            <span className="text-sm text-zinc-500">{label}</span>
-            <span className={`p-2 rounded-lg ${iconBg}`}>
-              <Icon className={`w-4 h-4 ${iconClass}`} />
+            <span className="text-sm font-medium text-zinc-500">{label}</span>
+            <span className={`p-2.5 rounded-xl ${iconBg}`}>
+              <Icon className={`w-5 h-5 ${iconClass}`} />
             </span>
           </div>
-          <p className="text-3xl font-bold text-white tabular-nums">{value}</p>
+          <p className="text-4xl font-black text-white tabular-nums tracking-tight">{value}</p>
         </motion.div>
       ))}
     </motion.div>

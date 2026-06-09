@@ -102,7 +102,7 @@ function IntelStat({
   value: string;
 }) {
   return (
-    <div className="flex flex-col gap-1 rounded-lg bg-zinc-800/50 px-3 py-2.5">
+    <div className="flex flex-col gap-1 rounded-xl bg-zinc-800/50 border border-zinc-700/30 px-3 py-2.5">
       <div className="flex items-center gap-1.5 text-[10px] font-medium text-zinc-500 uppercase tracking-wide">
         <Icon className="w-3 h-3" />
         {label}
@@ -151,7 +151,7 @@ function ClientProfileInput({
         onChange={(e) => onChange(e.target.value)}
         placeholder="https://www.upwork.com/companies/~..."
         disabled={disabled}
-        className="w-full rounded-lg border border-zinc-800 bg-[#0a0a0a] px-4 py-2.5 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-violet-500 transition-colors disabled:opacity-50"
+        className="w-full rounded-xl border border-zinc-800 bg-[#0a0a0a] px-4 py-2.5 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-violet-500/50 focus:shadow-[0_0_0_1px_rgba(139,92,246,0.2),0_0_24px_rgba(139,92,246,0.08)] transition-all disabled:opacity-50"
       />
     </div>
   );
@@ -261,17 +261,30 @@ export function Personalizer({ profile }: { profile: Profile }) {
   return (
     <div className="space-y-6">
 
-      {/* ── Input card ─────────────────────────────────────────────────────── */}
-      <div className="rounded-xl border border-zinc-800 bg-[#111111] p-6 space-y-5">
+      {/* ── Hero header ─────────────────────────────────────────────────────── */}
+      <div className="text-center space-y-3 pb-2">
+        <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-500/20 to-violet-600/[0.08] border border-violet-500/20 shadow-[0_0_30px_rgba(124,58,237,0.12)]">
+          <Sparkles className="w-6 h-6 text-violet-400" />
+        </div>
+        <h1 className="text-2xl font-black text-white tracking-tight">
+          Write a proposal that speaks to this client&apos;s psychology
+        </h1>
+        <p className="text-zinc-400 text-sm max-w-md mx-auto leading-relaxed">
+          Paste the job description — we research the client, analyze their patterns, and write a proposal tailored to win them.
+        </p>
+      </div>
 
-        {/* Mode toggle tabs */}
-        <div className="flex rounded-lg border border-zinc-800 bg-[#0a0a0a] p-0.5 gap-0.5">
+      {/* ── Input card ─────────────────────────────────────────────────────── */}
+      <div className="rounded-2xl border border-zinc-800 bg-[#111111] p-6 space-y-5">
+
+        {/* Mode toggle tabs — pill style */}
+        <div className="flex rounded-full border border-zinc-800 bg-[#0a0a0a] p-1 gap-1">
           <button
             type="button"
             onClick={() => handleModeSwitch("url")}
-            className={`flex flex-1 items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+            className={`flex flex-1 items-center justify-center gap-2 rounded-full px-5 py-2 text-sm font-medium transition-all ${
               mode === "url"
-                ? "bg-[#111111] text-white shadow-sm"
+                ? "bg-violet-500/10 text-violet-300 border border-violet-500/25"
                 : "text-zinc-500 hover:text-zinc-300"
             }`}
           >
@@ -281,9 +294,9 @@ export function Personalizer({ profile }: { profile: Profile }) {
           <button
             type="button"
             onClick={() => handleModeSwitch("paste")}
-            className={`flex flex-1 items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+            className={`flex flex-1 items-center justify-center gap-2 rounded-full px-5 py-2 text-sm font-medium transition-all ${
               mode === "paste"
-                ? "bg-[#111111] text-white shadow-sm"
+                ? "bg-violet-500/10 text-violet-300 border border-violet-500/25"
                 : "text-zinc-500 hover:text-zinc-300"
             }`}
           >
@@ -309,7 +322,7 @@ export function Personalizer({ profile }: { profile: Profile }) {
                   onKeyDown={(e) => e.key === "Enter" && handlePersonalize()}
                   placeholder="https://www.upwork.com/jobs/~..."
                   disabled={loading}
-                  className="w-full rounded-lg border border-zinc-800 bg-[#0a0a0a] pl-10 pr-4 py-2.5 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-violet-500 transition-colors disabled:opacity-50"
+                  className="w-full rounded-xl border border-zinc-800 bg-[#0a0a0a] pl-10 pr-4 py-2.5 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-violet-500/50 focus:shadow-[0_0_0_1px_rgba(139,92,246,0.2),0_0_24px_rgba(139,92,246,0.08)] transition-all disabled:opacity-50"
                 />
               </div>
             </div>
@@ -352,7 +365,7 @@ export function Personalizer({ profile }: { profile: Profile }) {
                 placeholder="Paste the full job description here — title, requirements, budget, everything the client wrote..."
                 disabled={loading}
                 rows={8}
-                className="w-full rounded-lg border border-zinc-800 bg-[#0a0a0a] px-4 py-3 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-violet-500 transition-colors disabled:opacity-50 resize-y leading-relaxed"
+                className="w-full rounded-xl border border-zinc-800 bg-[#0a0a0a] px-4 py-3 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-violet-500/50 focus:shadow-[0_0_0_1px_rgba(139,92,246,0.2),0_0_24px_rgba(139,92,246,0.08)] transition-all disabled:opacity-50 resize-y leading-relaxed"
                 style={{ minHeight: "200px" }}
               />
               {jobDescription.length > 0 && jobDescription.trim().length < 50 && (
@@ -379,7 +392,7 @@ export function Personalizer({ profile }: { profile: Profile }) {
         <button
           onClick={handlePersonalize}
           disabled={loading || !canSubmit}
-          className="flex w-full items-center justify-center gap-2 rounded-lg bg-violet-600 hover:bg-violet-700 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-violet-500 hover:from-violet-500 hover:to-violet-400 px-5 py-3 text-sm font-semibold text-white shadow-[0_0_20px_rgba(124,58,237,0.3)] hover:shadow-[0_0_30px_rgba(124,58,237,0.4)] disabled:opacity-50 disabled:cursor-not-allowed transition-all"
         >
           {loading ? (
             <>
@@ -473,7 +486,7 @@ export function Personalizer({ profile }: { profile: Profile }) {
             className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start"
           >
             {/* LEFT — Client Intelligence */}
-            <div className="rounded-xl border border-zinc-800 bg-[#111111] p-5 space-y-4">
+            <div className="rounded-xl border border-violet-500/20 bg-gradient-to-br from-violet-950/20 to-[#111111] p-5 space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-xs font-medium text-blue-400 uppercase tracking-wide">
                   <Brain className="w-3.5 h-3.5" />
@@ -562,7 +575,7 @@ export function Personalizer({ profile }: { profile: Profile }) {
                       {result.clientIntelligence.recent_reviews.map((review, i) => (
                         <blockquote
                           key={i}
-                          className="rounded-lg bg-zinc-800/50 border-l-2 border-violet-500/40 px-3 py-2.5 text-xs text-zinc-300 leading-relaxed italic"
+                          className="rounded-lg bg-zinc-800/40 border-l-[3px] border-l-violet-500/50 px-3 py-2.5 text-xs text-zinc-300 leading-relaxed italic"
                         >
                           &ldquo;{review}&rdquo;
                         </blockquote>
@@ -573,7 +586,7 @@ export function Personalizer({ profile }: { profile: Profile }) {
             </div>
 
             {/* RIGHT — Generated proposal */}
-            <div className="rounded-xl border border-zinc-800 bg-[#111111] p-5 space-y-3 flex flex-col">
+            <div className="rounded-xl border border-zinc-800 bg-[#111111] p-5 space-y-3 flex flex-col shadow-[0_0_30px_rgba(124,58,237,0.05)]">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-xs font-medium text-violet-400 uppercase tracking-wide">
                   <Sparkles className="w-3.5 h-3.5" />
@@ -581,16 +594,20 @@ export function Personalizer({ profile }: { profile: Profile }) {
                 </div>
                 <button
                   onClick={handleCopy}
-                  className="flex items-center gap-1.5 rounded-lg border border-zinc-700 px-3 py-1.5 text-xs font-medium text-zinc-400 hover:text-white hover:border-zinc-600 transition-colors"
+                  className={`flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition-all ${
+                    copied
+                      ? "bg-emerald-950 border border-emerald-500/30 text-emerald-400"
+                      : "bg-violet-500/10 border border-violet-500/25 text-violet-400 hover:bg-violet-500/15 hover:border-violet-500/40 hover:text-violet-300"
+                  }`}
                 >
                   {copied ? (
                     <>
-                      <Check className="w-3 h-3 text-emerald-400" />
-                      <span className="text-emerald-400">Copied</span>
+                      <Check className="w-3.5 h-3.5" />
+                      Copied
                     </>
                   ) : (
                     <>
-                      <Copy className="w-3 h-3" />
+                      <Copy className="w-3.5 h-3.5" />
                       Copy
                     </>
                   )}
@@ -600,7 +617,7 @@ export function Personalizer({ profile }: { profile: Profile }) {
               <textarea
                 readOnly
                 value={result.proposal}
-                className="w-full min-h-[420px] rounded-lg border border-zinc-800 bg-[#0a0a0a] px-4 py-3 text-sm text-zinc-200 resize-y focus:outline-none focus:border-violet-500 transition-colors leading-relaxed"
+                className="w-full min-h-[420px] rounded-xl border border-zinc-800 bg-[#0a0a0a] px-4 py-3 text-sm text-zinc-200 resize-y focus:outline-none focus:border-violet-500/50 focus:shadow-[0_0_0_1px_rgba(139,92,246,0.2),0_0_24px_rgba(139,92,246,0.08)] transition-all leading-relaxed"
               />
 
               <p className="text-[11px] text-zinc-600">

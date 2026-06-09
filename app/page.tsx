@@ -210,8 +210,8 @@ export default function Home() {
       {/* Violet ambient glow */}
       <div
         aria-hidden
-        className="fixed top-[-20%] left-1/2 -translate-x-1/2 w-[700px] h-[500px] rounded-full pointer-events-none z-0"
-        style={{ background: "radial-gradient(ellipse, rgba(124,58,237,0.08) 0%, transparent 70%)" }}
+        className="fixed top-[-20%] left-1/2 -translate-x-1/2 w-[900px] h-[600px] rounded-full pointer-events-none z-0"
+        style={{ background: "radial-gradient(ellipse, rgba(124,58,237,0.14) 0%, transparent 70%)" }}
       />
 
       <div className="relative z-10">
@@ -250,8 +250,7 @@ export default function Home() {
                   initial={{ opacity: 0, y: 24 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.7, ease }}
-                  className="font-bold tracking-tight"
-                  style={{ fontSize: "clamp(40px, 5vw, 72px)", lineHeight: 1.05 }}
+                  className="font-black tracking-tight text-5xl sm:text-6xl md:text-7xl leading-[1.02]"
                 >
                   <span className="text-white block">Stop Losing Jobs</span>
                   <span className="block bg-gradient-to-r from-violet-400 to-purple-500 bg-clip-text text-transparent">
@@ -281,7 +280,9 @@ export default function Home() {
                     "Score jobs before wasting connects",
                   ].map((point) => (
                     <li key={point} className="flex items-center gap-3 text-sm text-zinc-300">
-                      <span className="text-violet-400 font-bold text-base leading-none shrink-0">&#8594;</span>
+                      <span className="flex items-center justify-center w-5 h-5 rounded-full bg-violet-500/20 border border-violet-500/30 shrink-0">
+                        <Check className="w-2.5 h-2.5 text-violet-400" />
+                      </span>
                       {point}
                     </li>
                   ))}
@@ -452,7 +453,7 @@ export default function Home() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.7, delay: 0.1 }}
-            className="relative rounded-2xl border border-zinc-800 bg-[#111111] overflow-hidden shadow-[0_0_60px_rgba(124,58,237,0.07)]"
+            className="relative rounded-2xl border border-zinc-800 bg-[#111111] overflow-hidden shadow-[0_0_80px_rgba(124,58,237,0.12)]"
           >
             {/* Subtle violet glow */}
             <div
@@ -817,7 +818,7 @@ export default function Home() {
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1, duration: 0.6 }}
                 whileHover={{ scale: 1.02 }}
-                className="relative rounded-xl border border-zinc-800 bg-[#111111] p-6 space-y-4 hover:border-violet-500/40 hover:-translate-y-0.5 transition-all duration-300 cursor-default"
+                className="relative rounded-xl border border-zinc-800 bg-[#111111] p-6 space-y-4 hover:border-violet-500/40 hover:-translate-y-2 hover:shadow-[0_0_30px_rgba(124,58,237,0.08)] transition-all duration-300 cursor-default"
               >
                 {badge && (
                   <div className="absolute -top-3 left-6">
@@ -826,8 +827,8 @@ export default function Home() {
                     </span>
                   </div>
                 )}
-                <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-violet-500/20 to-violet-600/[0.08] border border-violet-500/20 flex items-center justify-center">
-                  <Icon className="w-5 h-5 text-violet-400" />
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-500/20 to-violet-600/[0.08] border border-violet-500/20 flex items-center justify-center shadow-[0_0_20px_rgba(124,58,237,0.12)]">
+                  <Icon className="w-6 h-6 text-violet-400" />
                 </div>
                 <div>
                   <h3 className="text-base font-semibold text-white mb-1.5">{title}</h3>
@@ -880,8 +881,8 @@ export default function Home() {
                       </div>
                     </th>
                   ))}
-                  <th className="pb-4 px-2 text-center w-[16%]">
-                    <div className="flex flex-col items-center gap-0.5">
+                  <th className="pb-4 px-2 text-center w-[16%] rounded-t-xl bg-violet-500/[0.04]">
+                    <div className="flex flex-col items-center gap-0.5 py-2">
                       <span className="text-[9px] bg-violet-600 text-white font-bold px-2.5 py-0.5 rounded-full leading-[18px] tracking-wide uppercase">
                         Best Value
                       </span>
@@ -920,7 +921,7 @@ export default function Home() {
                           {isPrice ? (
                             <span className="text-sm text-zinc-500 font-medium">{comp.price}</span>
                           ) : (
-                            <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-red-500/10">
+                            <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-red-950 border border-red-500/25">
                               <X className="w-3 h-3 text-red-400" />
                             </span>
                           )}
@@ -931,8 +932,8 @@ export default function Home() {
                         {isPrice ? (
                           <span className="relative text-sm font-bold text-violet-400">$20/mo</span>
                         ) : (
-                          <span className="relative inline-flex items-center justify-center w-6 h-6 rounded-full bg-violet-500/15">
-                            <Check className="w-3 h-3 text-violet-400" />
+                          <span className="relative inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-950 border border-green-500/30">
+                            <Check className="w-3 h-3 text-green-400" />
                           </span>
                         )}
                       </td>
@@ -1093,7 +1094,7 @@ export default function Home() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="relative rounded-2xl border border-zinc-800 bg-[#111111] p-12 sm:p-16 text-center space-y-7 overflow-hidden"
+            className="relative rounded-2xl border border-zinc-800/60 bg-[#111111] p-12 sm:p-16 text-center space-y-7 overflow-hidden shadow-[0_0_80px_rgba(124,58,237,0.08)]"
           >
             <div className="absolute inset-0 bg-gradient-to-b from-violet-600/5 to-transparent pointer-events-none" />
             <div
